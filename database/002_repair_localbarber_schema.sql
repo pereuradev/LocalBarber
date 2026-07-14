@@ -85,32 +85,9 @@ where nome is null
    or trim(papel) = ''
    or ativo is null;
 
--- Garante um usuario admin para barbearias que possuem email.
--- Senha inicial: 123456. O PHP consegue validar esse hash com password_verify().
-insert into locaalbarber.usuarios (barbearia_id, nome, email, telefone, senha_hash, papel, ativo)
-select
-  b.id,
-  coalesce(nullif(trim(b.nome_fantasia), ''), 'Administrador'),
-  lower(trim(b.email)),
-  b.telefone,
-  crypt('123456', gen_salt('bf')),
-  'admin',
-  true
-from locaalbarber.barbearias b
-where b.email is not null
-  and trim(b.email) <> ''
-  and not exists (
-    select 1
-    from locaalbarber.usuarios u
-    where lower(u.email) = lower(b.email)
-  );
-
--- Corrige usuarios sem senha, incluindo o usuario demo do seed antigo.
-update locaalbarber.usuarios
-set senha_hash = crypt('123456', gen_salt('bf'))
-where ativo = true
-  and email is not null
-  and (senha_hash is null or trim(senha_hash) = '');
+-- Por seguranca, esta migracao nao cria usuarios com senha padrao.
+-- Crie o administrador pelo formulario cadastro-empresa.php, que gera um hash
+-- exclusivo com password_hash(), ou defina a senha por um fluxo administrativo.
 
 -- Indices usados pelo login/cadastro. Os unicos case-insensitive so sao criados
 -- quando nao ha duplicados; assim o reparo nao quebra bancos que ja tenham dados.

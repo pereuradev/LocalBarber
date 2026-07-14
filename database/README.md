@@ -1,80 +1,49 @@
 # Banco de dados LocalBarber
 
-Este diretorio guarda a migracao inicial do schema `locaalbarber` do TCC.
+Este diretório contém as migrações do schema `locaalbarber` usado pelo TCC. O banco principal é PostgreSQL hospedado no Supabase; as tabelas da aplicação ficam isoladas nesse schema.
 
-No Supabase, o banco principal do projeto continua sendo o Postgres gerenciado pelo projeto. O nome `locaalbarber` foi criado como schema, que e onde ficam as tabelas do sistema.
+## Arquivos
 
-- `001_create_localbarber_schema.sql`
-- `002_repair_localbarber_schema.sql`
+- `001_create_localbarber_schema.sql`: cria a estrutura inicial do banco;
+- `002_repair_localbarber_schema.sql`: completa e corrige um banco existente sem apagar os dados.
 
-Ela cria as tabelas principais do sistema dentro do schema `locaalbarber`:
+## Estrutura criada
 
-- `barbearias`
-- `enderecos_barbearia`
-- `usuarios`
-- `clientes`
-- `categorias_servico`
-- `servicos`
-- `funcionarios`
-- `funcionario_servicos`
-- `horarios_funcionamento`
-- `redes_sociais`
-- `agendamentos`
-- `caixas`
-- `categorias_financeiras`
-- `transacoes`
-- `produtos_estoque`
-- `movimentacoes_estoque`
-- `avaliacoes`
-- `notificacoes`
+As migrações incluem as tabelas:
 
-Tambem cria views para dashboard/faturamento:
+- `barbearias`;
+- `enderecos_barbearia`;
+- `usuarios`;
+- `clientes`;
+- `categorias_servico`;
+- `servicos`;
+- `funcionarios`;
+- `funcionario_servicos`;
+- `horarios_funcionamento`;
+- `redes_sociais`;
+- `agendamentos`;
+- `caixas`;
+- `categorias_financeiras`;
+- `transacoes`;
+- `produtos_estoque`;
+- `movimentacoes_estoque`;
+- `avaliacoes`;
+- `notificacoes`.
 
-- `vw_faturamento_diario`
-- `vw_rank_servicos`
-- `vw_clientes_resumo`
-
-O arquivo `002_repair_localbarber_schema.sql` deve ser usado quando o banco ja
-existe e precisa ser corrigido sem apagar dados. Ele:
-
-- completa colunas essenciais usadas por cadastro e login;
-- garante usuario admin com senha hash para barbearias que tenham email;
-- corrige usuarios ativos sem senha;
-- cria indices auxiliares para email/documento;
-- recria triggers de `updated_at`;
-- adiciona as views `vw_dashboard_resumo` e `vw_agenda_dia`.
+Também são criadas views de apoio ao dashboard, à agenda e ao faturamento.
 
 ## Como aplicar no Supabase
 
 1. Abra o projeto no Supabase.
-2. Va em `SQL Editor`.
-3. Abra o arquivo `database/001_create_localbarber_schema.sql`.
-4. Copie o conteudo inteiro.
-5. Cole no SQL Editor e clique em `Run`.
+2. Entre no **SQL Editor**.
+3. Copie todo o conteúdo de `001_create_localbarber_schema.sql`.
+4. Execute o script.
+5. Para corrigir um banco já existente, execute depois `002_repair_localbarber_schema.sql`.
 
-Para corrigir um banco que ja foi criado, rode depois o arquivo:
+Por segurança, a migração de reparo não cria usuários com senha padrão. Crie o primeiro administrador pelo formulário `cadastro-empresa.php`, que gera a senha com `password_hash()`.
 
-```txt
-database/002_repair_localbarber_schema.sql
-```
+## Configuração da conexão
 
-Senha inicial dos usuarios admin criados/corrigidos pelo reparo: `123456`.
+Os dados reais da conexão devem existir somente no arquivo `.env` localizado na raiz do projeto. Use `../.env.example` como modelo e nunca envie o `.env` ao GitHub.
 
-## Observacao sobre conexao local
-
-O host direto do Supabase costuma usar IPv6:
-
-```txt
-db.rkxqylhrwyxuockhsoad.supabase.co
-```
-
-Se a rede local for apenas IPv4, use a connection string `Session pooler` do Supabase Dashboard e configure estas variaveis antes de rodar o PHP:
-
-```txt
-SUPABASE_DB_HOST=aws-0-SUA-REGIAO.pooler.supabase.com
-SUPABASE_DB_PORT=5432
-SUPABASE_DB_NAME=postgres
-SUPABASE_DB_USER=postgres.rkxqylhrwyxuockhsoad
-SUPABASE_DB_PASSWORD=sua-senha-do-banco
-SUPABASE_DB_SCHEMA=locaalbarber
-```
+Quando a rede local não oferecer IPv6, use os dados de **Session Pooler** exibidos no painel do seu próprio projeto Supabase.

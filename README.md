@@ -56,8 +56,11 @@ O projeto está em fase de protótipo funcional para o TCC.
 
 ```text
 LocalBarber/
+|-- .env.example              # Modelo público das variáveis de ambiente
+|-- .gitignore                # Impede o envio de credenciais locais
+|-- .htaccess                 # Protege arquivos ocultos no Apache
 |-- auth/                     # Login e encerramento de sessão
-|-- config/                   # Conexão PDO com o PostgreSQL
+|-- config/                   # Carregamento do .env e conexão PDO
 |-- css/                      # Estilos de cada tela e responsividade global
 |-- database/                 # Criação e reparo do schema do banco
 |-- js/                       # Tema e paleta de comandos
@@ -125,7 +128,13 @@ Mais detalhes estão em [`database/README.md`](database/README.md).
 
 ### 4. Configure a conexão
 
-O arquivo `config/database.php` lê as seguintes variáveis de ambiente:
+Crie o arquivo local `.env` a partir do modelo público:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Preencha o novo `.env` com os dados exibidos na seção de conexão do seu projeto Supabase. O arquivo `config/database.php` lê as seguintes variáveis:
 
 | Variável | Finalidade |
 | --- | --- |
@@ -138,17 +147,17 @@ O arquivo `config/database.php` lê as seguintes variáveis de ambiente:
 
 Use o Session Pooler quando a rede local não oferecer suporte a IPv6.
 
-> Não publique senhas ou credenciais reais. Antes de enviar o projeto para um repositório público, remova qualquer credencial padrão de `config/database.php` e forneça a senha somente pela variável `SUPABASE_DB_PASSWORD`.
+> O `.env` contém credenciais reais e está bloqueado pelo `.gitignore`. Publique somente o `.env.example`, que contém valores de exemplo.
 
 ### 5. Execute o sistema
 
 Com o Apache iniciado, acesse:
 
 ```text
-http://localhost:8080/LocalBarber/pagina-inicial.html
+http://localhost:8080/LocalBarber/
 ```
 
-Neste computador, o Apache do XAMPP está configurado na porta `8080`. Em outra instalação, a URL pode ser `http://localhost/LocalBarber/pagina-inicial.html`.
+Neste computador, o Apache do XAMPP está configurado na porta `8080`. Em outra instalação, a URL pode ser `http://localhost/LocalBarber/`.
 
 ## Fluxo principal
 
@@ -162,7 +171,6 @@ Neste computador, o Apache do XAMPP está configurado na porta `8080`. Em outra 
 
 - conectar agenda, clientes, serviços, equipe e financeiro ao banco;
 - substituir os dados demonstrativos das telas por consultas e APIs PHP;
-- remover credenciais padrão do código antes da publicação;
 - adicionar validação e proteção CSRF aos formulários;
 - criar testes automatizados para cadastro, login e regras financeiras;
 - padronizar os títulos e metadados de todas as páginas;
@@ -171,4 +179,3 @@ Neste computador, o Apache do XAMPP está configurado na porta `8080`. Em outra 
 ## Documentação complementar
 
 A descrição acadêmica e os textos curtos de apresentação estão em [`DESCRICAO_DO_PROJETO.md`](DESCRICAO_DO_PROJETO.md).
-

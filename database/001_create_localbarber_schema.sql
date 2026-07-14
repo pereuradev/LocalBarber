@@ -455,18 +455,8 @@ on conflict (barbearia_id) do update set
   uf = excluded.uf,
   pais = excluded.pais;
 
-with b as (
-  select id from locaalbarber.barbearias where documento = '12.345.678/0001-90'
-)
-insert into locaalbarber.usuarios (barbearia_id, nome, email, telefone, senha_hash, papel)
-select id, 'Joao Rafael Silva', 'joao@localbarber.com.br', '(11) 9 9123-4567', crypt('123456', gen_salt('bf')), 'admin'
-from b
-on conflict (email) do update set
-  nome = excluded.nome,
-  telefone = excluded.telefone,
-  senha_hash = coalesce(nullif(locaalbarber.usuarios.senha_hash, ''), excluded.senha_hash),
-  papel = excluded.papel,
-  ativo = true;
+-- O seed nao cria usuario com senha conhecida. Crie o administrador pelo
+-- formulario cadastro-empresa.php, que gera um hash exclusivo para cada senha.
 
 with b as (
   select id from locaalbarber.barbearias where documento = '12.345.678/0001-90'
