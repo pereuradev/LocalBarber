@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <script src="js/theme-init.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/agenda.css">
+  <link rel="stylesheet" href="css/responsivo.css">
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <img src="Logo-png.png" alt="LocalBarber">
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Principal</div>
+
+    <a class="nav-item" href="dashboard.php">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </a>
+
+    <a class="nav-item active" href="agenda.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Agenda</span>
+    </a>
+
+    <a class="nav-item" href="clientes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Clientes</span>
+    </a>
+
+    <a class="nav-item" href="servicos.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Serviços</span>
+    </a>
+
+    <div class="nav-group-label">Financeiro</div>
+
+    <a class="nav-item" href="faturamento.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Faturamento</span>  
+    </a>
+
+    <a class="nav-item" href="transacoes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <span>Transações</span>
+    </a>
+
+    <div class="nav-group-label">Gestão</div>
+
+    <a class="nav-item" href="equipe.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Equipe</span>
+    </a>
+
+    <div class="nav-group-label">Configurações</div>
+
+    <a class="nav-item" href="minha-barbearia.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Minha Barbearia</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="user-avatar">JR</div>
+      <div class="user-info">
+        <p>João Rafael</p>
+        <span>Administrador</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">Agenda</div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date"></div>
+      <button class="btn-primary" onclick="openNewAppt()">
+       
+        Novo Agendamento
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <div class="panel" id="calPanel">
+
+      <!-- TOOLBAR -->
+      <div class="panel-header">
+        <div class="toolbar">
+          <div class="week-nav">
+            <button class="nav-arrow" id="prevBtn" title="Semana anterior">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="week-label" id="weekLabel"></span>
+            <button class="nav-arrow" id="nextBtn" title="Próxima semana">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <button class="nav-arrow" id="todayBtn" title="Hoje" style="width:auto;padding:0 12px;font-size:.76rem;font-weight:700;color:var(--gold);">Hoje</button>
+        </div>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <span class="filter-label">Filtros:</span>
+        <select class="filter-select" id="filterBarbeiro">
+          <option value="">Todos os Barbeiros</option>
+          <option>João Rafael</option>
+          <option>Carlos Melo</option>
+          <option>Felipe Santos</option>
+        </select>
+        <select class="filter-select" id="filterStatus">
+          <option value="">Todos os Status</option>
+          <option>Confirmado</option>
+          <option>Pendente</option>
+          <option>Concluído</option>
+        </select>
+        <select class="filter-select" id="filterServico">
+          <option value="">Todos os Serviços</option>
+          <option>Corte Simples</option>
+          <option>Corte + Barba</option>
+          <option>Barba Completa</option>
+          <option>Degradê + Barba</option>
+        </select>
+      </div>
+
+      <!-- CALENDAR GRID -->
+      <div class="calendar-wrap">
+        <div class="calendar-grid" id="calGrid">
+          <!-- Built by JS -->
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ── MODAL NOVO AGENDAMENTO ── -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModal(event)">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="fecharModal()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="modal-header">
+      <div class="modal-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div>
+        <h2 class="modal-title">Novo Agendamento</h2>
+        <p class="modal-subtitle">Preencha os dados para criar um agendamento</p>
+      </div>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Cliente</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <input class="form-input" type="text" placeholder="Nome do cliente" id="m-cliente"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.26h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.86a16 16 0 0 0 6.29 6.29l1.87-1.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <input class="form-input" type="text" placeholder="(11) 9 0000-0000" id="m-telefone"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Serviço</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <select class="form-input form-select" id="m-servico">
+              <option value="">Selecione um serviço</option>
+              <option>Corte Simples</option>
+              <option>Corte + Barba</option>
+              <option>Barba Completa</option>
+              <option>Degradê + Barba</option>
+              <option>Pigmentação</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Barbeiro</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <select class="form-input form-select" id="m-barbeiro">
+              <option value="">Selecione um barbeiro</option>
+              <option>João Rafael</option>
+              <option>Carlos Melo</option>
+              <option>Felipe Santos</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input class="form-input" type="date" id="m-data"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Horário</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <select class="form-input form-select" id="m-horario">
+              <option value="">Selecione um horário</option>
+              <option>08:00</option><option>09:00</option><option>10:00</option>
+              <option>11:00</option><option>12:00</option><option>13:00</option>
+              <option>14:00</option><option>15:00</option><option>16:00</option>
+              <option>17:00</option><option>18:00</option><option>19:00</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:2px">
+        <label class="form-label">Observações <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+        <textarea class="form-input form-textarea" placeholder="Ex: Cliente prefere degradê baixo…" id="m-obs"></textarea>
+      </div>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-primary" onclick="salvarAgendamento()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirmar Agendamento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLTIP -->
+<div class="appt-tooltip" id="tooltip">
+  <div class="tooltip-name" id="tt-name"></div>
+  <div class="tooltip-row">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <strong id="tt-time"></strong>
+  </div>
+  <div class="tooltip-row">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/></svg>
+    <strong id="tt-svc"></strong>
+  </div>
+  <div class="tooltip-row">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    <strong id="tt-barber"></strong>
+  </div>
+  <div class="tooltip-row" style="margin-top:6px"></div>
+</div>
+
+<script>
+  // ── DATA ──
+  const SERVICES = ['Corte Simples','Corte + Barba','Barba Completa','Degradê + Barba','Pigmentação'];
+  const BARBERS  = ['João Rafael','Carlos Melo','Felipe Santos'];
+  const CLIENTS  = ['Rafael Mendes','Lucas Silva','Pedro Oliveira','Matheus Costa','Bruno Ferreira',
+                    'Gabriel Neves','Henrique Lopes','André Castro','Felipe Rocha','Rodrigo Dias',
+                    'Thiago Nunes','Gustavo Lima','Diego Alves','Leandro Moura','Caio Ribeiro'];
+  const STATUSES = ['confirmed','confirmed','confirmed','pending','done','partial'];
+  const HOURS    = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+
+  // Seeded random so it's stable per load
+  let seed = 42;
+  function rand(max) { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return Math.abs(seed) % max; }
+  function pick(arr) { return arr[rand(arr.length)]; }
+
+  // Build appointments for current week
+  function buildAppts(weekStart) {
+    seed = 42;
+    const appts = {};
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(weekStart);
+      day.setDate(day.getDate() + d);
+      const key = day.toDateString();
+      appts[key] = [];
+      if (d === 6) continue; // Sunday sparse
+      const count = d === 5 ? 8 : (d === 0 ? 4 : 5 + rand(4));
+      const usedHours = new Set();
+      for (let i = 0; i < count; i++) {
+        let h;
+        do { h = pick(HOURS); } while (usedHours.has(h));
+        usedHours.add(h);
+        appts[key].push({
+          client: pick(CLIENTS),
+          service: pick(SERVICES),
+          time: h,
+          barber: pick(BARBERS),
+          status: pick(STATUSES)
+        });
+      }
+      appts[key].sort((a,b) => a.time.localeCompare(b.time));
+    }
+    return appts;
+  }
+
+  // ── STATE ──
+  let currentWeekStart = getMonday(new Date());
+
+  function getMonday(d) {
+    const m = new Date(d);
+    const day = m.getDay();
+    const diff = (day === 0) ? -6 : 1 - day;
+    m.setDate(m.getDate() + diff);
+    m.setHours(0,0,0,0);
+    return m;
+  }
+
+  const DAY_NAMES = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+  const MONTHS_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+  function fmt(d) { return `${d.getDate().toString().padStart(2,'0')} ${MONTHS_PT[d.getMonth()]}`; }
+
+  function renderCalendar() {
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+    const appts = buildAppts(currentWeekStart);
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    // Week label
+    const weekEnd = new Date(currentWeekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    document.getElementById('weekLabel').textContent =
+      `${fmt(currentWeekStart)} – ${fmt(weekEnd)}`;
+
+    // Header row: empty corner + 7 day headers
+    grid.appendChild(Object.assign(document.createElement('div'), { className:'cal-header-empty' }));
+
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(currentWeekStart);
+      day.setDate(day.getDate() + d);
+      const isToday = day.getTime() === today.getTime();
+      const cell = document.createElement('div');
+      cell.className = 'cal-day-header' + (isToday ? ' today' : '');
+      cell.innerHTML = `<div class="cal-day-name">${DAY_NAMES[d]}</div>
+                        <div class="cal-day-num">${day.getDate()}</div>`;
+      grid.appendChild(cell);
+    }
+
+    // Time rows
+    HOURS.forEach(hour => {
+      const timeCell = document.createElement('div');
+      timeCell.className = 'cal-time-label';
+      timeCell.textContent = hour;
+      grid.appendChild(timeCell);
+
+      for (let d = 0; d < 7; d++) {
+        const day = new Date(currentWeekStart);
+        day.setDate(day.getDate() + d);
+        const isToday = day.getTime() === today.getTime();
+        const cell = document.createElement('div');
+        cell.className = 'cal-cell' + (isToday ? ' today-col' : '');
+
+        const dayAppts = (appts[day.toDateString()] || []).filter(a => a.time === hour);
+        dayAppts.forEach(appt => {
+          const block = document.createElement('div');
+          block.className = `appt-block ${appt.status}`;
+          block.innerHTML = `<div class="appt-client">${appt.client.split(' ')[0]}</div>
+                             <div class="appt-svc">${appt.service}</div>`;
+          block.addEventListener('mouseenter', (e) => showTooltip(e, appt));
+          block.addEventListener('mouseleave', hideTooltip);
+          cell.appendChild(block);
+        });
+
+        grid.appendChild(cell);
+      }
+    });
+  }
+
+  // ── TOOLTIP ──
+  const tooltip = document.getElementById('tooltip');
+  function showTooltip(e, appt) {
+    document.getElementById('tt-name').textContent = appt.client;
+    document.getElementById('tt-time').textContent = appt.time;
+    document.getElementById('tt-svc').textContent = appt.service;
+    document.getElementById('tt-barber').textContent = appt.barber;
+    const rect = e.target.getBoundingClientRect();
+    tooltip.style.left = Math.min(rect.right + 10, window.innerWidth - 220) + 'px';
+    tooltip.style.top  = Math.max(rect.top - 10, 10) + 'px';
+    tooltip.classList.add('visible');
+  }
+
+  function hideTooltip() { tooltip.classList.remove('visible'); }
+
+  // ── NAVIGATION ──
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+    renderCalendar();
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+    renderCalendar();
+  });
+
+  document.getElementById('todayBtn').addEventListener('click', () => {
+    currentWeekStart = getMonday(new Date());
+    renderCalendar();
+  });
+
+
+  function openNewAppt() {
+    // Set today as default date
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('m-data').value = today;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function fecharModal(e) {
+    if (e && e.target !== document.getElementById('modalOverlay')) return;
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function salvarAgendamento() {
+    const cliente = document.getElementById('m-cliente').value.trim();
+    const servico = document.getElementById('m-servico').value;
+    const barbeiro = document.getElementById('m-barbeiro').value;
+    const data = document.getElementById('m-data').value;
+    const horario = document.getElementById('m-horario').value;
+    if (!cliente || !servico || !barbeiro || !data || !horario) {
+      // Highlight empty fields
+      ['m-cliente','m-servico','m-barbeiro','m-data','m-horario'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el.value.trim()) { el.style.borderColor = '#dc2626'; el.style.boxShadow = '0 0 0 3px rgba(220,38,38,.1)'; }
+        else { el.style.borderColor = ''; el.style.boxShadow = ''; }
+      });
+      return;
+    }
+    document.getElementById('modalOverlay').classList.remove('open');
+    // Reset form
+    ['m-cliente','m-telefone','m-servico','m-barbeiro','m-data','m-horario','m-obs'].forEach(id => {
+      document.getElementById(id).value = '';
+      document.getElementById(id).style.borderColor = '';
+      document.getElementById(id).style.boxShadow = '';
+    });
+  }
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('open');
+  });
+
+  // ── TOPBAR DATE ──
+  const now = new Date();
+  const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
+  document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR', opts);
+
+  // ── INIT ──
+  renderCalendar();
+
+  // Animate panel
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.panel').forEach(el => obs.observe(el));
+</script>
+
+<script src="js/theme-toggle.js"></script>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <script src="js/theme-init.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/clientes.css">
+  <link rel="stylesheet" href="css/responsivo.css">
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <img src="Logo-png.png" alt="LocalBarber">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Principal</div>
+    <a class="nav-item" href="dashboard.php">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </a>
+    <a class="nav-item" href="agenda.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Agenda</span>
+    </a>
+    <a class="nav-item active" href="clientes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Clientes</span>
+    </a>
+    <a class="nav-item" href="servicos.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Serviços</span>
+    </a>
+    <div class="nav-group-label">Financeiro</div>
+    <a class="nav-item" href="faturamento.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Faturamento</span>
+    </a>
+    <a class="nav-item" href="transacoes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <span>Transações</span>
+    </a>
+    <div class="nav-group-label">Gestão</div>
+    <a class="nav-item" href="equipe.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Equipe</span>
+    </a>
+    <div class="nav-group-label">Configurações</div>
+    <a class="nav-item" href="minha-barbearia.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Minha Barbearia</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="user-avatar">JR</div>
+      <div class="user-info">
+        <p>João Rafael</p>
+        <span>Administrador</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">Clientes</div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date"></div>
+      <button class="btn-primary" onclick="abrirModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Cliente
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        
+        <div class="kpi-label">Total de Clientes</div>
+        <div class="kpi-value">148</div>
+      </div>
+      <div class="kpi-card">
+       
+        <div class="kpi-label">Clientes Recorrentes</div>
+        <div class="kpi-value">94</div>
+      </div>
+      <div class="kpi-card">
+      
+        <div class="kpi-label">Novos este Mês</div>
+        <div class="kpi-value">12</div>
+      </div>
+      <div class="kpi-card">
+        
+        <div class="kpi-label">Ticket Médio</div>
+        <div class="kpi-value">R$&nbsp;58</div>
+      </div>
+    </div>
+
+    <!-- TABLE PANEL -->
+    <div class="panel" id="tablePanel">
+
+      <!-- SEARCH BAR -->
+      <div class="search-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" type="text" placeholder="Buscar por nome, telefone ou e-mail…" id="searchInput" oninput="filtrarTabela()"/>
+        </div>
+        <select class="filter-select" id="filterOrdem" onchange="filtrarTabela()">
+          <option value="">Ordenar por</option>
+          <option value="nome">Nome A–Z</option>
+          <option value="visita">Última Visita</option>
+          <option value="gasto">Maior Gasto</option>
+        </select>
+        <select class="filter-select" id="filterMes" onchange="filtrarTabela()">
+          <option value="">Todos os períodos</option>
+          <option>Este mês</option>
+          <option>Último mês</option>
+          <option>Últimos 3 meses</option>
+        </select>
+        <span class="results-count" id="resultsCount"></span>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <table id="clientesTable">
+          <thead>
+            <tr>
+              <th style="width:40px"><input type="checkbox" id="checkAll" onchange="toggleAll(this)"/></th>
+              <th style="width:46px"></th>
+              <th><div class="th-inner">Nome</div></th>
+              <th><div class="th-inner">Contato</div></th>
+              <th><div class="th-inner">Última Visita</div></th>
+              <th><div class="th-inner">Total Gasto</div></th>
+              <th style="width:110px">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="clientesTbody">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="pagination">
+        <span class="page-info" id="pageInfo"></span>
+        <div class="page-btns" id="pageBtns"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL NOVO CLIENTE ── -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModalOut(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="fecharModal()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="modal-header">
+      <div class="modal-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      </div>
+      <div>
+        <h2 class="modal-title">Novo Cliente</h2>
+        <p class="modal-subtitle">Cadastre um novo cliente na barbearia</p>
+      </div>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome Completo</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <input class="form-input" type="text" placeholder="Ex: João da Silva" id="c-nome"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.26h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.86a16 16 0 0 0 6.29 6.29l1.87-1.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <input class="form-input" type="text" placeholder="(11) 9 0000-0000" id="c-tel"/>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input class="form-input" type="email" placeholder="email@exemplo.com" id="c-email"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cidade</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <input class="form-input" type="text" placeholder="Ex: Jundiaí" id="c-cidade"/>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observações <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="14" height="14" style="top:12px;transform:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <textarea class="form-input" id="c-obs" placeholder="Preferências, alergias…" style="min-height:68px;padding-top:10px;resize:vertical;line-height:1.5"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-primary" onclick="salvarCliente()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Cadastrar Cliente
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── DATA ──
+  const CORES = [
+    'linear-gradient(135deg,#2a52c9,#4169e1)',
+    'linear-gradient(135deg,#7c3aed,#a855f7)',
+    'linear-gradient(135deg,#059669,#10b981)',
+    'linear-gradient(135deg,#d97706,#f59e0b)',
+    'linear-gradient(135deg,#dc2626,#ef4444)',
+    'linear-gradient(135deg,#0891b2,#06b6d4)',
+    'linear-gradient(135deg,#db2777,#ec4899)',
+    'linear-gradient(135deg,#65a30d,#84cc16)',
+  ];
+
+  const CLIENTES_BASE = [
+    { nome:'Rafael Mendes',    email:'rafael@email.com',   tel:'(11) 9 9123-4567', cidade:'Jundiaí',       visita:'13/05/2026', visitas:18, gasto:1240 },
+    { nome:'Lucas Silva',      email:'lucas@email.com',    tel:'(11) 9 8234-5678', cidade:'São Paulo',     visita:'12/05/2026', visitas:9,  gasto:620  },
+    { nome:'Pedro Oliveira',   email:'pedro@email.com',    tel:'(11) 9 7345-6789', cidade:'Campinas',      visita:'10/05/2026', visitas:22, gasto:1540 },
+    { nome:'Matheus Costa',    email:'matheus@email.com',  tel:'(11) 9 6456-7890', cidade:'Jundiaí',       visita:'08/05/2026', visitas:5,  gasto:310  },
+    { nome:'Bruno Ferreira',   email:'bruno@email.com',    tel:'(11) 9 5567-8901', cidade:'Indaiatuba',    visita:'07/05/2026', visitas:14, gasto:910  },
+    { nome:'Gabriel Neves',    email:'gabriel@email.com',  tel:'(11) 9 4678-9012', cidade:'Jundiaí',       visita:'06/05/2026', visitas:7,  gasto:455  },
+    { nome:'Henrique Lopes',   email:'henrique@email.com', tel:'(11) 9 3789-0123', cidade:'Vinhedo',       visita:'05/05/2026', visitas:31, gasto:2170 },
+    { nome:'André Castro',     email:'andre@email.com',    tel:'(11) 9 2890-1234', cidade:'Jundiaí',       visita:'04/05/2026', visitas:3,  gasto:175  },
+    { nome:'Felipe Rocha',     email:'felipe@email.com',   tel:'(11) 9 1901-2345', cidade:'Itupeva',       visita:'02/05/2026', visitas:11, gasto:770  },
+    { nome:'Rodrigo Dias',     email:'rodrigo@email.com',  tel:'(11) 9 0012-3456', cidade:'Jundiaí',       visita:'30/04/2026', visitas:8,  gasto:520  },
+    { nome:'Thiago Nunes',     email:'thiago@email.com',   tel:'(11) 9 9123-5555', cidade:'Cabreúva',      visita:'28/04/2026', visitas:16, gasto:1040 },
+    { nome:'Gustavo Lima',     email:'gustavo@email.com',  tel:'(11) 9 8234-6666', cidade:'Jundiaí',       visita:'26/04/2026', visitas:2,  gasto:120  },
+    { nome:'Diego Alves',      email:'diego@email.com',    tel:'(11) 9 7345-7777', cidade:'Louveira',      visita:'24/04/2026', visitas:19, gasto:1330 },
+    { nome:'Leandro Moura',    email:'leandro@email.com',  tel:'(11) 9 6456-8888', cidade:'Jundiaí',       visita:'22/04/2026', visitas:6,  gasto:390  },
+    { nome:'Caio Ribeiro',     email:'caio@email.com',     tel:'(11) 9 5567-9999', cidade:'Campo Limpo',   visita:'20/04/2026', visitas:24, gasto:1680 },
+    { nome:'Victor Santos',    email:'victor@email.com',   tel:'(11) 9 4678-0000', cidade:'Jundiaí',       visita:'18/04/2026', visitas:10, gasto:700  },
+    { nome:'Eduardo Pinto',    email:'edu@email.com',      tel:'(11) 9 3789-1111', cidade:'Várzea Paulista',visita:'16/04/2026', visitas:4,  gasto:260  },
+    { nome:'Ricardo Souza',    email:'rico@email.com',     tel:'(11) 9 2890-2222', cidade:'Jundiaí',       visita:'14/04/2026', visitas:28, gasto:1960 },
+  ];
+
+  let clientes = [...CLIENTES_BASE];
+  let paginaAtual = 1;
+  const POR_PAGINA = 8;
+
+  function iniciais(nome) {
+    const p = nome.trim().split(' ');
+    return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase();
+  }
+
+  function corAvatar(nome) {
+    let h = 0;
+    for (const c of nome) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+    return CORES[h % CORES.length];
+  }
+
+  function renderTabela() {
+    const tbody = document.getElementById('clientesTbody');
+    const inicio = (paginaAtual - 1) * POR_PAGINA;
+    const pagina = clientes.slice(inicio, inicio + POR_PAGINA);
+
+    tbody.innerHTML = pagina.map((c, i) => `
+      <tr>
+        <td><input type="checkbox" class="row-check"/></td>
+        <td>
+          <div class="client-avatar" style="background:${corAvatar(c.nome)}">${iniciais(c.nome)}</div>
+        </td>
+        <td>
+          <div class="client-cell" style="flex-direction:column;align-items:flex-start;gap:2px">
+            <div class="client-name">${c.nome}</div>
+            <div class="client-email">${c.email}</div>
+          </div>
+        </td>
+        <td>
+          <div class="contact-cell">
+            <div class="contact-phone">${c.tel}</div>
+            <div class="contact-city">${c.cidade}</div>
+          </div>
+        </td>
+        <td>
+          <div class="last-visit">${c.visita}</div>
+          <div class="visits-count">${c.visitas} visita${c.visitas !== 1 ? 's' : ''}</div>
+        </td>
+        <td><span class="total-gasto">R$&nbsp;${c.gasto.toLocaleString('pt-BR')}</span></td>
+        <td>
+          <div class="actions-cell">
+            <button class="action-icon-btn" title="Ver perfil">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <button class="action-icon-btn" title="Editar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="action-icon-btn danger" title="Excluir" onclick="excluirCliente(${inicio + i})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    // Update count & pagination
+    document.getElementById('resultsCount').textContent = `${clientes.length} cliente${clientes.length !== 1 ? 's' : ''}`;
+    renderPaginacao();
+  }
+
+  function renderPaginacao() {
+    const total = Math.ceil(clientes.length / POR_PAGINA);
+    const inicio = (paginaAtual - 1) * POR_PAGINA + 1;
+    const fim = Math.min(paginaAtual * POR_PAGINA, clientes.length);
+    document.getElementById('pageInfo').textContent = `Mostrando ${inicio}–${fim} de ${clientes.length}`;
+
+    const container = document.getElementById('pageBtns');
+    let html = `<button class="page-btn" onclick="irPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''}>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>`;
+    for (let p = 1; p <= total; p++) {
+      html += `<button class="page-btn ${p === paginaAtual ? 'active' : ''}" onclick="irPagina(${p})">${p}</button>`;
+    }
+    html += `<button class="page-btn" onclick="irPagina(${paginaAtual + 1})" ${paginaAtual === total ? 'disabled' : ''}>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>`;
+    container.innerHTML = html;
+  }
+
+  function irPagina(p) {
+    const total = Math.ceil(clientes.length / POR_PAGINA);
+    if (p < 1 || p > total) return;
+    paginaAtual = p;
+    renderTabela();
+  }
+
+  function filtrarTabela() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const ordem = document.getElementById('filterOrdem').value;
+
+    clientes = CLIENTES_BASE.filter(c =>
+      c.nome.toLowerCase().includes(q) ||
+      c.tel.includes(q) ||
+      c.email.toLowerCase().includes(q)
+    );
+
+    if (ordem === 'nome') clientes.sort((a,b) => a.nome.localeCompare(b.nome));
+    else if (ordem === 'gasto') clientes.sort((a,b) => b.gasto - a.gasto);
+
+    paginaAtual = 1;
+    renderTabela();
+  }
+
+  function toggleAll(cb) {
+    document.querySelectorAll('.row-check').forEach(c => c.checked = cb.checked);
+  }
+
+  function excluirCliente(idx) {
+    if (confirm(`Excluir ${clientes[idx].nome}?`)) {
+      const nome = clientes[idx].nome;
+      const i = CLIENTES_BASE.findIndex(c => c.nome === nome);
+      if (i > -1) CLIENTES_BASE.splice(i, 1);
+      filtrarTabela();
+    }
+  }
+
+  // ── MODAL ──
+  function abrirModal() { document.getElementById('modalOverlay').classList.add('open'); }
+  function fecharModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+  function fecharModalOut(e) { if (e.target === document.getElementById('modalOverlay')) fecharModal(); }
+
+  function salvarCliente() {
+    const nome = document.getElementById('c-nome').value.trim();
+    const tel  = document.getElementById('c-tel').value.trim();
+    const email = document.getElementById('c-email').value.trim();
+    const cidade = document.getElementById('c-cidade').value.trim();
+    const required = ['c-nome','c-tel'];
+    let ok = true;
+    required.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.style.borderColor='#dc2626'; el.style.boxShadow='0 0 0 3px rgba(220,38,38,.1)'; ok=false; }
+      else { el.style.borderColor=''; el.style.boxShadow=''; }
+    });
+    if (!ok) return;
+
+    const hoje = new Date();
+    const dataFmt = `${hoje.getDate().toString().padStart(2,'0')}/${(hoje.getMonth()+1).toString().padStart(2,'0')}/${hoje.getFullYear()}`;
+    CLIENTES_BASE.unshift({ nome, email: email || '—', tel, cidade: cidade || '—', visita: dataFmt, visitas: 0, gasto: 0 });
+    filtrarTabela();
+    fecharModal();
+    ['c-nome','c-tel','c-email','c-cidade','c-obs'].forEach(id => {
+      document.getElementById(id).value = '';
+      document.getElementById(id).style.borderColor = '';
+      document.getElementById(id).style.boxShadow = '';
+    });
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+
+  // ── TOPBAR DATE ──
+  const now = new Date();
+  document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // ── INIT ──
+  filtrarTabela();
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e,i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i*60); obs.unobserve(e.target); } });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.kpi-card, .panel').forEach(el => obs.observe(el));
+</script>
+
+<script src="js/theme-toggle.js"></script>
+</body>
+</html>
+
+
+
+

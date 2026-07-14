@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LocalBarber - Faturamento</title>
+  <script src="js/theme-init.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"/>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <link rel="stylesheet" href="css/faturamento.css">
+  <link rel="stylesheet" href="css/responsivo.css">
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <img src="Logo-png.png" alt="">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Principal</div>
+    <a class="nav-item" href="dashboard.php">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </a>
+    <a class="nav-item" href="agenda.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Agenda</span>
+    </a>
+    <a class="nav-item" href="clientes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Clientes</span>
+    </a>
+    <a class="nav-item" href="servicos.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Serviços</span>
+    </a>
+    <div class="nav-group-label">Financeiro</div>
+    <a class="nav-item active" href="faturamento.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Faturamento</span>
+    </a>
+    <a class="nav-item" href="transacoes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <span>Transações</span>
+    </a>
+    <div class="nav-group-label">Gestão</div>
+    <a class="nav-item" href="equipe.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Equipe</span>
+    </a>
+    <div class="nav-group-label">Configurações</div>
+    <a class="nav-item" href="minha-barbearia.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Minha Barbearia</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="user-avatar">JR</div>
+      <div class="user-info"><p>João Rafael</p><span>Administrador</span></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">Faturamento</div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date"></div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- PERIOD TABS -->
+    <div class="period-row" id="periodRow">
+      <div class="period-tabs">
+        <button class="period-tab" onclick="setPeriodo('hoje', this)">Hoje</button>
+        <button class="period-tab" onclick="setPeriodo('semana', this)">Semana</button>
+        <button class="period-tab active" onclick="setPeriodo('mes', this)">Mês</button>
+        <button class="period-tab" onclick="setPeriodo('ano', this)">Ano</button>
+      </div>
+      <div class="period-custom">
+        <input class="period-input" type="date" id="dataInicio"/>
+        <span class="period-sep">até</span>
+        <input class="period-input" type="date" id="dataFim"/>
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-badge up" id="badgeFat">+14%</span>
+        </div>
+        <div class="kpi-label">Faturamento Total</div>
+        <div class="kpi-value" id="kvFat">R$ 0</div>
+        <div class="kpi-sub" id="subFat">vs. período anterior</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-badge up" id="badgeTx">+8%</span>
+        </div>
+        <div class="kpi-label">Transações</div>
+        <div class="kpi-value" id="kvTx">0</div>
+        <div class="kpi-sub" id="subTx">atendimentos realizados</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-badge up" id="badgeTicket">+5%</span>
+        </div>
+        <div class="kpi-label">Ticket Médio</div>
+        <div class="kpi-value" id="kvTicket">R$ 0</div>
+        <div class="kpi-sub">por atendimento</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-badge down" id="badgeDespesa">+3%</span>
+        </div>
+        <div class="kpi-label">Despesas</div>
+        <div class="kpi-value" id="kvDespesa">R$ 0</div>
+        <div class="kpi-sub" id="subLucro">Lucro líquido: <strong id="kvLucro">R$ 0</strong></div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO FATURAMENTO NO PERÍODO (Google Charts) -->
+    <div class="panel" id="panelChart">
+      <div class="panel-header">
+        <h3>Faturamento no Período</h3>
+        <span class="panel-tag" id="chartTag">Mai 2026</span>
+      </div>
+      <div class="panel-body">
+        <div id="gchart_div"></div>
+      </div>
+    </div>
+
+    <!-- Serviços Mais Vendidos -->
+    <div class="panel" id="panelServicos">
+      <div class="panel-header">
+        <h3>Serviços Mais Vendidos</h3>
+        <span class="panel-tag">Top 6</span>
+      </div>
+      <div class="panel-body">
+        <div class="servicos-list" id="servicosList"></div>
+      </div>
+    </div>
+
+    <!-- Transações Recentes -->
+    <div class="panel" id="panelTx">
+      <div class="panel-header">
+        <h3>Transações Recentes</h3>
+        <span class="panel-tag">Últimas 8</span>
+      </div>
+      <div class="panel-body" style="padding-top:8px;padding-bottom:8px">
+        <div class="tx-list" id="txList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── DATA ──
+  const PERIODOS = {
+    hoje:   { fat: 620,  tx: 9,   despesa: 85,   label: 'Hoje'       },
+    semana: { fat: 3820, tx: 58,  despesa: 420,  label: 'Esta Semana'},
+    mes:    { fat: 14860,tx: 228, despesa: 1940, label: 'Mai 2026'   },
+    ano:    { fat: 87400,tx: 1312,despesa: 10200,label: 'Ano 2026'   },
+  };
+
+  const CHART_DATA = {
+    hoje:   { labels: ['08h','09h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h'], values: [0,65,40,35,0,65,75,40,80,35,65,0] },
+    semana: { labels: ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],                               values: [420,540,380,660,720,980,120] },
+    mes:    { labels: ['01','05','09','13','17','21','25','29'],                                  values: [1200,1450,980,1680,1320,1960,1740,1530] },
+    ano:    { labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],   values: [5200,6100,7800,8200,9400,10200,9100,8800,7600,6900,8400,9700] },
+  };
+
+  const SERVICOS_RANK = [
+    { nome:'Corte + Barba',        val: 3890, count: 56 },
+    { nome:'Corte Simples',        val: 3120, count: 78 },
+    { nome:'Barba Completa',       val: 1960, count: 56 },
+    { nome:'Degradê + Barba',      val: 1500, count: 20 },
+    { nome:'Pigmentação de Barba', val: 1040, count: 13 },
+    { nome:'Tratamento Capilar',   val: 720,  count: 8  },
+  ];
+
+  const CORES_AVATAR = [
+    'linear-gradient(135deg,#2a52c9,#4169e1)',
+    'linear-gradient(135deg,#7c3aed,#a855f7)',
+    'linear-gradient(135deg,#059669,#10b981)',
+    'linear-gradient(135deg,#d97706,#f59e0b)',
+    'linear-gradient(135deg,#dc2626,#ef4444)',
+    'linear-gradient(135deg,#0891b2,#06b6d4)',
+    'linear-gradient(135deg,#db2777,#ec4899)',
+  ];
+
+  const CLIENTES_TX  = ['Rafael M.','Lucas S.','Pedro O.','Matheus C.','Bruno F.','Gabriel N.','Henrique L.','André C.'];
+  const SERVICOS_TX  = ['Corte + Barba','Corte Simples','Barba Completa','Degradê + Barba','Pigmentação','Tratamento Capilar'];
+  const HORAS        = ['08:30','09:00','09:45','10:30','11:00','13:15','14:00','15:30'];
+  const METODOS_TX   = ['Pix','Crédito','Débito','Dinheiro'];
+  const PRECOS_TX    = [65, 40, 35, 75, 80, 90];
+
+  let periodoAtual = 'mes';
+
+  function iniciais(nome) { const p = nome.trim().split(' '); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
+  function corAvatar(nome) { let h = 0; for (const c of nome) h = (h * 31 + c.charCodeAt(0)) & 0xffff; return CORES_AVATAR[h % CORES_AVATAR.length]; }
+  function fmt(n) { return n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+
+  // ── PERIOD ──
+  function setPeriodo(p, btn) {
+    periodoAtual = p;
+    document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderTudo();
+  }
+
+  function renderTudo() {
+    const d = PERIODOS[periodoAtual];
+    const lucro  = d.fat - d.despesa;
+    const ticket = Math.round(d.fat / d.tx);
+
+    document.getElementById('kvFat').textContent     = 'R$ ' + fmt(d.fat);
+    document.getElementById('kvTx').textContent      = fmt(d.tx);
+    document.getElementById('kvTicket').textContent  = 'R$ ' + fmt(ticket);
+    document.getElementById('kvDespesa').textContent = 'R$ ' + fmt(d.despesa);
+    document.getElementById('kvLucro').textContent   = 'R$ ' + fmt(lucro);
+    document.getElementById('chartTag').textContent  = d.label;
+
+    drawGoogleChart();
+    renderServicos();
+    renderTx();
+    bindRevenueInteractions();
+  }
+
+  // ── GOOGLE CHARTS ──
+  google.charts.load('current', { packages: ['corechart', 'bar'] });
+  google.charts.setOnLoadCallback(renderTudo);
+
+  function drawGoogleChart() {
+    const cd = CHART_DATA[periodoAtual];
+
+    const dataRows = cd.labels.map((lbl, i) => [lbl, cd.values[i]]);
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', 'Período');
+    data.addColumn('number', 'Faturamento');
+    data.addRows(dataRows);
+
+    // Build colors array: highlight the max bar
+    const maxVal = Math.max(...cd.values);
+    const colors = cd.values.map(v => v === maxVal ? '#4169e1' : 'rgba(42,82,201,0.28)');
+
+    const options = {
+      backgroundColor: 'transparent',
+      chartArea: { left: 56, right: 16, top: 16, bottom: 36, width: '100%', height: '100%' },
+      legend: { position: 'none' },
+      bar: { groupWidth: '58%' },
+      colors: ['#4169e1'],
+      series: { 0: { color: '#4169e1' } },
+      vAxis: {
+        gridlines: { color: 'rgba(208,217,240,0.7)', count: 5 },
+        minorGridlines: { count: 0 },
+        baselineColor: 'rgba(208,217,240,0.7)',
+        textStyle: { color: '#5a6480', fontSize: 10, fontName: 'Inter' },
+        format: 'R$#,###',
+      },
+      hAxis: {
+        textStyle: { color: '#5a6480', fontSize: 10, fontName: 'Inter' },
+        gridlines: { color: 'transparent' },
+        baselineColor: 'rgba(208,217,240,0.5)',
+      },
+      tooltip: {
+        textStyle: { color: '#1a1f3a', fontName: 'Inter', fontSize: 12 },
+        showColorCode: true,
+      },
+      animation: { startup: true, duration: 600, easing: 'out' },
+      fontName: 'Inter',
+    };
+
+    // Apply per-bar colors via DataView style column
+    const view = new google.visualization.DataView(data);
+    data.addColumn({ type: 'string', role: 'style' });
+    cd.values.forEach((v, i) => {
+      const isMax = v === maxVal;
+      data.setValue(i, 2, isMax
+        ? 'color: #4169e1; stroke-color: rgba(42,82,201,0.5); stroke-width: 1'
+        : 'color: rgba(42,82,201,0.22); stroke-color: rgba(42,82,201,0.18); stroke-width: 1');
+    });
+
+    const chart = new google.visualization.ColumnChart(document.getElementById('gchart_div'));
+    chart.draw(data, options);
+  }
+
+  // ── SERVIÇOS ──
+  function renderServicos() {
+    const max = SERVICOS_RANK[0].val;
+    document.getElementById('servicosList').innerHTML = SERVICOS_RANK.map((s, i) => `
+      <div class="servico-rank-row">
+        <div class="rank-num">${i + 1}</div>
+        <div class="rank-info">
+          <div class="rank-name">${s.nome}</div>
+          <div class="rank-bar-wrap">
+            <div class="rank-bar" style="width:${Math.round(s.val / max * 100)}%"></div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="rank-val">R$ ${fmt(s.val)}</div>
+          <div class="rank-count">${s.count} atend.</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── TRANSAÇÕES ──
+  function renderTx() {
+    document.getElementById('txList').innerHTML = CLIENTES_TX.map((c, i) => {
+      const svc     = SERVICOS_TX[i % SERVICOS_TX.length];
+      const preco   = PRECOS_TX[i % PRECOS_TX.length];
+      const metodo  = METODOS_TX[i % METODOS_TX.length];
+      const hora    = HORAS[i];
+      const dataLabel = i < 4 ? `Hoje, ${hora}` : `Ontem, ${hora}`;
+      return `
+      <div class="tx-row">
+        <div class="tx-avatar" style="background:${corAvatar(c)}">${iniciais(c)}</div>
+        <div class="tx-info">
+          <div class="tx-name">${c}</div>
+          <div class="tx-meta">${svc} · ${dataLabel}</div>
+        </div>
+        <div class="tx-right">
+          <span class="tx-amount pos">+R$${preco}</span>
+          <span class="tx-method">${metodo}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function bindActiveHover(selector, scopeSelector) {
+    document.querySelectorAll(selector).forEach(el => {
+      if (el.dataset.hoverBound === 'true') return;
+      el.dataset.hoverBound = 'true';
+
+      el.addEventListener('mouseenter', () => {
+        if (scopeSelector) {
+          const scope = el.closest(scopeSelector) || document;
+          scope.querySelectorAll(selector).forEach(item => item.classList.remove('active-hover'));
+        }
+
+        el.classList.add('active-hover');
+      });
+    });
+  }
+
+  function bindRevenueInteractions() {
+    bindActiveHover('.kpi-card', '.kpi-grid');
+    bindActiveHover('.period-tab', '.period-tabs');
+    bindActiveHover('.panel', '.content');
+    bindActiveHover('.servico-rank-row', '.servicos-list');
+    bindActiveHover('.tx-row', '.tx-list');
+    bindActiveHover('.panel-tag', '.panel-header');
+  }
+
+  // ── TOPBAR DATE ──
+  document.getElementById('topbar-date').textContent =
+    new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // ── DEFAULT DATES ──
+  const hoje = new Date();
+  const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  document.getElementById('dataInicio').value = primeiroDia.toISOString().split('T')[0];
+  document.getElementById('dataFim').value    = hoje.toISOString().split('T')[0];
+  document.querySelectorAll('.period-input').forEach(input => {
+    input.addEventListener('change', () => {
+      document.getElementById('periodRow').classList.add('custom-active');
+      setTimeout(() => document.getElementById('periodRow').classList.remove('custom-active'), 520);
+    });
+  });
+
+  // ── ANIMATE ──
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 60); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.kpi-card, .panel, .period-row').forEach(el => obs.observe(el));
+  bindRevenueInteractions();
+
+  // Redraw chart on resize
+  window.addEventListener('resize', drawGoogleChart);
+</script>
+
+<script src="js/theme-toggle.js"></script>
+</body>
+</html>
+
+
+
+

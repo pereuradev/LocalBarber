@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LocalBarber - Serviços</title>
+  <script src="js/theme-init.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/servicos.css">
+  <link rel="stylesheet" href="css/responsivo.css">
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <img src="Logo-png.png" alt="logo">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Principal</div>
+    <a class="nav-item" href="dashboard.php">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </a>
+    <a class="nav-item" href="agenda.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Agenda</span>
+    </a>
+    <a class="nav-item" href="clientes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Clientes</span>
+    </a>
+    <a class="nav-item active" href="servicos.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Serviços</span>
+    </a>
+    <div class="nav-group-label">Financeiro</div>
+    <a class="nav-item" href="faturamento.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Faturamento</span>
+    </a>
+    <a class="nav-item" href="transacoes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <span>Transações</span>
+    </a>
+    <div class="nav-group-label">Gestão</div>
+    <a class="nav-item" href="equipe.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Equipe</span>
+    </a>
+    <div class="nav-group-label">Configurações</div>
+    <a class="nav-item" href="minha-barbearia.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Minha Barbearia</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="user-avatar">JR</div>
+      <div class="user-info"><p>João Rafael</p><span>Administrador</span></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">Serviços</div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date"></div>
+      <button class="btn-primary" onclick="abrirModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Serviço
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total de Serviços</div>
+        <div class="kpi-value" id="kpiTotal">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Ativos</div>
+        <div class="kpi-value" id="kpiAtivos">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Duração Média</div>
+        <div class="kpi-value" id="kpiDuracao">0 min</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Preço Médio</div>
+        <div class="kpi-value" id="kpiPreco">R$ 0</div>
+      </div>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div class="search-bar" id="searchBar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="text" placeholder="Buscar serviço…" id="searchInput" oninput="renderCards()"/>
+      </div>
+      <select class="filter-select" id="filterCat" onchange="renderCards()">
+        <option value="">Todas as categorias</option>
+        <option>Corte</option>
+        <option>Barba</option>
+        <option>Combo</option>
+        <option>Tratamento</option>
+      </select>
+      <select class="filter-select" id="filterOrdem" onchange="renderCards()">
+        <option value="">Ordenar por</option>
+        <option value="nome">Nome A–Z</option>
+        <option value="preco">Maior Preço</option>
+        <option value="duracao">Duração</option>
+        <option value="pop">Mais Populares</option>
+      </select>
+      <span class="results-count" id="resultsCount"></span>
+    </div>
+
+    <!-- CARDS GRID -->
+    <div class="services-grid" id="servicesGrid"></div>
+
+  </div>
+</div>
+
+<!-- ── MODAL NOVO SERVIÇO ── -->
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModalOut(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="fecharModal()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="modal-header">
+      <div class="modal-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      </div>
+      <div>
+        <h2 class="modal-title" id="modalTitleText">Novo Serviço</h2>
+        <p class="modal-subtitle">Preencha os detalhes do serviço</p>
+      </div>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <div class="modal-body">
+
+      <!-- Image Upload -->
+      <div class="form-group">
+        <label class="form-label">Imagem do Serviço</label>
+        <div class="image-upload-area" id="imageUploadArea" onclick="triggerFileInput()">
+          <div class="upload-placeholder" id="uploadPlaceholder">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <span class="upload-text">Clique ou arraste uma imagem</span>
+            <span class="upload-sub">JPG, PNG ou WEBP — máx. 5 MB</span>
+          </div>
+          <img id="imagePreview" src="" alt="Preview" style="display:none"/>
+          <div class="image-overlay" id="imageOverlay">
+            <button class="overlay-btn" onclick="triggerFileInput(event)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Trocar
+            </button>
+            <button class="overlay-btn remove" onclick="removerImagem(event)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              Remover
+            </button>
+          </div>
+        </div>
+        <input type="file" id="fileInput" class="file-input-hidden" accept="image/*" onchange="handleFileSelect(event)"/>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Nome do Serviço</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/></svg>
+            <input class="form-input" type="text" placeholder="Ex: Corte + Barba" id="s-nome"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <div class="input-wrap">
+          <svg class="input-icon" width="14" height="14" style="top:12px;transform:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+          <textarea class="form-input" id="s-desc" placeholder="Descreva o serviço brevemente…" style="min-height:72px;padding-top:10px;resize:vertical;line-height:1.5"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Preço (R$)</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <input class="form-input" type="number" placeholder="0,00" id="s-preco" min="0" step="0.01"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Duração (min)</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <input class="form-input" type="number" placeholder="30" id="s-duracao" min="5" step="5"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <select class="form-input form-select" id="s-cat">
+              <option value="">Selecionar…</option>
+              <option>Corte</option>
+              <option>Barba</option>
+              <option>Combo</option>
+              <option>Tratamento</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Comissão do Barbeiro</label>
+          <div class="input-wrap">
+            <svg class="input-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+            <input class="form-input" type="number" placeholder="50" id="s-comissao" min="0" max="100" step="1"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Serviço ativo</div>
+          <div class="toggle-sub">Aparece na agenda e no agendamento online</div>
+        </div>
+        <button class="toggle on" id="s-toggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-primary" onclick="salvarServico()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="btnSalvarLabel">Cadastrar Serviço</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── STATE ──
+  let currentImageDataUrl = null; // base64 data URL of selected image
+  let editingIdx = null;
+
+  // Gradient placeholder colors per category for cards with no image
+  const CAT_GRADIENTS = {
+    'Corte':      'linear-gradient(135deg, #e8edf8 0%, #d0d9f0 100%)',
+    'Barba':      'linear-gradient(135deg, #e8edf8 0%, #d0d9f0 100%)',
+    'Combo':      'linear-gradient(135deg, #e8edf8 0%, #d0d9f0 100%)',
+    'Tratamento': 'linear-gradient(135deg, #e8edf8 0%, #d0d9f0 100%)',
+    'default':    'linear-gradient(135deg, #e8edf8 0%, #d0d9f0 100%)',
+  };
+
+  // ── DATA ──
+  let servicos = [
+    { image: null, nome:'Corte Simples', desc:'Corte tradicional com tesoura ou máquina, finalização com produto.', preco:40, duracao:30, cat:'Corte', comissao:50, ativo:true, atendimentos:312, avaliacao:4.8 },
+    { image: null, nome:'Barba Completa', desc:'Aparagem e modelagem de barba com navalha, toalha quente e hidratação.', preco:35, duracao:25, cat:'Barba', comissao:50, ativo:true, atendimentos:248, avaliacao:4.9 },
+    { image: null, nome:'Corte + Barba', desc:'Combo completo de corte e barba com desconto especial.', preco:65, duracao:55, cat:'Combo', comissao:55, ativo:true, atendimentos:489, avaliacao:5.0 },
+    { image: null, nome:'Degradê + Barba', desc:'Degradê moderno com acabamento perfeito e barba incluída.', preco:75, duracao:60, cat:'Combo', comissao:55, ativo:true, atendimentos:201, avaliacao:4.7 },
+    { image: null, nome:'Pigmentação de Barba', desc:'Coloração e pigmentação para disfarçar falhas e uniformizar a barba.', preco:80, duracao:45, cat:'Tratamento', comissao:60, ativo:true, atendimentos:87, avaliacao:4.6 },
+    { image: null, nome:'Tratamento Capilar', desc:'Hidratação profunda, reconstrução e nutrição dos fios.', preco:90, duracao:50, cat:'Tratamento', comissao:60, ativo:false, atendimentos:43, avaliacao:4.5 },
+  ];
+
+  // ── IMAGE UPLOAD ──
+  function triggerFileInput(e) {
+    if (e) e.stopPropagation();
+    document.getElementById('fileInput').click();
+  }
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('A imagem deve ter no máximo 5 MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setImagePreview(ev.target.result);
+    };
+    reader.readAsDataURL(file);
+    // Reset input so same file can be re-selected
+    e.target.value = '';
+  }
+
+  function setImagePreview(dataUrl) {
+    currentImageDataUrl = dataUrl;
+    const area = document.getElementById('imageUploadArea');
+    const preview = document.getElementById('imagePreview');
+    const placeholder = document.getElementById('uploadPlaceholder');
+    preview.src = dataUrl;
+    preview.style.display = 'block';
+    placeholder.style.display = 'none';
+    area.classList.add('has-image');
+  }
+
+  function clearImagePreview() {
+    currentImageDataUrl = null;
+    const area = document.getElementById('imageUploadArea');
+    const preview = document.getElementById('imagePreview');
+    const placeholder = document.getElementById('uploadPlaceholder');
+    preview.src = '';
+    preview.style.display = 'none';
+    placeholder.style.display = 'flex';
+    area.classList.remove('has-image');
+  }
+
+  function removerImagem(e) {
+    e.stopPropagation();
+    clearImagePreview();
+  }
+
+  // Drag & drop support
+  const uploadArea = document.getElementById('imageUploadArea');
+  uploadArea.addEventListener('dragover', e => {
+    e.preventDefault();
+    uploadArea.classList.add('drag-over');
+  });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    if (file.size > 5 * 1024 * 1024) { alert('A imagem deve ter no máximo 5 MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = ev => setImagePreview(ev.target.result);
+    reader.readAsDataURL(file);
+  });
+
+  // ── KPIs ──
+  function atualizarKPIs() {
+    document.getElementById('kpiTotal').textContent = servicos.length;
+    document.getElementById('kpiAtivos').textContent = servicos.filter(s => s.ativo).length;
+    const durMedia = Math.round(servicos.reduce((a,s) => a + s.duracao, 0) / servicos.length);
+    document.getElementById('kpiDuracao').textContent = durMedia + ' min';
+    const precoMedio = Math.round(servicos.reduce((a,s) => a + s.preco, 0) / servicos.length);
+    document.getElementById('kpiPreco').textContent = 'R$ ' + precoMedio;
+  }
+
+  // ── RENDER CARDS ──
+  function cardImageHtml(s) {
+    if (s.image) {
+      return `<img src="${s.image}" alt="${s.nome}" style="width:100%;height:100%;object-fit:cover;display:block;"/>`;
+    }
+    // Stylish placeholder when no image
+    return `
+      <div class="img-placeholder">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        <span>Sem imagem</span>
+      </div>`;
+  }
+
+  function renderCards() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const cat = document.getElementById('filterCat').value;
+    const ordem = document.getElementById('filterOrdem').value;
+
+    let lista = servicos.filter(s =>
+      s.nome.toLowerCase().includes(q) &&
+      (!cat || s.cat === cat)
+    );
+
+    if (ordem === 'nome') lista.sort((a,b) => a.nome.localeCompare(b.nome));
+    else if (ordem === 'preco') lista.sort((a,b) => b.preco - a.preco);
+    else if (ordem === 'duracao') lista.sort((a,b) => a.duracao - b.duracao);
+    else if (ordem === 'pop') lista.sort((a,b) => b.atendimentos - a.atendimentos);
+
+    document.getElementById('resultsCount').textContent = `${lista.length} serviço${lista.length !== 1 ? 's' : ''}`;
+
+    const grid = document.getElementById('servicesGrid');
+
+    if (!lista.length) {
+      grid.innerHTML = `<div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">Nenhum serviço encontrado</div>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = lista.map((s, i) => {
+      const realIdx = servicos.indexOf(s);
+      return `
+      <div class="service-card" style="transition-delay:${i * 50}ms" data-idx="${realIdx}">
+        <div class="service-card-bar"></div>
+        <div class="service-card-img">
+          ${cardImageHtml(s)}
+          <button class="service-badge ${s.ativo ? 'active' : 'inactive'}" title="${s.ativo ? 'Ativo — clique para desativar' : 'Inativo — clique para ativar'}"
+            onclick="toggleAtivo(${realIdx}, event)">
+            ${s.ativo
+              ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+              : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
+            }
+          </button>
+        </div>
+        <div class="service-card-body">
+          <div class="service-name">${s.nome}</div>
+          <div class="service-desc">${s.desc}</div>
+          <div class="service-meta">
+            <div class="meta-pill">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              ${s.duracao} min
+            </div>
+            <div class="meta-pill">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              ${s.cat}
+            </div>
+            <div class="meta-pill">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+              ${s.comissao}%
+            </div>
+          </div>
+          <div class="service-price">R$&nbsp;${s.preco.toFixed(2).replace('.',',')} <span>por sessão</span></div>
+          <div class="service-card-footer">
+            <div class="service-stats">
+              <div class="stat-item">
+                <div class="stat-val">${s.atendimentos}</div>
+                <div class="stat-lbl">Atend.</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-val">${s.avaliacao.toFixed(1)} ⭐</div>
+                <div class="stat-lbl">Avaliação</div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="card-action-btn" title="Editar" onclick="editarServico(${realIdx}, event)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="card-action-btn danger" title="Excluir" onclick="excluirServico(${realIdx}, event)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Animate cards
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.service-card').forEach(c => {
+        setTimeout(() => c.classList.add('visible'), parseInt(c.style.transitionDelay) || 0);
+      });
+    });
+
+    atualizarKPIs();
+    bindServiceInteractions();
+  }
+
+  function bindActiveHover(selector, scopeSelector) {
+    document.querySelectorAll(selector).forEach(el => {
+      if (el.dataset.hoverBound === 'true') return;
+      el.dataset.hoverBound = 'true';
+
+      el.addEventListener('mouseenter', () => {
+        if (scopeSelector) {
+          const scope = el.closest(scopeSelector) || document;
+          scope.querySelectorAll(selector).forEach(item => item.classList.remove('active-hover'));
+        }
+
+        el.classList.add('active-hover');
+      });
+    });
+  }
+
+  function bindServiceInteractions() {
+    bindActiveHover('.service-card', '#servicesGrid');
+    bindActiveHover('.meta-pill', '.service-card');
+    bindActiveHover('.stat-item', '.service-card');
+    bindActiveHover('.card-action-btn', '.service-card');
+  }
+
+  function toggleAtivo(idx, e) {
+    e.stopPropagation();
+    servicos[idx].ativo = !servicos[idx].ativo;
+    renderCards();
+  }
+
+  function excluirServico(idx, e) {
+    e.stopPropagation();
+    if (confirm(`Excluir "${servicos[idx].nome}"?`)) {
+      servicos.splice(idx, 1);
+      renderCards();
+    }
+  }
+
+  function editarServico(idx, e) {
+    e.stopPropagation();
+    editingIdx = idx;
+    const s = servicos[idx];
+
+    // Load image if exists
+    if (s.image) {
+      setImagePreview(s.image);
+    } else {
+      clearImagePreview();
+    }
+
+    document.getElementById('s-nome').value = s.nome;
+    document.getElementById('s-desc').value = s.desc;
+    document.getElementById('s-preco').value = s.preco;
+    document.getElementById('s-duracao').value = s.duracao;
+    document.getElementById('s-cat').value = s.cat;
+    document.getElementById('s-comissao').value = s.comissao;
+    const tog = document.getElementById('s-toggle');
+    s.ativo ? tog.classList.add('on') : tog.classList.remove('on');
+    document.getElementById('modalTitleText').textContent = 'Editar Serviço';
+    document.getElementById('btnSalvarLabel').textContent = 'Salvar Alterações';
+    abrirModal();
+  }
+
+  // ── MODAL ──
+  function abrirModal() {
+    if (editingIdx === null) {
+      clearImagePreview();
+      document.getElementById('modalTitleText').textContent = 'Novo Serviço';
+      document.getElementById('btnSalvarLabel').textContent = 'Cadastrar Serviço';
+      document.getElementById('s-toggle').classList.add('on');
+    }
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function fecharModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    editingIdx = null;
+    clearImagePreview();
+    ['s-nome','s-desc','s-preco','s-duracao','s-comissao'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = '';
+      el.style.borderColor = ''; el.style.boxShadow = '';
+    });
+    document.getElementById('s-cat').value = '';
+  }
+
+  function fecharModalOut(e) { if (e.target === document.getElementById('modalOverlay')) fecharModal(); }
+
+  function salvarServico() {
+    const nome = document.getElementById('s-nome').value.trim();
+    const preco = parseFloat(document.getElementById('s-preco').value);
+    const duracao = parseInt(document.getElementById('s-duracao').value);
+    const required = ['s-nome','s-preco','s-duracao'];
+    let ok = true;
+    required.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.style.borderColor='#dc2626'; el.style.boxShadow='0 0 0 3px rgba(220,38,38,.1)'; ok=false; }
+      else { el.style.borderColor=''; el.style.boxShadow=''; }
+    });
+    if (!ok) return;
+
+    const novo = {
+      image: currentImageDataUrl,
+      nome,
+      desc: document.getElementById('s-desc').value.trim() || 'Sem descrição.',
+      preco: isNaN(preco) ? 0 : preco,
+      duracao: isNaN(duracao) ? 30 : duracao,
+      cat: document.getElementById('s-cat').value || 'Geral',
+      comissao: parseInt(document.getElementById('s-comissao').value) || 50,
+      ativo: document.getElementById('s-toggle').classList.contains('on'),
+      atendimentos: 0,
+      avaliacao: 5.0,
+    };
+
+    if (editingIdx !== null) {
+      novo.atendimentos = servicos[editingIdx].atendimentos;
+      novo.avaliacao = servicos[editingIdx].avaliacao;
+      servicos[editingIdx] = novo;
+    } else {
+      servicos.unshift(novo);
+    }
+
+    fecharModal();
+    renderCards();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+
+  // ── TOPBAR DATE ──
+  document.getElementById('topbar-date').textContent =
+    new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // ── INIT ──
+  renderCards();
+  bindActiveHover('.kpi-card', '.kpi-grid');
+  bindActiveHover('.filter-select', '.search-bar');
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e,i) => {
+      if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i*60); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.kpi-card, .search-bar').forEach(el => obs.observe(el));
+</script>
+
+<script src="js/theme-toggle.js"></script>
+</body>
+</html>
+
+
+
+

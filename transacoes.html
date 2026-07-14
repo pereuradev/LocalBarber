@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <script src="js/theme-init.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/transacoes.css">
+  <link rel="stylesheet" href="css/responsivo.css">
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+   <img src="Logo-png.png" alt="">
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Principal</div>
+
+    <a class="nav-item" href="dashboard.php">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </a>
+
+    <a class="nav-item" href="agenda.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Agenda</span>
+    </a>
+
+    <a class="nav-item" href="clientes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Clientes</span>
+    </a>
+
+    <a class="nav-item" href="servicos.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Serviços</span>
+    </a>
+
+    <div class="nav-group-label">Financeiro</div>
+
+    <a class="nav-item" href="faturamento.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Faturamento</span>
+    </a>
+
+    <a class="nav-item active" href="transacoes.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      <span>Transações</span>
+    </a>
+
+    <div class="nav-group-label">Gestão</div>
+
+    <a class="nav-item" href="equipe.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Equipe</span>
+    </a>
+
+    <div class="nav-group-label">Configurações</div>
+
+    <a class="nav-item" href="minha-barbearia.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Minha Barbearia</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="user-avatar">JR</div>
+      <div class="user-info">
+        <p>João Rafael</p>
+        <span>Administrador</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <header class="topbar">
+    <div class="topbar-title">Transações</div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date"></div>
+      <a class="btn-primary" href="#">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Lançar Transação
+      </a>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">Entradas Hoje</div>
+        <div class="summary-value positive">R$ 620</div>
+        <div class="summary-sub">14 transações realizadas</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Saídas Hoje</div>
+        <div class="summary-value negative">R$ 120</div>
+        <div class="summary-sub">1 despesa lançada</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Saldo do Dia</div>
+        <div class="summary-value">R$ 500</div>
+        <div class="summary-sub">Saldo líquido acumulado</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar cliente ou serviço..." oninput="filterTable()">
+      </div>
+
+      <select class="filter-select" id="methodFilter" onchange="filterTable()">
+        <option value="">Método de pagamento</option>
+        <option value="pix">Pix</option>
+        <option value="credito">Cartão de Crédito</option>
+        <option value="debito">Cartão de Débito</option>
+        <option value="dinheiro">Dinheiro</option>
+      </select>
+
+      <select class="filter-select" id="statusFilter" onchange="filterTable()">
+        <option value="">Status</option>
+        <option value="Concluído">Concluído</option>
+        <option value="Pendente">Pendente</option>
+        <option value="Cancelado">Cancelado</option>
+      </select>
+
+      <div class="filter-tab-group">
+        <button class="filter-tab active" onclick="setDateFilter(this,'hoje')">Hoje</button>
+        <button class="filter-tab" onclick="setDateFilter(this,'semana')">Semana</button>
+        <button class="filter-tab" onclick="setDateFilter(this,'mes')">Mês</button>
+        <button class="filter-tab" onclick="setDateFilter(this,'todos')">Todos</button>
+      </div>
+    </div>
+
+    <!-- Table Panel -->
+    <div class="panel" id="mainPanel">
+      <div class="panel-header">
+        <h3>Histórico de Transações</h3>
+        <span class="panel-tag" id="totalCount">14 transações</span>
+      </div>
+
+      <table class="tx-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Serviço</th>
+            <th>Horário</th>
+            <th>Método</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <div class="pagination-info" id="paginationInfo">Mostrando 1–10 de 14 transações</div>
+        <div class="pagination-controls">
+          <button class="page-btn" id="prevBtn" onclick="changePage(-1)" disabled>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="page-btn active" id="page1" onclick="goToPage(1)">1</button>
+          <button class="page-btn" id="page2" onclick="goToPage(2)">2</button>
+          <button class="page-btn" id="nextBtn" onclick="changePage(1)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const transactions = [
+    { id:'#0041', client:'Rafael Mendes', initials:'RM', color:'linear-gradient(135deg,#2a52c9,#4169e1)', phone:'(11) 9 8765-4321', service:'Corte + Barba', time:'09:00', date:'Hoje', method:'pix', methodLabel:'Pix', methodClass:'method-pix', amount:'+R$ 65', type:'positive', status:'Concluído', statusClass:'status-concluido' },
+    { id:'#0040', client:'Lucas Silva', initials:'LS', color:'linear-gradient(135deg,#7c3aed,#a855f7)', phone:'(11) 9 9876-5432', service:'Corte Simples', time:'10:00', date:'Hoje', method:'credito', methodLabel:'Crédito', methodClass:'method-card', amount:'+R$ 40', type:'positive', status:'Concluído', statusClass:'status-concluido' },
+    { id:'#0039', client:'Pedro Oliveira', initials:'PO', color:'linear-gradient(135deg,#059669,#10b981)', phone:'(11) 9 7654-3210', service:'Barba Completa', time:'10:20', date:'Hoje', method:'pix', methodLabel:'Pix', methodClass:'method-pix', amount:'+R$ 28', type:'positive', status:'Concluído', statusClass:'status-concluido' },
+    { id:'#0038', client:'Matheus Costa', initials:'MC', color:'linear-gradient(135deg,#d97706,#f59e0b)', phone:'(11) 9 5432-1098', service:'Corte + Barba', time:'11:30', date:'Hoje', method:'dinheiro', methodLabel:'Dinheiro', methodClass:'method-cash', amount:'+R$ 65', type:'positive', status:'Pendente', statusClass:'status-pendente' },
+    { id:'#0037', client:'Bruno Ferreira', initials:'BF', color:'linear-gradient(135deg,#dc2626,#ef4444)', phone:'(11) 9 3210-9876', service:'Corte Simples', time:'13:00', date:'Hoje', method:'debito', methodLabel:'Débito', methodClass:'method-debit', amount:'+R$ 40', type:'positive', status:'Confirmado', statusClass:'status-concluido' },
+    { id:'#0036', client:'Gabriel Neves', initials:'GN', color:'linear-gradient(135deg,#0891b2,#06b6d4)', phone:'(11) 9 2109-8765', service:'Degradê + Barba', time:'14:30', date:'Hoje', method:'pix', methodLabel:'Pix', methodClass:'method-pix', amount:'+R$ 80', type:'positive', status:'Pendente', statusClass:'status-pendente' },
+    { id:'#0035', client:'Estoque', initials:'ES', color:'linear-gradient(135deg,#9ca3af,#6b7280)', phone:'Fornecedor', service:'Reposição Estoque', time:'09:15', date:'Hoje', method:'credito', methodLabel:'Crédito', methodClass:'method-card', amount:'−R$ 120', type:'negative', status:'Concluído', statusClass:'status-concluido' },
+    { id:'#0034', client:'Rodrigo Lima', initials:'RL', color:'linear-gradient(135deg,#be185d,#ec4899)', phone:'(11) 9 1098-7654', service:'Corte + Barba', time:'16:00', date:'Hoje', method:'pix', methodLabel:'Pix', methodClass:'method-pix', amount:'+R$ 65', type:'positive', status:'Concluído', statusClass:'status-concluido' },
+    { id:'#0033', client:'André Santos', initials:'AS', color:'linear-gradient(135deg,#b45309,#d97706)', phone:'(11) 9 0987-6543', service:'Hidratação', time:'16:30', date:'Hoje', method:'dinheiro', methodLabel:'Dinheiro', methodClass:'method-cash', amount:'+R$ 35', type:'positive', status:'Concluído', statusClass:'status-concluido' },
+    { id:'#0032', client:'Felipe Souza', initials:'FS', color:'linear-gradient(135deg,#1d4ed8,#3b82f6)', phone:'(11) 9 8776-1234', service:'Corte Simples', time:'17:00', date:'Hoje', method:'debito', methodLabel:'Débito', methodClass:'method-debit', amount:'+R$ 40', type:'positive', status:'Concluído', statusClass:'status-concluido' },
+    { id:'#0031', client:'Carlos Melo', initials:'CM', color:'linear-gradient(135deg,#7c3aed,#a855f7)', phone:'(11) 9 7665-4312', service:'Barba Completa', time:'09:00', date:'Ontem', method:'pix', methodLabel:'Pix', methodClass:'method-pix', amount:'+R$ 28', type:'positive', status:'Concluído', statusClass:'status-concluido' },
+    { id:'#0030', client:'Vitor Alves', initials:'VA', color:'linear-gradient(135deg,#059669,#10b981)', phone:'(11) 9 6554-3201', service:'Corte + Barba', time:'10:30', date:'Ontem', method:'credito', methodLabel:'Crédito', methodClass:'method-card', amount:'+R$ 65', type:'positive', status:'Cancelado', statusClass:'status-cancelado' },
+    { id:'#0029', client:'Diego Rocha', initials:'DR', color:'linear-gradient(135deg,#0891b2,#06b6d4)', phone:'(11) 9 5443-2190', service:'Degradê', time:'13:00', date:'Ontem', method:'dinheiro', methodLabel:'Dinheiro', methodClass:'method-cash', amount:'+R$ 55', type:'positive', status:'Concluído', statusClass:'status-concluido' },
+    { id:'#0028', client:'Henrique Dias', initials:'HD', color:'linear-gradient(135deg,#d97706,#f59e0b)', phone:'(11) 9 4332-1089', service:'Corte Simples', time:'15:30', date:'Ontem', method:'pix', methodLabel:'Pix', methodClass:'method-pix', amount:'+R$ 40', type:'positive', status:'Concluído', statusClass:'status-concluido' },
+  ];
+
+  let currentPage = 1;
+  const perPage = 10;
+  let filtered = [...transactions];
+  let activeDateFilter = 'hoje';
+
+  function methodIcon(method) {
+    if (method === 'pix') return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+    if (method === 'credito' || method === 'debito') return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+    return '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
+  }
+
+  function renderTable() {
+    const body = document.getElementById('tableBody');
+    const start = (currentPage - 1) * perPage;
+    const pageData = filtered.slice(start, start + perPage);
+
+    body.innerHTML = pageData.map((t, i) => `
+      <tr data-method="${t.method}" data-status="${t.status}" data-date="${t.date}" style="transition-delay:${i*40}ms">
+        <td><span class="tx-id">${t.id}</span></td>
+        <td>
+          <div class="client-cell">
+            <div class="client-avatar" style="background:${t.color}">${t.initials}</div>
+            <div>
+              <div class="client-name">${t.client}</div>
+              <div class="client-phone">${t.phone}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="service-badge">${t.service}</span></td>
+        <td>
+          <div class="tx-time-main">${t.time}</div>
+          <div class="tx-time-date">${t.date}</div>
+        </td>
+        <td><span class="method-badge ${t.methodClass}">${methodIcon(t.method)} ${t.methodLabel}</span></td>
+        <td><span class="${t.type === 'positive' ? 'amount-positive' : 'amount-negative'}">${t.amount}</span></td>
+        <td><span class="status-badge ${t.statusClass}">${t.status}</span></td>
+        <td>
+          <div class="action-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    // Animate rows
+    requestAnimationFrame(() => {
+      body.querySelectorAll('tr').forEach(tr => {
+        requestAnimationFrame(() => tr.classList.add('visible'));
+      });
+    });
+
+    // Update count
+    document.getElementById('totalCount').textContent = `${filtered.length} transações`;
+    const end = Math.min(start + perPage, filtered.length);
+    document.getElementById('paginationInfo').textContent = `Mostrando ${filtered.length === 0 ? 0 : start + 1}–${end} de ${filtered.length} transações`;
+
+    // Pagination buttons
+    const totalPages = Math.ceil(filtered.length / perPage);
+    document.getElementById('prevBtn').disabled = currentPage === 1;
+    document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+    document.querySelectorAll('.page-btn[id^="page"]').forEach(btn => {
+      const pg = parseInt(btn.id.replace('page',''));
+      btn.classList.toggle('active', pg === currentPage);
+      btn.style.display = pg <= totalPages ? '' : 'none';
+    });
+  }
+
+  function filterTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const method = document.getElementById('methodFilter').value;
+    const status = document.getElementById('statusFilter').value;
+
+    filtered = transactions.filter(t => {
+      const matchSearch = !search || t.client.toLowerCase().includes(search) || t.service.toLowerCase().includes(search);
+      const matchMethod = !method || t.method === method;
+      const matchStatus = !status || t.status === status;
+      const matchDate = activeDateFilter === 'todos' ||
+        (activeDateFilter === 'hoje' && t.date === 'Hoje') ||
+        (activeDateFilter === 'semana' && (t.date === 'Hoje' || t.date === 'Ontem')) ||
+        (activeDateFilter === 'mes');
+      return matchSearch && matchMethod && matchStatus && matchDate;
+    });
+
+    currentPage = 1;
+    renderTable();
+  }
+
+  function setDateFilter(btn, val) {
+    activeDateFilter = val;
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTable();
+  }
+
+  function changePage(dir) {
+    const totalPages = Math.ceil(filtered.length / perPage);
+    currentPage = Math.max(1, Math.min(totalPages, currentPage + dir));
+    renderTable();
+  }
+
+  function goToPage(pg) {
+    currentPage = pg;
+    renderTable();
+  }
+
+  // Init
+  const now = new Date();
+  const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
+  document.getElementById('topbar-date').textContent = now.toLocaleDateString('pt-BR', opts);
+
+  // Animate cards
+  const animEls = document.querySelectorAll('.summary-card, .panel');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.05 });
+  animEls.forEach(el => obs.observe(el));
+
+  renderTable();
+</script>
+
+<script src="js/theme-toggle.js"></script>
+</body>
+</html>
+
+
+
+

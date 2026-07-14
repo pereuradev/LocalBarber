@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <script src="js/theme-init.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="css/central-informacoes.css">
+  <link rel="stylesheet" href="css/responsivo.css">
+</head>
+<body>
+  <header>
+    <a href="pagina-inicial.html" class="nav-logo">
+      <img src="Logo-png.png" alt="LocalBarber">
+    </a>
+    <ul class="nav-links">
+      <li><a href="pagina-inicial.html">Home</a></li>
+      <li><a href="pagina-inicial.html#features">Sobre Nós</a></li>
+      <li><a href="pagina-inicial.html#contato">Contato</a></li>
+    </ul>
+    <div class="nav-actions">
+    </div>
+  </header>
+   
+  <!-- ===================== SOBRE ===================== -->
+  <div id="page-sobre" class="page active">
+    <div class="sidebar-layout">
+      <aside class="sidebar-nav">
+        <h3>Sobre nós</h3>
+        <a class="active" onclick="showPage('sobre')">Sobre nós</a>
+        <a onclick="showPage('termos')">Termos de Serviço</a>
+        <a onclick="showPage('privacidade')">Política de Privacidade</a>
+        <a onclick="showPage('contato')">Contato</a>
+        <a onclick="showPage('seguranca')">Termos de uso</a>
+        <a onclick="showPage('faq')">FAQ</a>
+      </aside>
+      <article class="sidebar-content">
+        <span class="page-badge">Quem somos</span>
+        <h1 class="page-title">Transformamos barbearias em negócios digitais</h1>
+        <p class="page-subtitle">O LocalBarber nasceu da necessidade real de barbeiros que queriam mais do que uma agenda.</p>
+        <hr class="divider" />
+        <h2 class="section-title">Nossa missão</h2>
+        <p class="body-text">Acreditamos que cada barbearia tem uma identidade única. Nossa missão é oferecer ferramentas simples, eficientes e acessíveis para que barbeiros e barbearias possam gerir seus negócios com mais autonomia, organização e profissionalismo.</p>
+        <p class="body-text">Desde o agendamento online até o controle financeiro, o LocalBarber reúne tudo que um negócio moderno precisa em uma única plataforma intuitiva.</p>
+        <div class="value-grid">
+          <div class="value-card"><h4>Foco no barbeiro</h4><p>Funcionalidades pensadas para o dia a dia.</p></div>
+          <div class="value-card"><h4>Segurança</h4><p>Criptografia e proteção de dados.</p></div>
+          <div class="value-card"><h4>Agilidade</h4><p>Plataforma rápida e estável.</p></div>
+          <div class="value-card"><h4>Suporte humano</h4><p>Atendimento dedicado para ajudar você.</p></div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- ===================== TERMOS DE SERVIÇO ===================== -->
+  <div id="page-termos" class="page">
+    <div class="sidebar-layout">
+      <aside class="sidebar-nav">
+        <h3>Termos de Serviço</h3>
+        <a onclick="showPage('sobre')">Sobre nós</a>
+        <a class="active" onclick="showPage('termos')">Termos de Serviço</a>
+        <a onclick="showPage('privacidade')">Política de Privacidade</a>
+        <a onclick="showPage('contato')">Contato</a>
+        <a onclick="showPage('seguranca')">Termos de uso</a>
+        <a onclick="showPage('faq')">FAQ</a>
+      </aside>
+      <article class="sidebar-content">
+        <span class="page-badge">Termos</span>
+        <h1 class="page-title">Termos de Serviço</h1>
+        <p class="page-subtitle">Leia com atenção antes de utilizar a plataforma LocalBarber.</p>
+        
+
+        <div class="legal-section">
+          <h2>1. Aceitação dos Termos</h2>
+          <p>Ao acessar ou utilizar a plataforma LocalBarber, você concorda integralmente com estes Termos de Serviço. Caso não concorde com alguma disposição, pedimos que interrompa o uso imediatamente. O uso contínuo da plataforma após alterações nos termos constitui aceitação das novas condições.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>2. Descrição do Serviço</h2>
+          <p>O LocalBarber é uma plataforma de gestão para barbearias que oferece, entre outros recursos:</p>
+          <ul>
+            <li>Agendamento online de serviços</li>
+            <li>Gestão de clientes e histórico de atendimentos</li>
+            <li>Controle financeiro e relatórios</li>
+            <li>Comunicação via notificações e lembretes automáticos</li>
+            <li>Personalização de perfil da barbearia</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>3. Cadastro e Responsabilidades do Usuário</h2>
+          <p>Para utilizar o LocalBarber, é necessário criar uma conta com informações verdadeiras, completas e atualizadas. Você é responsável por:</p>
+          <ul>
+            <li>Manter a confidencialidade de suas credenciais de acesso</li>
+            <li>Todas as atividades realizadas com sua conta</li>
+            <li>Notificar imediatamente qualquer uso não autorizado</li>
+          </ul>
+          <p>É proibido criar contas falsas, usar dados de terceiros sem autorização ou tentar acessar contas de outros usuários.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>4. Planos e Pagamentos</h2>
+          <p>O LocalBarber oferece planos pagos com diferentes funcionalidades. As cobranças são realizadas de forma recorrente (mensal ou anual) conforme o plano escolhido. O cancelamento pode ser feito a qualquer momento, com efeito ao final do período vigente. Não há reembolso proporcional por períodos não utilizados, exceto nos casos previstos pelo Código de Defesa do Consumidor.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>5. Propriedade Intelectual</h2>
+          <p>Todo o conteúdo da plataforma — incluindo marca, logotipo, textos, layouts e código-fonte — é de propriedade exclusiva do LocalBarber e está protegido pela legislação vigente de propriedade intelectual. É vedada a reprodução, distribuição ou uso comercial sem autorização expressa.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>6. Limitação de Responsabilidade</h2>
+          <p>O LocalBarber não se responsabiliza por danos decorrentes de interrupções de serviço, falhas de terceiros (como provedores de internet), uso indevido da plataforma ou perda de dados causada por fatores externos ao nosso controle. Empenhamo-nos em manter alta disponibilidade, mas não garantimos funcionamento ininterrupto 24/7.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>7. Rescisão</h2>
+          <p>O LocalBarber reserva-se o direito de suspender ou encerrar contas que violem estes termos, pratiquem fraudes, utilizem a plataforma para fins ilícitos ou prejudiquem outros usuários. O usuário poderá cancelar sua conta a qualquer momento pelo painel de configurações.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>8. Legislação Aplicável</h2>
+          <p>Estes Termos são regidos pelas leis brasileiras. Quaisquer conflitos serão resolvidos no foro da comarca de São Paulo – SP, com renúncia a qualquer outro, por mais privilegiado que seja.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- ===================== PRIVACIDADE ===================== -->
+  <div id="page-privacidade" class="page">
+    <div class="sidebar-layout">
+      <aside class="sidebar-nav">
+        <h3>Privacidade</h3>
+        <a onclick="showPage('sobre')">Sobre nós</a>
+        <a onclick="showPage('termos')">Termos de Serviço</a>
+        <a class="active" onclick="showPage('privacidade')">Política de Privacidade</a>
+        <a onclick="showPage('contato')">Contato</a>
+        <a onclick="showPage('seguranca')">Termos de uso</a>
+        <a onclick="showPage('faq')">FAQ</a>
+      </aside>
+      <article class="sidebar-content">
+        <span class="page-badge">Privacidade</span>
+        <h1 class="page-title">Política de Privacidade</h1>
+        <p class="page-subtitle">Sua privacidade é prioridade. Veja como coletamos, usamos e protegemos seus dados.</p>
+       
+
+        <div class="legal-section">
+          <h2>1. Quais dados coletamos</h2>
+          <p>Para fornecer nossos serviços, coletamos os seguintes tipos de dados:</p>
+          <ul>
+            <li><strong>Dados de cadastro:</strong> nome, e-mail, telefone, CPF/CNPJ e endereço</li>
+            <li><strong>Dados de uso:</strong> agendamentos, histórico de serviços, preferências e interações com a plataforma</li>
+            <li><strong>Dados técnicos:</strong> endereço IP, tipo de dispositivo, navegador e logs de acesso</li>
+            <li><strong>Dados de pagamento:</strong> processados de forma segura por parceiros certificados PCI-DSS (não armazenamos dados completos de cartão)</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>2. Como utilizamos seus dados</h2>
+          <p>Utilizamos seus dados para:</p>
+          <ul>
+            <li>Operar e melhorar a plataforma</li>
+            <li>Enviar confirmações de agendamento e lembretes</li>
+            <li>Processar pagamentos e emitir cobranças</li>
+            <li>Oferecer suporte ao cliente</li>
+            <li>Cumprir obrigações legais e regulatórias</li>
+            <li>Realizar análises estatísticas (sempre de forma anonimizada)</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>3. Compartilhamento de dados</h2>
+          <p>Não vendemos seus dados pessoais. Podemos compartilhá-los apenas com:</p>
+          <ul>
+            <li>Parceiros de pagamento (para processar transações)</li>
+            <li>Serviços de e-mail/SMS (para notificações)</li>
+            <li>Autoridades públicas, quando exigido por lei</li>
+          </ul>
+          <p>Todos os nossos parceiros estão sujeitos a acordos de confidencialidade e seguem a LGPD.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>4. Seus direitos (LGPD)</h2>
+          <p>Conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), você tem direito a:</p>
+          <ul>
+            <li>Confirmar a existência de tratamento dos seus dados</li>
+            <li>Acessar seus dados a qualquer momento</li>
+            <li>Corrigir dados incompletos, inexatos ou desatualizados</li>
+            <li>Solicitar a anonimização, bloqueio ou eliminação dos seus dados</li>
+            <li>Revogar consentimentos dados anteriormente</li>
+            <li>Portar seus dados para outro prestador de serviço</li>
+          </ul>
+          <p>Para exercer esses direitos, entre em contato com nosso DPO: <strong>privacidade@localbarber.com.br</strong></p>
+        </div>
+
+        <div class="legal-section">
+          <h2>5. Segurança dos dados</h2>
+          <p>Adotamos medidas técnicas e organizacionais adequadas para proteger seus dados, incluindo criptografia TLS em trânsito, criptografia em repouso, controle de acesso por perfil, monitoramento contínuo de segurança e backups regulares.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>6. Retenção de dados</h2>
+          <p>Mantemos seus dados enquanto sua conta estiver ativa ou pelo período exigido por lei. Após o cancelamento da conta, os dados são anonimizados ou excluídos em até 90 dias, salvo obrigações legais que exijam retenção por prazo maior.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>7. Cookies</h2>
+          <p>Utilizamos cookies essenciais para o funcionamento da plataforma e cookies analíticos (com seu consentimento) para melhorar a experiência. Você pode gerenciar suas preferências de cookies nas configurações do navegador.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- ===================== CONTATO ===================== -->
+  <div id="page-contato" class="page">
+    <div class="sidebar-layout">
+      <aside class="sidebar-nav">
+        <h3>Contato</h3>
+        <a onclick="showPage('sobre')">Sobre nós</a>
+        <a onclick="showPage('termos')">Termos de Serviço</a>
+        <a onclick="showPage('privacidade')">Política de Privacidade</a>
+        <a class="active" onclick="showPage('contato')">Contato</a>
+        <a onclick="showPage('seguranca')">Termos de uso</a>
+        <a onclick="showPage('faq')">FAQ</a>
+      </aside>
+      <article class="sidebar-content">
+        <span class="page-badge">Fale conosco</span>
+        <h1 class="page-title">Entre em contato</h1>
+        <div class="contact-grid">
+          <div class="contact-info">
+            <p>Nossa equipe responde em até 24 horas úteis. Para urgências, use o telefone ou WhatsApp.</p>
+            <div class="contact-item"><span>contato@localbarber.com.br</span></div>
+            <div class="contact-item"><span>(11) 4002-8922</span></div>
+            <div class="contact-item"><span>WhatsApp: (11) 98765-4321</span></div>
+            <div class="contact-item"><span>Seg – Sex: 09h às 18h</span></div>
+            <div class="contact-item"><span>São Paulo – SP, Brasil</span></div>
+          </div>
+          <div>
+            <div class="form-group">
+              <label>Nome</label>
+              <input type="text" id="c-name" placeholder="Seu nome completo">
+            </div>
+            <div class="form-group">
+              <label>E-mail</label>
+              <input type="email" id="c-email" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+              <label>Assunto</label>
+              <select id="c-subject">
+                <option value="">Selecione um assunto</option>
+                <option>Suporte técnico</option>
+                <option>Dúvidas sobre planos</option>
+                <option>Cancelamento</option>
+                <option>Sugestão</option>
+                <option>Outro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Mensagem</label>
+              <textarea id="c-msg" placeholder="Descreva como podemos ajudar..."></textarea>
+            </div>
+            <button class="btn-send" onclick="submitForm()">Enviar mensagem</button>
+            <div class="alert-ok" id="form-alert"> Mensagem enviada com sucesso! Retornaremos em breve.</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- ===================== TERMOS DE USO (SEGURANÇA) ===================== -->
+  <div id="page-seguranca" class="page">
+    <div class="sidebar-layout">
+      <aside class="sidebar-nav">
+        <h3>Termos de uso</h3>
+        <a onclick="showPage('sobre')">Sobre nós</a>
+        <a onclick="showPage('termos')">Termos de Serviço</a>
+        <a onclick="showPage('privacidade')">Política de Privacidade</a>
+        <a onclick="showPage('contato')">Contato</a>
+        <a class="active" onclick="showPage('seguranca')">Termos de uso</a>
+        <a onclick="showPage('faq')">FAQ</a>
+      </aside>
+      <article class="sidebar-content">
+        <span class="page-badge">Termos de uso</span>
+        <h1 class="page-title">Termos de Uso</h1>
+        <p class="page-subtitle">Regras e diretrizes para o uso adequado e seguro da plataforma LocalBarber.</p>
+        
+
+        <div class="legal-section">
+          <h2>1. Uso Permitido</h2>
+          <p>A plataforma LocalBarber destina-se exclusivamente ao gerenciamento profissional de barbearias e serviços correlatos. O acesso é permitido a maiores de 18 anos ou a menores devidamente representados por responsável legal.</p>
+          <div class="highlight-box"><p>Ao usar nossa plataforma, você declara ter lido, compreendido e concordado com todos estes Termos de Uso, bem como com nossa Política de Privacidade.</p></div>
+        </div>
+
+        <div class="legal-section">
+          <h2>2. Condutas Proibidas</h2>
+          <p>É expressamente vedado ao usuário:</p>
+          <ul>
+            <li>Utilizar a plataforma para fins ilegais, fraudulentos ou prejudiciais a terceiros</li>
+            <li>Realizar engenharia reversa, descompilar ou tentar extrair o código-fonte</li>
+            <li>Acessar dados de outros usuários sem autorização</li>
+            <li>Realizar ataques de força bruta, injeção de código ou qualquer forma de exploração de vulnerabilidades</li>
+            <li>Publicar conteúdo ofensivo, discriminatório ou que viole direitos de terceiros</li>
+            <li>Criar múltiplas contas com o objetivo de burlar restrições da plataforma</li>
+            <li>Revender ou sublicenciar o acesso à plataforma sem autorização prévia</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>3. Segurança da Conta</h2>
+          <p>Para proteger sua conta, recomendamos:</p>
+          <ul>
+            <li>Utilizar senha forte com letras, números e caracteres especiais</li>
+            <li>Ativar a autenticação em dois fatores (2FA)</li>
+            <li>Nunca compartilhar suas credenciais com terceiros</li>
+            <li>Encerrar a sessão ao usar dispositivos públicos ou compartilhados</li>
+            <li>Notificar-nos imediatamente em caso de acesso suspeito</li>
+          </ul>
+        </div>
+
+        <div class="legal-section">
+          <h2>4. Conteúdo do Usuário</h2>
+          <p>Ao inserir conteúdo na plataforma (fotos, textos, informações de serviços), você declara ser o titular ou ter autorização para tal uso, e concede ao LocalBarber licença não exclusiva para exibir esse conteúdo no contexto da prestação do serviço. O LocalBarber não reivindica propriedade sobre seu conteúdo.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>5. Disponibilidade do Serviço</h2>
+          <p>Buscamos manter a plataforma disponível 24/7, porém podem ocorrer interrupções para manutenção programada (comunicada com antecedência) ou emergências técnicas. O LocalBarber não se responsabiliza por prejuízos decorrentes de indisponibilidade temporária.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>6. Atualizações dos Termos</h2>
+          <p>Podemos atualizar estes Termos periodicamente. Notificaremos os usuários por e-mail ou aviso na plataforma com pelo menos 10 dias de antecedência. O uso continuado após a data de vigência das alterações implica na aceitação dos novos termos.</p>
+        </div>
+
+        <div class="legal-section">
+          <h2>7. Contato para Denúncias</h2>
+          <p>Para reportar violações a estes Termos ou atividades suspeitas, entre em contato: <strong>seguranca@localbarber.com.br</strong></p>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- ===================== FAQ ===================== -->
+  <div id="page-faq" class="page">
+    <div class="sidebar-layout">
+      <aside class="sidebar-nav">
+        <h3>Ajuda</h3>
+        <a onclick="showPage('sobre')">Sobre nós</a>
+        <a onclick="showPage('termos')">Termos de Serviço</a>
+        <a onclick="showPage('privacidade')">Política de Privacidade</a>
+        <a onclick="showPage('contato')">Contato</a>
+        <a onclick="showPage('seguranca')">Termos de uso</a>
+        <a class="active" onclick="showPage('faq')">FAQ</a>
+      </aside>
+      <article class="sidebar-content">
+        <span class="page-badge">Perguntas Frequentes</span>
+        <h1 class="page-title">FAQ</h1>
+        <p class="page-subtitle">Encontre respostas rápidas para as dúvidas mais comuns sobre o LocalBarber.</p>
+        <hr class="divider" />
+
+        <div id="faq-list">
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              O LocalBarber é gratuito?
+              
+            </div>
+            <div class="faq-a">
+              Oferecemos um plano gratuito com funcionalidades básicas para que você possa conhecer a plataforma. Para recursos avançados — como relatórios financeiros detalhados, agendamento ilimitado e suporte prioritário — estão disponíveis nos planos pagos. Confira todos os planos na página de preços.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Como faço para cadastrar minha barbearia?
+              
+            </div>
+            <div class="faq-a">
+              O cadastro é simples e leva menos de 5 minutos. Acesse o site, clique em "Criar conta", preencha os dados da sua barbearia e confirme seu e-mail. Após isso, você já pode personalizar seu perfil, adicionar serviços e começar a receber agendamentos.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Meus clientes precisam criar uma conta para agendar?
+             
+            </div>
+            <div class="faq-a">
+              Não necessariamente. Seus clientes podem agendar informando apenas nome, telefone e e-mail, sem necessidade de criar uma conta na plataforma. Para quem preferir, o cadastro oferece benefícios como histórico de agendamentos e notificações personalizadas.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Posso gerenciar mais de um profissional na mesma conta?
+            
+            </div>
+            <div class="faq-a">
+              Sim! Nos planos Pro e Business você pode cadastrar múltiplos profissionais, cada um com sua própria agenda, serviços e comissões. Ideal para barbearias com equipe.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              O sistema envia lembretes automáticos para os clientes?
+             
+            </div>
+            <div class="faq-a">
+              Sim. O LocalBarber envia lembretes automáticos via e-mail e WhatsApp (conforme configuração) para reduzir faltas e cancelamentos de última hora. Você pode personalizar os textos e os horários de envio.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Como funciona o cancelamento do plano?
+           
+            </div>
+            <div class="faq-a">
+              Você pode cancelar seu plano a qualquer momento pelo painel de configurações, sem multas ou taxas. O acesso continua disponível até o fim do período já pago. Após o cancelamento, seus dados ficam disponíveis por 90 dias para exportação.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Meus dados estão seguros na plataforma?
+             
+            </div>
+            <div class="faq-a">
+              Com certeza. Utilizamos criptografia TLS para todas as transmissões de dados, armazenamento criptografado em servidores certificados, controle de acesso rigoroso e monitoramento constante de segurança. Estamos em conformidade com a LGPD.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              O LocalBarber tem aplicativo para celular?
+              
+            </div>
+            <div class="faq-a">
+              Sim! Nosso app está disponível para Android e iOS. Além disso, a versão web é totalmente responsiva e funciona muito bem em qualquer dispositivo móvel pelo navegador.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Como entro em contato com o suporte?
+             
+            </div>
+            <div class="faq-a">
+              Você pode falar com nossa equipe pelo chat dentro da plataforma, por e-mail (contato@localbarber.com.br) ou pelo WhatsApp (11) 98765-4321. O atendimento é de segunda a sexta, das 9h às 18h. Clientes nos planos Pro e Business têm suporte prioritário com tempo de resposta reduzido.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-q" onclick="toggleFaq(this)">
+              Consigo migrar meus dados de outro sistema para o LocalBarber?
+              
+            </div>
+            <div class="faq-a">
+              Sim. Nossa equipe pode auxiliar na migração de clientes e histórico de agendamentos a partir de planilhas ou de outros sistemas compatíveis. Entre em contato com o suporte para que possamos avaliar o melhor caminho para a sua situação.
+            </div>
+          </div>
+
+        </div>
+
+        <hr class="divider" />
+        <p class="body-text">Não encontrou o que precisava? <a onclick="showPage('contato')" style="color:var(--blue);font-weight:600;cursor:pointer;">Fale com nossa equipe.</a></p>
+      </article>
+    </div>
+  </div>
+
+  <script>
+    const PAGES = ['sobre','termos','privacidade','contato','seguranca','faq'];
+
+    function showPage(id){
+      PAGES.forEach(page => {
+        const el = document.getElementById('page-' + page);
+        if(el) el.classList.remove('active');
+      });
+      const target = document.getElementById('page-' + id);
+      if(target){
+        target.classList.add('active');
+        window.scrollTo({ top:0, behavior:'smooth' });
+      }
+      document.querySelectorAll('.sidebar-nav a').forEach(link => link.classList.remove('active'));
+    }
+
+    function setNav(id){
+      document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById(id);
+      if(btn) btn.classList.add('active');
+    }
+
+    function toggleFaq(el){
+      el.closest('.faq-item').classList.toggle('open');
+    }
+
+    function submitForm(){
+      const name  = document.getElementById('c-name').value.trim();
+      const email = document.getElementById('c-email').value.trim();
+      const msg   = document.getElementById('c-msg').value.trim();
+      if(!name || !email || !msg){ alert('Preencha todos os campos obrigatórios.'); return; }
+      document.getElementById('form-alert').classList.add('show');
+      document.getElementById('c-name').value  = '';
+      document.getElementById('c-email').value = '';
+      document.getElementById('c-msg').value   = '';
+    }
+  </script>
+
+<script src="js/theme-toggle.js"></script>
+</body>
+</html>
+
+
+
+
