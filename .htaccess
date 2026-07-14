@@ -1,8 +1,7 @@
-DirectoryIndex pagina-inicial.html
+DirectoryIndex index.html
 Options -Indexes
 
 # Impede acesso HTTP a .env, .git e outros arquivos ocultos.
 <FilesMatch "^\.">
     Require all denied
 </FilesMatch>
-

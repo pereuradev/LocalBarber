@@ -5,11 +5,11 @@ declare(strict_types=1);
 session_start();
 
 if (empty($_SESSION['usuario_id'])) {
-    header('Location: pagina-inicial.html?login=necessario');
+    header('Location: index.html?login=necessario');
     exit;
 }
 
-$dashboard = file_get_contents(__DIR__ . '/dashboard.html');
+$dashboard = file_get_contents(__DIR__ . '/views/dashboard.html');
 
 if ($dashboard === false) {
     http_response_code(500);
@@ -21,7 +21,6 @@ $nomeUsuario = htmlspecialchars((string)($_SESSION['usuario_nome'] ?? 'Usuario')
 $papelUsuario = htmlspecialchars((string)($_SESSION['usuario_papel'] ?? 'admin'), ENT_QUOTES, 'UTF-8');
 $iniciais = strtoupper(substr(trim((string)($_SESSION['usuario_nome'] ?? 'U')), 0, 1));
 
-$dashboard = str_replace('href="dashboard.html"', 'href="dashboard.php"', $dashboard);
 $dashboard = preg_replace(
     '/<div class="user-avatar">.*?<\/div>\s*<div class="user-info">\s*<p>.*?<\/p>\s*<span>.*?<\/span>\s*<\/div>/s',
     '<div class="user-avatar">' . $iniciais . '</div>' .

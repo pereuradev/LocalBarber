@@ -1,19 +1,26 @@
 (function () {
+  const scriptUrl = document.currentScript && document.currentScript.src;
+  const appRoot = new URL("../../", scriptUrl || window.location.href);
+
+  function resolveAppUrl(path) {
+    return new URL(path, appRoot).href;
+  }
+
   const commands = [
     { title: "Dashboard", detail: "Resumo do dia, equipe e atalhos", group: "Principal", url: "dashboard.php", icon: "D", keywords: "painel inicio resumo home" },
-    { title: "Agenda", detail: "Horarios e atendimentos marcados", group: "Principal", url: "agenda.html", icon: "A", keywords: "marcar agendamento horario calendario" },
-    { title: "Clientes", detail: "Cadastro e historico dos clientes", group: "Principal", url: "clientes.html", icon: "C", keywords: "cliente telefone contato cadastro" },
-    { title: "Servicos", detail: "Precos, duracao e categorias", group: "Principal", url: "servicos.html", icon: "S", keywords: "servico corte barba preco tabela" },
-    { title: "Faturamento", detail: "Indicadores, ranking e ticket medio", group: "Financeiro", url: "faturamento.html", icon: "$", keywords: "faturamento receita lucro caixa dinheiro" },
-    { title: "Transacoes", detail: "Entradas, saidas e formas de pagamento", group: "Financeiro", url: "transacoes.html", icon: "T", keywords: "transacao despesa pagamento pix credito debito" },
-    { title: "Equipe", detail: "Profissionais, cargos e disponibilidade", group: "Gestao", url: "equipe.html", icon: "E", keywords: "barbeiro funcionario equipe profissional" },
-    { title: "Minha Barbearia", detail: "Dados da barbearia e configuracoes", group: "Gestao", url: "minha-barbearia.html", icon: "B", keywords: "configuracao barbearia dados loja" },
-    { title: "Central de informacoes", detail: "Ajuda, politicas e FAQ", group: "Ajuda", url: "central-informacoes.html", icon: "?", keywords: "ajuda faq termos contato suporte" },
-    { title: "Pagina inicial", detail: "Voltar para a vitrine do LocalBarber", group: "Principal", url: "pagina-inicial.html", icon: "L", keywords: "landing home inicio apresentacao" },
+    { title: "Agenda", detail: "Horarios e atendimentos marcados", group: "Principal", url: "pages/agenda.html", icon: "A", keywords: "marcar agendamento horario calendario" },
+    { title: "Clientes", detail: "Cadastro e historico dos clientes", group: "Principal", url: "pages/clientes.html", icon: "C", keywords: "cliente telefone contato cadastro" },
+    { title: "Servicos", detail: "Precos, duracao e categorias", group: "Principal", url: "pages/servicos.html", icon: "S", keywords: "servico corte barba preco tabela" },
+    { title: "Faturamento", detail: "Indicadores, ranking e ticket medio", group: "Financeiro", url: "pages/faturamento.html", icon: "$", keywords: "faturamento receita lucro caixa dinheiro" },
+    { title: "Transacoes", detail: "Entradas, saidas e formas de pagamento", group: "Financeiro", url: "pages/transacoes.html", icon: "T", keywords: "transacao despesa pagamento pix credito debito" },
+    { title: "Equipe", detail: "Profissionais, cargos e disponibilidade", group: "Gestao", url: "pages/equipe.html", icon: "E", keywords: "barbeiro funcionario equipe profissional" },
+    { title: "Minha Barbearia", detail: "Dados da barbearia e configuracoes", group: "Gestao", url: "pages/minha-barbearia.html", icon: "B", keywords: "configuracao barbearia dados loja" },
+    { title: "Central de informacoes", detail: "Ajuda, politicas e FAQ", group: "Ajuda", url: "pages/central-informacoes.html", icon: "?", keywords: "ajuda faq termos contato suporte" },
+    { title: "Pagina inicial", detail: "Voltar para a vitrine do LocalBarber", group: "Principal", url: "index.html", icon: "L", keywords: "landing home inicio apresentacao" },
     { title: "Cadastrar barbearia", detail: "Abrir o formulario de cadastro", group: "Acoes", url: "cadastro-empresa.php", icon: "+", keywords: "cadastro criar conta empresa barbearia" },
-    { title: "Novo servico", detail: "Cadastrar corte, barba ou combo", group: "Acoes", url: "servicos.html", action: "newService", icon: "+", keywords: "novo servico criar preco duracao" },
-    { title: "Novo cliente", detail: "Ir para o cadastro de clientes", group: "Acoes", url: "clientes.html", icon: "+", keywords: "novo cliente cadastrar contato" },
-    { title: "Novo agendamento", detail: "Ir para a agenda de horarios", group: "Acoes", url: "agenda.html", icon: "+", keywords: "novo agendamento marcar horario" },
+    { title: "Novo servico", detail: "Cadastrar corte, barba ou combo", group: "Acoes", url: "pages/servicos.html", action: "newService", icon: "+", keywords: "novo servico criar preco duracao" },
+    { title: "Novo cliente", detail: "Ir para o cadastro de clientes", group: "Acoes", url: "pages/clientes.html", icon: "+", keywords: "novo cliente cadastrar contato" },
+    { title: "Novo agendamento", detail: "Ir para a agenda de horarios", group: "Acoes", url: "pages/agenda.html", icon: "+", keywords: "novo agendamento marcar horario" },
     { title: "Alternar tema", detail: "Trocar entre claro e escuro", group: "Acoes", action: "toggleTheme", icon: "*", keywords: "tema claro escuro modo cor" }
   ];
 
@@ -23,7 +30,7 @@
   let elements = {};
 
   function currentPage() {
-    return window.location.pathname.split("/").pop() || "pagina-inicial.html";
+    return window.location.pathname;
   }
 
   function normalize(text) {
@@ -73,7 +80,7 @@
 
   function samePage(url) {
     if (!url) return false;
-    return url.split("#")[0] === currentPage();
+    return new URL(resolveAppUrl(url)).pathname === currentPage();
   }
 
   function runCommand(command) {
@@ -91,7 +98,7 @@
     }
 
     if (command.url) {
-      window.location.href = command.url;
+      window.location.href = resolveAppUrl(command.url);
     }
   }
 

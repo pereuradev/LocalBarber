@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode([
             'ok' => true,
             'message' => 'Cadastro realizado com sucesso. Voce ja pode entrar.',
-            'redirect' => 'pagina-inicial.html?cadastro=ok',
+            'redirect' => 'index.html?cadastro=ok',
         ]);
     } catch (PDOException $e) {
         if ($pdo->inTransaction()) {
@@ -115,24 +115,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalBarber | Cadastrar Barbearia</title>
     
-  <script src="js/theme-init.js"></script>
+  <script src="assets/js/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="css/cadastro-empresa.css">
-  <link rel="stylesheet" href="css/responsivo.css">
+      <link rel="stylesheet" href="assets/css/cadastro-empresa.css">
+  <link rel="stylesheet" href="assets/css/responsivo.css">
 </head>
 <body>
 
     <nav>
-        <a href="#" class="nav-logo">
-            <img src="Logo-png.png" alt="logo">
+        <a href="index.html" class="nav-logo">
+            <img src="assets/images/logo.png" alt="LocalBarber">
         </a>
         <ul class="nav-links">
-            <li><a href="pagina-inicial.html#">Home</a></li>
-            <li><a href="pagina-inicial.html#features">Sobre Nós</a></li>
-            <li><a href="pagina-inicial.html#contato">Contato</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#features">Sobre Nós</a></li>
+            <li><a href="index.html#contato">Contato</a></li>
         </ul>
         <div class="nav-cta"></div>
     </nav>
@@ -283,7 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 mostrarCadastroPopup(retorno.message || 'Cadastro realizado com sucesso.', 'sucesso');
                 setTimeout(() => {
-                    window.location.href = retorno.redirect || 'pagina-inicial.html?cadastro=ok';
+                    window.location.href = retorno.redirect || 'index.html?cadastro=ok';
                 }, 900);
             } catch (erro) {
                 mostrarCadastroPopup('Erro de conexao. Verifique o servidor e tente novamente.', 'erro');
@@ -292,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
     </script>
-<script src="js/theme-toggle.js"></script>
+<script src="assets/js/theme-toggle.js"></script>
 </body>
 </html>
 

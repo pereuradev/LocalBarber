@@ -19,5 +19,5 @@ if (ini_get('session.use_cookies')) {
 }
 
 session_destroy();
-header('Location: ../pagina-inicial.html');
+header('Location: ../index.html');
 exit;
