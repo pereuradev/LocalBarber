@@ -256,6 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LocalBarber | Cadastrar Barbearia</title>
+    <link rel="icon" type="image/png" href="assets/images/favicon.png?v=20260715">
     
   <script src="assets/js/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
