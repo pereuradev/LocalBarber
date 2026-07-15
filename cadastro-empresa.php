@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json; charset=utf-8');
-    require_once __DIR__ . '/config/database.php';
+    require_once __DIR__ . '/config/brasil-api.php';
 
     $dados = [
         'razao_social' => trim((string)($_POST['razaoSocial'] ?? '')),
@@ -14,19 +14,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'senha' => (string)($_POST['senha'] ?? ''),
         'telefone' => trim((string)($_POST['telefone'] ?? '')),
         'endereco' => trim((string)($_POST['endereco'] ?? '')),
+        'numero' => trim((string)($_POST['numero'] ?? '')),
+        'complemento' => trim((string)($_POST['complemento'] ?? '')),
         'uf' => strtoupper(trim((string)($_POST['uf'] ?? ''))),
         'bairro' => trim((string)($_POST['bairro'] ?? '')),
+        'cidade' => trim((string)($_POST['cidade'] ?? '')),
         'cep' => trim((string)($_POST['cep'] ?? '')),
         'nome_representante' => trim((string)($_POST['nomeRepresentante'] ?? '')),
         'telefone_representante' => trim((string)($_POST['telefoneRepresentante'] ?? '')),
     ];
 
-    foreach (['razao_social', 'documento', 'nome_fantasia', 'email', 'senha', 'telefone', 'endereco', 'uf', 'bairro', 'cep', 'nome_representante', 'telefone_representante'] as $campo) {
+    foreach (['razao_social', 'documento', 'nome_fantasia', 'email', 'senha', 'telefone', 'endereco', 'uf', 'bairro', 'cidade', 'cep', 'nome_representante', 'telefone_representante'] as $campo) {
         if ($dados[$campo] === '') {
             http_response_code(422);
             echo json_encode(['ok' => false, 'message' => 'Preencha todos os campos obrigatorios.']);
             exit;
         }
+    }
+
+    if (!cnpjEhValido($dados['documento'])) {
+        http_response_code(422);
+        echo json_encode(['ok' => false, 'message' => 'Informe um CNPJ válido com 14 dígitos.']);
+        exit;
     }
 
     if (!filter_var($dados['email'], FILTER_VALIDATE_EMAIL)) {
@@ -40,6 +49,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['ok' => false, 'message' => 'A senha precisa ter pelo menos 6 caracteres.']);
         exit;
     }
+
+    if (preg_match('/^[A-Z]{2}$/', $dados['uf']) !== 1 || strlen(somenteDigitos($dados['cep'])) !== 8) {
+        http_response_code(422);
+        echo json_encode(['ok' => false, 'message' => 'Informe UF e CEP válidos.']);
+        exit;
+    }
+
+    try {
+        $empresaConsultada = consultarCnpjNaBrasilApi($dados['documento']);
+    } catch (BrasilApiException $exception) {
+        http_response_code($exception->getHttpStatus());
+        echo json_encode(['ok' => false, 'message' => $exception->getMessage()], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $situacaoCadastral = strtoupper(trim((string)($empresaConsultada['descricao_situacao_cadastral'] ?? '')));
+
+    if ($situacaoCadastral !== 'ATIVA') {
+        http_response_code(422);
+        echo json_encode([
+            'ok' => false,
+            'code' => 'cnpj_inativo',
+            'message' => 'O CNPJ precisa estar com situação cadastral ATIVA para concluir o cadastro.',
+            'situacao_cadastral' => $situacaoCadastral,
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $razaoSocialOficial = trim((string)($empresaConsultada['razao_social'] ?? ''));
+    $dados['documento'] = formatarCnpj($dados['documento']);
+
+    if ($razaoSocialOficial !== '') {
+        $dados['razao_social'] = $razaoSocialOficial;
+    }
+
+    require_once __DIR__ . '/config/database.php';
 
     try {
         $pdo->beginTransaction();
@@ -61,14 +106,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $barbeariaId = $stmt->fetchColumn();
 
         $pdo->prepare(
-            'insert into enderecos_barbearia (barbearia_id, cep, logradouro, bairro, cidade, uf, pais)
-             values (:barbearia_id, :cep, :logradouro, :bairro, :cidade, :uf, :pais)'
+            'insert into enderecos_barbearia (barbearia_id, cep, logradouro, numero, complemento, bairro, cidade, uf, pais)
+             values (:barbearia_id, :cep, :logradouro, :numero, :complemento, :bairro, :cidade, :uf, :pais)'
         )->execute([
             'barbearia_id' => $barbeariaId,
             'cep' => $dados['cep'],
             'logradouro' => $dados['endereco'],
+            'numero' => $dados['numero'] !== '' ? $dados['numero'] : null,
+            'complemento' => $dados['complemento'] !== '' ? $dados['complemento'] : null,
             'bairro' => $dados['bairro'],
-            'cidade' => null,
+            'cidade' => $dados['cidade'],
             'uf' => $dados['uf'],
             'pais' => 'Brasil',
         ]);
@@ -162,7 +209,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-row">
                     <div class="form-group">
                         <label for="cnpj">CNPJ</label>
-                        <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00" required>
+                        <div class="cnpj-input-row">
+                            <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00" inputmode="numeric" autocomplete="off" aria-describedby="cnpj-status-message" required>
+                            <button type="button" id="consultar-cnpj" class="btn-consultar-cnpj" data-state="idle">Consultar</button>
+                        </div>
+                        <div id="cnpj-status" class="cnpj-feedback" data-state="idle" role="status" aria-live="polite">
+                            <span id="cnpj-status-icon" class="cnpj-feedback-icon" aria-hidden="true">i</span>
+                            <span class="cnpj-feedback-content">
+                                <strong id="cnpj-status-title">Consulta de CNPJ</strong>
+                                <span id="cnpj-status-message">Digite o CNPJ para preencher os dados da empresa.</span>
+                            </span>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="nomeFantasia">Nome fantasia</label>
@@ -206,6 +263,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="numero">Número</label>
+                        <input type="text" id="numero" name="numero" placeholder="123">
+                    </div>
+                    <div class="form-group">
+                        <label for="complemento">Complemento</label>
+                        <input type="text" id="complemento" name="complemento" placeholder="Sala, bloco ou referência">
+                    </div>
+                </div>
+
                 <div class="form-row-three">
                     <div class="form-group">
                         <label for="uf">UF</label>
@@ -219,6 +287,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="cep">CEP</label>
                         <input type="text" id="cep" name="cep" placeholder="00000-000" required>
                     </div>
+                </div>
+
+                <div class="form-group form-group-spaced">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" id="cidade" name="cidade" required>
                 </div>
             </section>
 
@@ -250,10 +323,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById(id).addEventListener('input', e => e.target.value = maskFunc(e.target.value));
         };
 
-        applyMask('cnpj', v => v.replace(/\D/g, '').replace(/^(\d{2})(\d)/, '$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\d{4})(\d)/, '$1-$2').substring(0, 18));
-        applyMask('telefone', v => v.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d)(\d{4})$/, '$1-$2').substring(0, 15));
-        applyMask('telefoneRepresentante', v => v.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d)(\d{4})$/, '$1-$2').substring(0, 15));
-        applyMask('cep', v => v.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2').substring(0, 9));
+        const formatarCnpj = v => v.replace(/\D/g, '').replace(/^(\d{2})(\d)/, '$1.$2').replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3').replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\d{4})(\d)/, '$1-$2').substring(0, 18);
+        const formatarTelefone = v => v.replace(/\D/g, '').replace(/^(\d{2})(\d)/g, '($1) $2').replace(/(\d)(\d{4})$/, '$1-$2').substring(0, 15);
+        const formatarCep = v => v.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2').substring(0, 9);
+
+        applyMask('cnpj', formatarCnpj);
+        applyMask('telefone', formatarTelefone);
+        applyMask('telefoneRepresentante', formatarTelefone);
+        applyMask('cep', formatarCep);
         
         document.getElementById('uf').addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
 
@@ -265,9 +342,145 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             popup.hideTimer = setTimeout(() => popup.classList.remove('show'), 4500);
         }
 
+        const cnpjInput = document.getElementById('cnpj');
+        const consultarCnpjBtn = document.getElementById('consultar-cnpj');
+        const cnpjStatus = document.getElementById('cnpj-status');
+        const cnpjStatusIcon = document.getElementById('cnpj-status-icon');
+        const cnpjStatusTitle = document.getElementById('cnpj-status-title');
+        const cnpjStatusMessage = document.getElementById('cnpj-status-message');
+        let consultaCnpjAtual = null;
+
+        const estadosConsulta = {
+            idle: { titulo: 'Consulta de CNPJ', icone: 'i', botao: 'Consultar' },
+            loading: { titulo: 'Consultando CNPJ', icone: '…', botao: 'Consultando' },
+            success: { titulo: 'Empresa ativa', icone: '✓', botao: 'Validado' },
+            inactive: { titulo: 'Empresa não está ativa', icone: '!', botao: 'Consultar novamente' },
+            error: { titulo: 'Não foi possível consultar', icone: '×', botao: 'Tentar novamente' },
+        };
+
+        function atualizarStatusCnpj(mensagem, estado = 'idle') {
+            const configuracao = estadosConsulta[estado] || estadosConsulta.idle;
+            cnpjStatus.dataset.state = estado;
+            cnpjStatusIcon.textContent = configuracao.icone;
+            cnpjStatusTitle.textContent = configuracao.titulo;
+            cnpjStatusMessage.textContent = mensagem;
+        }
+
+        function atualizarBotaoConsulta(estado = 'idle') {
+            const configuracao = estadosConsulta[estado] || estadosConsulta.idle;
+            consultarCnpjBtn.dataset.state = estado;
+            consultarCnpjBtn.textContent = configuracao.botao;
+        }
+
+        function preencherCampo(id, valor, formatador = valorAtual => valorAtual) {
+            const campo = document.getElementById(id);
+
+            if (campo) {
+                const valorNormalizado = valor === null || valor === undefined ? '' : String(valor).trim();
+                campo.value = valorNormalizado === '' ? '' : formatador(valorNormalizado);
+            }
+        }
+
+        async function executarConsultaCnpj() {
+            const cnpj = cnpjInput.value.replace(/\D/g, '');
+
+            if (cnpj.length !== 14) {
+                cnpjInput.dataset.validado = '';
+                atualizarStatusCnpj('Digite os 14 dígitos do CNPJ para continuar.', 'error');
+                atualizarBotaoConsulta('error');
+                cnpjInput.focus();
+                return false;
+            }
+
+            consultarCnpjBtn.disabled = true;
+            atualizarBotaoConsulta('loading');
+            atualizarStatusCnpj('Buscando os dados oficiais na Receita Federal.', 'loading');
+
+            try {
+                const resposta = await fetch(`api/consultar-cnpj.php?cnpj=${encodeURIComponent(cnpj)}`, {
+                    headers: { Accept: 'application/json' },
+                });
+                const retorno = await resposta.json();
+
+                if (!resposta.ok || !retorno.ok) {
+                    const erroConsulta = new Error(retorno.message || 'Não foi possível consultar este CNPJ.');
+                    erroConsulta.code = retorno.code || 'consulta_indisponivel';
+                    erroConsulta.situacaoCadastral = retorno.situacao_cadastral || '';
+                    throw erroConsulta;
+                }
+
+                const empresa = retorno.empresa;
+                const logradouro = [empresa.tipo_logradouro, empresa.logradouro]
+                    .filter(Boolean)
+                    .join(' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                preencherCampo('cnpj', empresa.cnpj, formatarCnpj);
+                preencherCampo('razaoSocial', empresa.razao_social);
+                preencherCampo('nomeFantasia', empresa.nome_fantasia || empresa.razao_social);
+                preencherCampo('email', empresa.email);
+                preencherCampo('telefone', empresa.telefone, formatarTelefone);
+                preencherCampo('endereco', logradouro);
+                preencherCampo('numero', empresa.numero);
+                preencherCampo('complemento', empresa.complemento);
+                preencherCampo('bairro', empresa.bairro);
+                preencherCampo('cidade', empresa.cidade);
+                preencherCampo('uf', empresa.uf, valor => valor.toUpperCase());
+                preencherCampo('cep', empresa.cep, formatarCep);
+
+                cnpjInput.dataset.validado = cnpj;
+                const localidade = [empresa.cidade, empresa.uf].filter(Boolean).join('/');
+                const atividade = empresa.atividade_principal ? ` · ${empresa.atividade_principal}` : '';
+                atualizarStatusCnpj(`Cadastro regular${localidade ? ` · ${localidade}` : ''}${atividade}`, 'success');
+                atualizarBotaoConsulta('success');
+                return true;
+            } catch (erro) {
+                cnpjInput.dataset.validado = '';
+                const estado = erro.code === 'cnpj_inativo' ? 'inactive' : 'error';
+                atualizarStatusCnpj(erro.message || 'Erro ao consultar o CNPJ.', estado);
+                atualizarBotaoConsulta(estado);
+                return false;
+            } finally {
+                consultarCnpjBtn.disabled = false;
+            }
+        }
+
+        function consultarCnpj() {
+            if (!consultaCnpjAtual) {
+                consultaCnpjAtual = executarConsultaCnpj().finally(() => {
+                    consultaCnpjAtual = null;
+                });
+            }
+
+            return consultaCnpjAtual;
+        }
+
+        consultarCnpjBtn.addEventListener('click', consultarCnpj);
+        cnpjInput.addEventListener('input', () => {
+            cnpjInput.dataset.validado = '';
+            atualizarStatusCnpj('Digite o CNPJ para preencher os dados da empresa.', 'idle');
+            atualizarBotaoConsulta('idle');
+        });
+        cnpjInput.addEventListener('blur', () => {
+            const cnpj = cnpjInput.value.replace(/\D/g, '');
+
+            if (cnpj.length === 14 && cnpjInput.dataset.validado !== cnpj) {
+                consultarCnpj();
+            }
+        });
+
         document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.querySelector('.btn-cadastrar');
+
+            const cnpj = cnpjInput.value.replace(/\D/g, '');
+            if (cnpjInput.dataset.validado !== cnpj && !(await consultarCnpj())) {
+                mostrarCadastroPopup('Valide o CNPJ antes de concluir o cadastro.', 'erro');
+                return;
+            }
+
+            btn.disabled = true;
             btn.textContent = 'Cadastrando...';
 
             try {
@@ -278,7 +491,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const retorno = await resposta.json();
 
                 if (!resposta.ok || !retorno.ok) {
-                    mostrarCadastroPopup(retorno.message || 'Nao foi possivel cadastrar.', 'erro');
+                    const tipoPopup = retorno.code === 'cnpj_inativo' ? 'alerta' : 'erro';
+                    mostrarCadastroPopup(retorno.message || 'Nao foi possivel cadastrar.', tipoPopup);
                     return;
                 }
 
@@ -289,6 +503,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } catch (erro) {
                 mostrarCadastroPopup('Erro de conexao. Verifique o servidor e tente novamente.', 'erro');
             } finally {
+                btn.disabled = false;
                 btn.textContent = 'Cadastrar';
             }
         });
