@@ -24,13 +24,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'telefone_representante' => trim((string)($_POST['telefoneRepresentante'] ?? '')),
     ];
 
-    foreach (['razao_social', 'documento', 'nome_fantasia', 'email', 'senha', 'telefone', 'endereco', 'uf', 'bairro', 'cidade', 'cep', 'nome_representante', 'telefone_representante'] as $campo) {
+    $camposObrigatorios = [
+        'razao_social' => 'razão social',
+        'documento' => 'CNPJ',
+        'nome_fantasia' => 'nome fantasia',
+        'email' => 'e-mail',
+        'senha' => 'senha',
+        'telefone' => 'telefone da empresa',
+        'endereco' => 'endereço',
+        'uf' => 'UF',
+        'bairro' => 'bairro',
+        'cidade' => 'cidade',
+        'cep' => 'CEP',
+        'nome_representante' => 'nome do representante',
+        'telefone_representante' => 'telefone do representante',
+    ];
+
+    foreach ($camposObrigatorios as $campo => $rotulo) {
         if ($dados[$campo] === '') {
             http_response_code(422);
-            echo json_encode(['ok' => false, 'message' => 'Preencha todos os campos obrigatorios.']);
+            echo json_encode([
+                'ok' => false,
+                'code' => 'campo_obrigatorio',
+                'field' => $campo,
+                'message' => "Preencha o campo {$rotulo}.",
+            ], JSON_UNESCAPED_UNICODE);
             exit;
         }
     }
+
+    $dados['email'] = strtolower($dados['email']);
 
     if (!cnpjEhValido($dados['documento'])) {
         http_response_code(422);
@@ -84,9 +107,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dados['razao_social'] = $razaoSocialOficial;
     }
 
-    require_once __DIR__ . '/config/database.php';
-
     try {
+        require_once __DIR__ . '/config/database.php';
+
+        $stmt = $pdo->prepare(
+            "select
+                exists (
+                    select 1
+                    from barbearias
+                    where regexp_replace(coalesce(documento, ''), '[^0-9]', '', 'g') = :cnpj
+                ) as cnpj_cadastrado,
+                (
+                    exists (select 1 from usuarios where lower(email) = :email_usuario)
+                    or exists (select 1 from barbearias where lower(email) = :email_barbearia)
+                ) as email_cadastrado"
+        );
+        $stmt->execute([
+            'cnpj' => somenteDigitos($dados['documento']),
+            'email_usuario' => $dados['email'],
+            'email_barbearia' => $dados['email'],
+        ]);
+        $cadastroExistente = $stmt->fetch();
+
+        if (($cadastroExistente['cnpj_cadastrado'] ?? false) === true) {
+            http_response_code(409);
+            echo json_encode([
+                'ok' => false,
+                'code' => 'cnpj_duplicado',
+                'field' => 'documento',
+                'message' => 'Este CNPJ já possui uma empresa cadastrada.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        if (($cadastroExistente['email_cadastrado'] ?? false) === true) {
+            http_response_code(409);
+            echo json_encode([
+                'ok' => false,
+                'code' => 'email_duplicado',
+                'field' => 'email',
+                'message' => 'Este e-mail já está vinculado a uma conta.',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
         $pdo->beginTransaction();
 
         $stmt = $pdo->prepare(
@@ -145,13 +209,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($e->getCode() === '23505') {
+            $detalhe = strtolower((string)($e->errorInfo[2] ?? $e->getMessage()));
+            $duplicidadeCnpj = str_contains($detalhe, 'documento') || str_contains($detalhe, 'barbearias_documento');
+
             http_response_code(409);
-            echo json_encode(['ok' => false, 'message' => 'Este email ou CNPJ ja esta cadastrado.']);
+            echo json_encode([
+                'ok' => false,
+                'code' => $duplicidadeCnpj ? 'cnpj_duplicado' : 'email_duplicado',
+                'field' => $duplicidadeCnpj ? 'documento' : 'email',
+                'message' => $duplicidadeCnpj
+                    ? 'Este CNPJ já possui uma empresa cadastrada.'
+                    : 'Este e-mail já está vinculado a uma conta.',
+            ], JSON_UNESCAPED_UNICODE);
             exit;
         }
 
+        $referenciaErro = bin2hex(random_bytes(4));
+        error_log("[LocalBarber][{$referenciaErro}] Falha no cadastro: {$e->getMessage()}");
         http_response_code(500);
-        echo json_encode(['ok' => false, 'message' => 'Erro ao salvar cadastro no banco de dados.']);
+        echo json_encode([
+            'ok' => false,
+            'code' => 'erro_banco',
+            'message' => "Não foi possível concluir o cadastro. Referência: {$referenciaErro}.",
+        ], JSON_UNESCAPED_UNICODE);
+    } catch (Throwable $e) {
+        if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        $referenciaErro = bin2hex(random_bytes(4));
+        error_log("[LocalBarber][{$referenciaErro}] Erro inesperado no cadastro: {$e->getMessage()}");
+        http_response_code(500);
+        echo json_encode([
+            'ok' => false,
+            'code' => 'erro_interno',
+            'message' => "Não foi possível concluir o cadastro. Referência: {$referenciaErro}.",
+        ], JSON_UNESCAPED_UNICODE);
     }
 
     exit;
@@ -342,6 +435,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             popup.hideTimer = setTimeout(() => popup.classList.remove('show'), 4500);
         }
 
+        const camposRespostaServidor = {
+            razao_social: 'razaoSocial',
+            documento: 'cnpj',
+            nome_fantasia: 'nomeFantasia',
+            email: 'email',
+            senha: 'senha',
+            telefone: 'telefone',
+            endereco: 'endereco',
+            uf: 'uf',
+            bairro: 'bairro',
+            cidade: 'cidade',
+            cep: 'cep',
+            nome_representante: 'nomeRepresentante',
+            telefone_representante: 'telefoneRepresentante',
+        };
+
+        function focarCampoComErro(campoServidor) {
+            const idCampo = camposRespostaServidor[campoServidor];
+
+            if (idCampo) {
+                document.getElementById(idCampo)?.focus();
+            }
+        }
+
         const cnpjInput = document.getElementById('cnpj');
         const consultarCnpjBtn = document.getElementById('consultar-cnpj');
         const cnpjStatus = document.getElementById('cnpj-status');
@@ -372,11 +489,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             consultarCnpjBtn.textContent = configuracao.botao;
         }
 
-        function preencherCampo(id, valor, formatador = valorAtual => valorAtual) {
+        function preencherCampo(id, valor, formatador = valorAtual => valorAtual, preservarAtualSeVazio = false) {
             const campo = document.getElementById(id);
 
             if (campo) {
                 const valorNormalizado = valor === null || valor === undefined ? '' : String(valor).trim();
+
+                if (preservarAtualSeVazio && valorNormalizado === '') {
+                    return;
+                }
+
                 campo.value = valorNormalizado === '' ? '' : formatador(valorNormalizado);
             }
         }
@@ -419,15 +541,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 preencherCampo('cnpj', empresa.cnpj, formatarCnpj);
                 preencherCampo('razaoSocial', empresa.razao_social);
                 preencherCampo('nomeFantasia', empresa.nome_fantasia || empresa.razao_social);
-                preencherCampo('email', empresa.email);
-                preencherCampo('telefone', empresa.telefone, formatarTelefone);
-                preencherCampo('endereco', logradouro);
-                preencherCampo('numero', empresa.numero);
-                preencherCampo('complemento', empresa.complemento);
-                preencherCampo('bairro', empresa.bairro);
-                preencherCampo('cidade', empresa.cidade);
-                preencherCampo('uf', empresa.uf, valor => valor.toUpperCase());
-                preencherCampo('cep', empresa.cep, formatarCep);
+                preencherCampo('email', empresa.email, valor => valor, true);
+                preencherCampo('telefone', empresa.telefone, formatarTelefone, true);
+                preencherCampo('endereco', logradouro, valor => valor, true);
+                preencherCampo('numero', empresa.numero, valor => valor, true);
+                preencherCampo('complemento', empresa.complemento, valor => valor, true);
+                preencherCampo('bairro', empresa.bairro, valor => valor, true);
+                preencherCampo('cidade', empresa.cidade, valor => valor, true);
+                preencherCampo('uf', empresa.uf, valor => valor.toUpperCase(), true);
+                preencherCampo('cep', empresa.cep, formatarCep, true);
 
                 cnpjInput.dataset.validado = cnpj;
                 const localidade = [empresa.cidade, empresa.uf].filter(Boolean).join('/');
@@ -493,6 +615,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!resposta.ok || !retorno.ok) {
                     const tipoPopup = retorno.code === 'cnpj_inativo' ? 'alerta' : 'erro';
                     mostrarCadastroPopup(retorno.message || 'Nao foi possivel cadastrar.', tipoPopup);
+                    focarCampoComErro(retorno.field);
                     return;
                 }
 
