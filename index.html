@@ -7,13 +7,14 @@
   <title>LocalBarber | Gestão para barbearias</title>
   <link rel="icon" type="image/png" href="assets/images/favicon.png?v=20260715" />
   <meta name="description" content="Centralize agenda, clientes, serviços, equipe e controle financeiro da sua barbearia com o LocalBarber." />
+  <link rel="preload" href="assets/videos/hero-localbarber.webm?v=2" as="video" type="video/webm" />
   
   <script src="assets/js/theme-init.js"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
     
-    <link rel="stylesheet" href="assets/css/inicio.css?v=3">
+    <link rel="stylesheet" href="assets/css/inicio.css?v=7">
   <link rel="stylesheet" href="assets/css/responsivo.css">
 </head>
 
@@ -49,10 +50,12 @@
         <a href="#features" class="btn btn-outline btn-hero">Conhecer recursos</a>
       </div>
     </div>
-    <div class="hero-system hero-scissors fade-up delay-1" aria-label="Navalha de barbeiro interativa">
-      <div class="scissors-3d">
-        <img src="assets/images/hero-navalha.png" alt="Navalha de barbeiro LocalBarber">
-      </div>
+    <div class="hero-system hero-video">
+      <video class="hero-brand-video" autoplay muted loop playsinline preload="auto" aria-label="Animação da marca LocalBarber">
+        <source src="assets/videos/hero-localbarber.webm?v=2" type="video/webm">
+        Seu navegador não suporta a reprodução deste vídeo.
+      </video>
+      <span class="hero-barber-word" aria-hidden="true">Barber</span>
     </div>
   </section>
 
@@ -404,74 +407,19 @@
       });
     });
 
-    (function initInteractiveScissors() {
-      const stage = document.querySelector('.hero-scissors');
-      const scissors = document.querySelector('.scissors-3d');
-      if (!stage || !scissors) return;
+    (function initHeroBrandVideo() {
+      const video = document.querySelector('.hero-brand-video');
+      const barberWord = document.querySelector('.hero-barber-word');
+      if (!video || !barberWord) return;
 
-      let dragging = false;
-      let startX = 0;
-      let startY = 0;
-      let rotationX = 0;
-      let rotationY = 0;
-      let rotationZ = -5;
-      let scale = 1;
-
-      function applyTransform() {
-        scissors.style.setProperty('--scissor-x-value', rotationX);
-        scissors.style.setProperty('--scissor-y-value', rotationY);
-        scissors.style.setProperty('--scissor-x', `${rotationX}deg`);
-        scissors.style.setProperty('--scissor-y', `${rotationY}deg`);
-        scissors.style.setProperty('--scissor-z', `${rotationZ}deg`);
-        scissors.style.setProperty('--scissor-scale', scale);
+      function syncBarberWord() {
+        const progress = video.duration ? video.currentTime / video.duration : 0;
+        barberWord.classList.toggle('is-visible', progress >= 0.68);
       }
 
-      stage.addEventListener('pointerdown', (event) => {
-        dragging = true;
-        startX = event.clientX;
-        startY = event.clientY;
-        stage.classList.add('is-dragging');
-        stage.setPointerCapture(event.pointerId);
-      });
-
-      stage.addEventListener('pointermove', (event) => {
-        if (!dragging) return;
-        const movementX = event.clientX - startX;
-        const movementY = event.clientY - startY;
-        startX = event.clientX;
-        startY = event.clientY;
-        rotationY = Math.max(-70, Math.min(70, rotationY + movementX * .34));
-        rotationX = Math.max(-45, Math.min(45, rotationX - movementY * .26));
-        rotationZ = Math.max(-18, Math.min(18, rotationZ + movementX * .03));
-        applyTransform();
-      });
-
-      function stopDrag(event) {
-        if (!dragging) return;
-        dragging = false;
-        stage.classList.remove('is-dragging');
-        if (event.pointerId !== undefined && stage.hasPointerCapture(event.pointerId)) {
-          stage.releasePointerCapture(event.pointerId);
-        }
-      }
-
-      stage.addEventListener('pointerup', stopDrag);
-      stage.addEventListener('pointercancel', stopDrag);
-      stage.addEventListener('wheel', (event) => {
-        event.preventDefault();
-        scale = Math.max(.84, Math.min(1.18, scale - event.deltaY * .001));
-        applyTransform();
-      }, { passive: false });
-
-      stage.addEventListener('dblclick', () => {
-        rotationX = 0;
-        rotationY = 0;
-        rotationZ = -5;
-        scale = 1;
-        applyTransform();
-      });
-
-      applyTransform();
+      video.addEventListener('loadedmetadata', syncBarberWord);
+      video.addEventListener('timeupdate', syncBarberWord);
+      video.addEventListener('seeking', syncBarberWord);
     })();
 
   </script>
