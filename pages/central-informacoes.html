@@ -491,12 +491,6 @@
       document.querySelectorAll('.sidebar-nav a').forEach(link => link.classList.remove('active'));
     }
 
-    function setNav(id){
-      document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
-      const btn = document.getElementById(id);
-      if(btn) btn.classList.add('active');
-    }
-
     function toggleFaq(el){
       el.closest('.faq-item').classList.toggle('open');
     }

@@ -7,14 +7,14 @@
   <title>LocalBarber | Gestão para barbearias</title>
   <link rel="icon" type="image/png" href="assets/images/favicon.png?v=20260715" />
   <meta name="description" content="Centralize agenda, clientes, serviços, equipe e controle financeiro da sua barbearia com o LocalBarber." />
-  <link rel="preload" href="assets/videos/hero-localbarber.webm?v=2" as="video" type="video/webm" />
+  <link rel="preload" href="assets/images/mascote-localbarber.png?v=2" as="image" type="image/png" />
   
   <script src="assets/js/theme-init.js"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
     
-    <link rel="stylesheet" href="assets/css/inicio.css?v=7">
+    <link rel="stylesheet" href="assets/css/inicio.css?v=10">
   <link rel="stylesheet" href="assets/css/responsivo.css">
 </head>
 
@@ -50,12 +50,14 @@
         <a href="#features" class="btn btn-outline btn-hero">Conhecer recursos</a>
       </div>
     </div>
-    <div class="hero-system hero-video">
-      <video class="hero-brand-video" autoplay muted loop playsinline preload="auto" aria-label="Animação da marca LocalBarber">
-        <source src="assets/videos/hero-localbarber.webm?v=2" type="video/webm">
-        Seu navegador não suporta a reprodução deste vídeo.
-      </video>
-      <span class="hero-barber-word" aria-hidden="true">Barber</span>
+    <div class="hero-system hero-mascot">
+      <img
+        class="hero-mascot-image"
+        src="assets/images/mascote-localbarber.png?v=2"
+        alt="Barbeiro LocalBarber organizando a agenda de atendimentos"
+        width="1672"
+        height="941"
+        decoding="async" />
     </div>
   </section>
 
@@ -406,21 +408,6 @@
         card.classList.add('active');
       });
     });
-
-    (function initHeroBrandVideo() {
-      const video = document.querySelector('.hero-brand-video');
-      const barberWord = document.querySelector('.hero-barber-word');
-      if (!video || !barberWord) return;
-
-      function syncBarberWord() {
-        const progress = video.duration ? video.currentTime / video.duration : 0;
-        barberWord.classList.toggle('is-visible', progress >= 0.68);
-      }
-
-      video.addEventListener('loadedmetadata', syncBarberWord);
-      video.addEventListener('timeupdate', syncBarberWord);
-      video.addEventListener('seeking', syncBarberWord);
-    })();
 
   </script>
 

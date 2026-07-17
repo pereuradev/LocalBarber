@@ -475,21 +475,6 @@
     }
   }
 
-  // Logo preview
-  function previewLogo(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      document.getElementById('logoEmoji').style.display = 'none';
-      const img = document.getElementById('logoImg');
-      img.src = e.target.result;
-      img.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-    markDirty();
-  }
-
   // CEP autocomplete (ViaCEP)
   let cepTimer;
   function buscarCEP(val) {

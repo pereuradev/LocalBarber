@@ -38,7 +38,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--bg-nav);
+
   color: var(--text-dark);
   font-family: "Inter", Arial, sans-serif;
 }
@@ -107,20 +107,75 @@ nav {
   gap: 10px;
 }
 
+.cadastro-stage {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 1400px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.cadastro-mascote {
+  position: absolute;
+  top: 70px;
+  right: 97px;
+  width: 540px;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  animation: mascotEntrance .82s cubic-bezier(.16, 1, .3, 1) .22s both;
+}
+
+.cadastro-mascote-base {
+  z-index: 0;
+  filter: drop-shadow(0 22px 26px rgba(0, 45, 105, .22));
+}
+
+.cadastro-mascote-mao {
+  z-index: 2;
+  filter: none;
+}
+
+.cadastro-mascote-mao-superior {
+  clip-path: inset(7% 52% 80% 34%);
+}
+
+.cadastro-mascote-mao-inferior {
+  clip-path: inset(55% 48% 30% 34%);
+}
+
 .form-container {
-  width: min(100%, 780px);
+  position: relative;
+  z-index: 1;
+  width: min(100%, 980px);
   padding: 34px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  animation: fadeIn .45s ease-out;
+  animation: formEntrance .62s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+body.cadastro-empresa-page .cadastro-stage .form-container {
+  max-width: 980px;
+  padding: 28px 34px;
+}
+
+body.cadastro-empresa-page:has(.form-container) {
+  padding: 92px 20px 20px;
+}
+
+.cadastro-empresa-page .form-heading {
+  margin-bottom: 20px;
 }
 
 .form-heading {
   max-width: 560px;
   margin: 0 auto 26px;
   text-align: center;
+  animation: contentEntrance .44s ease-out .12s backwards;
 }
 
 .auth-popup {
@@ -211,6 +266,65 @@ html[data-theme="dark"] body .auth-popup.alerta {
   color: var(--muted);
   font-size: .98rem;
   line-height: 1.65;
+}
+
+#cadastroForm {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "company address"
+    "access representative"
+    "submit submit";
+  column-gap: 50px;
+  align-items: start;
+}
+
+#cadastroForm::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 68px;
+  left: 50%;
+  width: 1px;
+  background: var(--border);
+  transform: translateX(-50%);
+  transform-origin: top;
+  animation: dividerEntrance .42s ease-out .34s both;
+}
+
+.form-column {
+  display: contents;
+  min-width: 0;
+}
+
+.form-section-company {
+  grid-area: company;
+  animation: contentEntrance .46s ease-out .22s backwards;
+}
+
+.form-section-access {
+  grid-area: access;
+  animation: contentEntrance .46s ease-out .38s backwards;
+}
+
+.form-section-address {
+  grid-area: address;
+  animation: contentEntrance .46s ease-out .29s backwards;
+}
+
+.form-section-representative {
+  grid-area: representative;
+  animation: contentEntrance .46s ease-out .45s backwards;
+}
+
+.form-section-company .form-row {
+  grid-template-columns: 1fr;
+}
+
+#cadastroForm > .btn-cadastrar {
+  grid-area: submit;
+  animation: contentEntrance .46s ease-out .54s backwards;
 }
 
 .form-section {
@@ -554,7 +668,7 @@ html[data-theme="dark"] body .cnpj-feedback[data-state="error"] {
   width: 100%;
   max-width: 300px;
   min-height: 48px;
-  margin: 8px auto 0;
+  margin: 20px auto 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -577,10 +691,36 @@ html[data-theme="dark"] body .cnpj-feedback[data-state="error"] {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 12px 24px rgba(0, 47, 120, .34);
 }
 
-@keyframes fadeIn {
+@keyframes formEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes mascotEntrance {
+  0% {
+    opacity: 0;
+    transform: translate3d(88px, 12px, 0) scale(.96) rotate(1.5deg);
+  }
+  72% {
+    opacity: 1;
+    transform: translate3d(-6px, 0, 0) scale(1.006) rotate(-.15deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0);
+  }
+}
+
+@keyframes contentEntrance {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -588,9 +728,57 @@ html[data-theme="dark"] body .cnpj-feedback[data-state="error"] {
   }
 }
 
+@keyframes dividerEntrance {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scaleY(1);
+  }
+}
+
+@media (max-width: 1399px) {
+  .cadastro-stage {
+    width: min(100%, 980px);
+    justify-content: center;
+  }
+
+  .cadastro-mascote {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .cadastro-stage {
+    width: min(100%, 780px);
+    justify-content: center;
+  }
+
+  #cadastroForm {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "company"
+      "access"
+      "address"
+      "representative"
+      "submit";
+    column-gap: 0;
+  }
+
+  #cadastroForm::before {
+    display: none;
+  }
+
+  .form-column + .form-column .form-section:first-child {
+    border-top: 1px solid var(--border);
+  }
+}
+
 @media (max-width: 768px) {
-  body {
-    padding: 96px 14px 32px;
+  body.cadastro-empresa-page:has(.form-container) {
+    padding: 88px 14px 24px;
   }
 
   nav {
@@ -609,7 +797,7 @@ html[data-theme="dark"] body .cnpj-feedback[data-state="error"] {
     min-width: 0;
   }
 
-  .form-container {
+  body.cadastro-empresa-page .cadastro-stage .form-container {
     padding: 24px 18px;
   }
 
@@ -634,5 +822,16 @@ html[data-theme="dark"] body .cnpj-feedback[data-state="error"] {
 
   .btn-consultar-cnpj {
     width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form-container,
+  .form-heading,
+  .form-section,
+  #cadastroForm::before,
+  #cadastroForm > .btn-cadastrar,
+  .cadastro-mascote {
+    animation: none !important;
   }
 }

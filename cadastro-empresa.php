@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'razao_social' => trim((string)($_POST['razaoSocial'] ?? '')),
         'documento' => trim((string)($_POST['cnpj'] ?? '')),
         'nome_fantasia' => trim((string)($_POST['nomeFantasia'] ?? '')),
-        'email' => trim((string)($_POST['email'] ?? '')),
-        'senha' => (string)($_POST['senha'] ?? ''),
+        'email' => trim((string)($_POST['emailCadastroEmpresa'] ?? $_POST['email'] ?? '')),
+        'senha' => (string)($_POST['senhaCadastroEmpresa'] ?? $_POST['senha'] ?? ''),
         'telefone' => trim((string)($_POST['telefone'] ?? '')),
         'endereco' => trim((string)($_POST['endereco'] ?? '')),
         'numero' => trim((string)($_POST['numero'] ?? '')),
@@ -262,10 +262,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="assets/css/cadastro-empresa.css">
+      <link rel="stylesheet" href="assets/css/cadastro-empresa.css?v=6">
   <link rel="stylesheet" href="assets/css/responsivo.css">
 </head>
-<body>
+<body class="cadastro-empresa-page">
 
     <nav>
         <a href="index.html" class="nav-logo">
@@ -279,7 +279,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="nav-cta"></div>
     </nav>
 
-    <div class="form-container">
+    <main class="cadastro-stage">
+        <img
+            class="cadastro-mascote cadastro-mascote-base"
+            src="assets/images/mascote-cadastro.png?v=1"
+            alt=""
+            aria-hidden="true"
+        >
+        <img
+            class="cadastro-mascote cadastro-mascote-mao cadastro-mascote-mao-superior"
+            src="assets/images/mascote-cadastro.png?v=1"
+            alt=""
+            aria-hidden="true"
+        >
+        <img
+            class="cadastro-mascote cadastro-mascote-mao cadastro-mascote-mao-inferior"
+            src="assets/images/mascote-cadastro.png?v=1"
+            alt=""
+            aria-hidden="true"
+        >
+
+        <div class="form-container">
         <div class="form-heading">
             <span class="form-badge">Nova barbearia</span>
             <h2 class="form-title">Cadastro de empresa</h2>
@@ -288,8 +308,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div id="cadastro-popup" class="auth-popup" role="alert" aria-live="polite"></div>
         
-        <form id="cadastroForm">
-            <section class="form-section">
+        <form id="cadastroForm" autocomplete="off" data-form-type="other">
+            <div class="form-column">
+            <section class="form-section form-section-company">
                 <div class="section-heading">
                     <h3>Dados da empresa</h3>
                     <p>Identificação fiscal e nome usado no atendimento.</p>
@@ -322,7 +343,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </section>
 
-            <section class="form-section">
+            <section class="form-section form-section-access">
                 <div class="section-heading">
                     <h3>Acesso</h3>
                     <p>Dados usados para entrar no sistema.</p>
@@ -330,17 +351,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
+                        <label for="emailCadastroEmpresa">Email</label>
+                        <input type="email" id="emailCadastroEmpresa" name="emailCadastroEmpresa" value="" autocomplete="off" autocapitalize="none" spellcheck="false" readonly data-credential-field data-lpignore="true" data-1p-ignore="true" data-bwignore="true" required>
                     </div>
                     <div class="form-group">
-                        <label for="senha">Senha</label>
-                        <input type="password" id="senha" name="senha" required>
+                        <label for="senhaCadastroEmpresa">Senha</label>
+                        <input type="text" id="senhaCadastroEmpresa" name="senhaCadastroEmpresa" value="" autocomplete="new-password" autocapitalize="none" spellcheck="false" readonly data-credential-field data-lpignore="true" data-1p-ignore="true" data-bwignore="true" required>
                     </div>
                 </div>
             </section>
+            </div>
 
-            <section class="form-section">
+            <div class="form-column">
+            <section class="form-section form-section-address">
                 <div class="section-heading">
                     <h3>Endereço e contato</h3>
                     <p>Informações públicas e operacionais da barbearia.</p>
@@ -389,7 +412,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </section>
 
-            <section class="form-section">
+            <section class="form-section form-section-representative">
                 <div class="section-heading">
                     <h3>Representante</h3>
                     <p>Responsável por administrar a conta da barbearia.</p>
@@ -406,10 +429,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
             </section>
+            </div>
 
             <button type="submit" class="btn-cadastrar">Cadastrar</button>
         </form>
-    </div>
+        </div>
+    </main>
 
     <script>
         // Máscaras de Input
@@ -425,6 +450,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         applyMask('telefone', formatarTelefone);
         applyMask('telefoneRepresentante', formatarTelefone);
         applyMask('cep', formatarCep);
+
+        const cadastroForm = document.getElementById('cadastroForm');
+        const emailCadastroInput = document.getElementById('emailCadastroEmpresa');
+        const senhaCadastroInput = document.getElementById('senhaCadastroEmpresa');
+        const camposCredenciais = [emailCadastroInput, senhaCadastroInput];
+
+        function bloquearCredencial(campo) {
+            campo.value = '';
+            campo.readOnly = true;
+
+            if (campo === senhaCadastroInput) {
+                campo.type = 'text';
+            }
+        }
+
+        function liberarCredencial(campoOuEvento) {
+            const campo = campoOuEvento.currentTarget || campoOuEvento;
+            campo.readOnly = false;
+
+            if (campo === senhaCadastroInput) {
+                campo.type = 'password';
+            }
+        }
+
+        camposCredenciais.forEach(campo => {
+            bloquearCredencial(campo);
+            campo.addEventListener('pointerdown', liberarCredencial);
+            campo.addEventListener('focus', liberarCredencial);
+            campo.addEventListener('keydown', liberarCredencial);
+            campo.addEventListener('blur', () => {
+                if (campo.value === '') {
+                    bloquearCredencial(campo);
+                }
+            });
+        });
+
+        window.addEventListener('pageshow', () => {
+            camposCredenciais.forEach(campo => bloquearCredencial(campo));
+        });
         
         document.getElementById('uf').addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
 
@@ -593,8 +657,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
 
-        document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
+        cadastroForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            camposCredenciais.forEach(campo => liberarCredencial(campo));
+            if (!this.reportValidity()) {
+                return;
+            }
+
             const btn = document.querySelector('.btn-cadastrar');
 
             const cnpj = cnpjInput.value.replace(/\D/g, '');
