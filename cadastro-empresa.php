@@ -262,8 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="assets/css/cadastro-empresa.css?v=6">
-  <link rel="stylesheet" href="assets/css/responsivo.css">
+  <link rel="stylesheet" href="assets/css/cadastro-empresa.css?v=10">
 </head>
 <body class="cadastro-empresa-page">
 
@@ -279,7 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="nav-cta"></div>
     </nav>
 
-    <main class="cadastro-stage">
+    <main class="cadastro-stage is-active" data-scroll-panel>
         <img
             class="cadastro-mascote cadastro-mascote-base"
             src="assets/images/mascote-cadastro.png?v=1"
@@ -301,8 +300,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="form-container">
         <div class="form-heading">
-            <span class="form-badge">Nova barbearia</span>
-            <h2 class="form-title">Cadastro de empresa</h2>
+            <h2 class="form-title" data-split-title>Cadastro da empresa</h2>
             <p class="form-subtitle">Preencha os dados da sua barbearia para criar o acesso ao painel LocalBarber.</p>
         </div>
 
@@ -702,7 +700,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
     </script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/SplitText.min.js"></script>
+<script src="assets/js/inicio-split-text.js?v=2"></script>
 <script src="assets/js/theme-toggle.js"></script>
+<script src="assets/js/cadastro-empresa-motion.js?v=1"></script>
 </body>
 </html>
 

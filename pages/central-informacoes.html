@@ -12,11 +12,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-    <link rel="stylesheet" href="../assets/css/central-informacoes.css">
-  <link rel="stylesheet" href="../assets/css/responsivo.css">
+  <link rel="stylesheet" href="../assets/css/central-informacoes.css?v=4">
 </head>
 <body>
-  <header>
+  <header class="site-nav">
     <a href="../index.html" class="nav-logo">
       <img src="../assets/images/logo.png" alt="LocalBarber">
     </a>
@@ -25,12 +24,11 @@
       <li><a href="../index.html#features">Sobre Nós</a></li>
       <li><a href="../index.html#contato">Contato</a></li>
     </ul>
-    <div class="nav-actions">
-    </div>
+    <div class="nav-actions"></div>
   </header>
    
   <!-- ===================== SOBRE ===================== -->
-  <div id="page-sobre" class="page active">
+  <div id="page-sobre" class="page active" data-scroll-panel>
     <div class="sidebar-layout">
       <aside class="sidebar-nav">
         <h3>Sobre nós</h3>
@@ -42,25 +40,106 @@
         <a onclick="showPage('faq')">FAQ</a>
       </aside>
       <article class="sidebar-content">
-        <span class="page-badge">Quem somos</span>
-        <h1 class="page-title">Transformamos barbearias em negócios digitais</h1>
-        <p class="page-subtitle">O LocalBarber nasceu da necessidade real de barbeiros que queriam mais do que uma agenda.</p>
-        <hr class="divider" />
-        <h2 class="section-title">Nossa missão</h2>
-        <p class="body-text">Acreditamos que cada barbearia tem uma identidade única. Nossa missão é oferecer ferramentas simples, eficientes e acessíveis para que barbeiros e barbearias possam gerir seus negócios com mais autonomia, organização e profissionalismo.</p>
-        <p class="body-text">Desde o agendamento online até o controle financeiro, o LocalBarber reúne tudo que um negócio moderno precisa em uma única plataforma intuitiva.</p>
-        <div class="value-grid">
-          <div class="value-card"><h4>Foco no barbeiro</h4><p>Funcionalidades pensadas para o dia a dia.</p></div>
-          <div class="value-card"><h4>Segurança</h4><p>Criptografia e proteção de dados.</p></div>
-          <div class="value-card"><h4>Agilidade</h4><p>Plataforma rápida e estável.</p></div>
-          <div class="value-card"><h4>Suporte humano</h4><p>Atendimento dedicado para ajudar você.</p></div>
-        </div>
+        <span class="page-badge">Sobre o produto</span>
+        <h1 class="page-title" data-split-title>Menos improviso. Mais controle sobre a rotina.</h1>
+        <p class="page-subtitle">O LocalBarber centraliza o que pequenas e médias barbearias costumam dividir entre agenda de papel, mensagens e planilhas.</p>
+
+        <section class="about-origin" aria-labelledby="about-origin-title">
+          <p class="about-kicker">Por que existimos</p>
+          <div class="about-origin-copy">
+            <h2 id="about-origin-title">A barbearia já tem ritmo. A gestão precisa acompanhar.</h2>
+            <p>Atender bem exige presença, mas administrar horários, clientes, serviços, equipe e caixa em ferramentas separadas tira o foco do que realmente importa.</p>
+            <p>O LocalBarber nasceu para reunir essa rotina em um ambiente visual, direto e fácil de consultar — do primeiro agendamento ao fechamento do dia.</p>
+          </div>
+        </section>
+
+        <section class="about-flow-section" aria-labelledby="about-flow-title">
+          <div class="about-section-heading">
+            <span>Como ajudamos</span>
+            <h2 id="about-flow-title">Da agenda ao caixa, tudo conversa.</h2>
+            <p>Quatro frentes conectadas para o responsável enxergar a rotina sem trocar de ferramenta.</p>
+          </div>
+          <div class="about-flow">
+            <article class="about-flow-step">
+              <span>01</span>
+              <h3>Agenda</h3>
+              <p>Organize horários, serviços e profissionais em uma visão fácil de acompanhar.</p>
+            </article>
+            <article class="about-flow-step">
+              <span>02</span>
+              <h3>Clientes</h3>
+              <p>Mantenha contatos, observações e histórico disponíveis quando precisar.</p>
+            </article>
+            <article class="about-flow-step">
+              <span>03</span>
+              <h3>Serviços e equipe</h3>
+              <p>Defina preços, duração, comissões e responsabilidades com mais clareza.</p>
+            </article>
+            <article class="about-flow-step">
+              <span>04</span>
+              <h3>Financeiro</h3>
+              <p>Acompanhe faturamento e transações sem depender de planilhas soltas.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="about-values-section" aria-labelledby="about-values-title">
+          <div class="about-section-heading">
+            <span>Nossos princípios</span>
+            <h2 id="about-values-title">Tecnologia que trabalha a favor do barbeiro.</h2>
+          </div>
+          <div class="value-grid">
+          <div class="value-card">
+            <span class="value-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+            </span>
+            <h4>Foco no barbeiro</h4>
+            <p>Funcionalidades pensadas para simplificar o trabalho de quem está na cadeira todos os dias.</p>
+          </div>
+          <div class="value-card">
+            <span class="value-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 4.7-2.8 8-7 10-4.2-2-7-5.3-7-10V6l7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+            </span>
+            <h4>Segurança</h4>
+            <p>Proteção de dados e acesso responsável em cada etapa da operação da barbearia.</p>
+          </div>
+          <div class="value-card">
+            <span class="value-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="m13 2-8 12h6l-1 8 9-13h-6V2Z"></path></svg>
+            </span>
+            <h4>Agilidade</h4>
+            <p>Respostas rápidas e fluxos diretos para que a equipe perca menos tempo com gestão.</p>
+          </div>
+          <div class="value-card">
+            <span class="value-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 16v-5a7 7 0 0 1 14 0v5"></path><path d="M5 13H3v4a2 2 0 0 0 2 2h2v-6H5ZM19 13h2v4a2 2 0 0 1-2 2h-2v-6h2ZM17 19c0 2-2 2-4 2"></path></svg>
+            </span>
+            <h4>Suporte humano</h4>
+            <p>Atendimento próximo, com pessoas preparadas para ajudar quando a rotina apertar.</p>
+          </div>
+          </div>
+        </section>
+
+        <section class="about-audience" aria-labelledby="about-audience-title">
+          <div class="about-audience-copy">
+            <span>Feito para a rotina real</span>
+            <h2 id="about-audience-title">Para quem atende e também administra.</h2>
+            <p>Uma experiência responsiva, com tema claro e escuro, pensada para proprietários, gestores e profissionais de barbearias pequenas e médias.</p>
+            <div class="about-actions">
+              <a class="about-button about-button-primary" href="../cadastro-empresa.php">Cadastrar barbearia</a>
+              <a class="about-button about-button-secondary" href="../index.html#features">Conhecer recursos</a>
+            </div>
+          </div>
+          <figure class="about-audience-visual" aria-hidden="true">
+            <img src="../assets/images/mascote-gestao-logo.png" alt="" loading="lazy" decoding="async">
+          </figure>
+        </section>
       </article>
     </div>
   </div>
 
   <!-- ===================== TERMOS DE SERVIÇO ===================== -->
-  <div id="page-termos" class="page">
+  <div id="page-termos" class="page" data-scroll-panel>
     <div class="sidebar-layout">
       <aside class="sidebar-nav">
         <h3>Termos de Serviço</h3>
@@ -73,7 +152,7 @@
       </aside>
       <article class="sidebar-content">
         <span class="page-badge">Termos</span>
-        <h1 class="page-title">Termos de Serviço</h1>
+        <h1 class="page-title" data-split-title>Termos de Serviço</h1>
         <p class="page-subtitle">Leia com atenção antes de utilizar a plataforma LocalBarber.</p>
         
 
@@ -134,7 +213,7 @@
   </div>
 
   <!-- ===================== PRIVACIDADE ===================== -->
-  <div id="page-privacidade" class="page">
+  <div id="page-privacidade" class="page" data-scroll-panel>
     <div class="sidebar-layout">
       <aside class="sidebar-nav">
         <h3>Privacidade</h3>
@@ -147,7 +226,7 @@
       </aside>
       <article class="sidebar-content">
         <span class="page-badge">Privacidade</span>
-        <h1 class="page-title">Política de Privacidade</h1>
+        <h1 class="page-title" data-split-title>Política de Privacidade</h1>
         <p class="page-subtitle">Sua privacidade é prioridade. Veja como coletamos, usamos e protegemos seus dados.</p>
        
 
@@ -219,7 +298,7 @@
   </div>
 
   <!-- ===================== CONTATO ===================== -->
-  <div id="page-contato" class="page">
+  <div id="page-contato" class="page" data-scroll-panel>
     <div class="sidebar-layout">
       <aside class="sidebar-nav">
         <h3>Contato</h3>
@@ -232,11 +311,11 @@
       </aside>
       <article class="sidebar-content">
         <span class="page-badge">Fale conosco</span>
-        <h1 class="page-title">Entre em contato</h1>
+        <h1 class="page-title" data-split-title>Entre em contato</h1>
         <div class="contact-grid">
           <div class="contact-info">
             <p>Nossa equipe responde em até 24 horas úteis. Para urgências, use o telefone ou WhatsApp.</p>
-            <div class="contact-item"><span>contato@localbarber.com.br</span></div>
+            <div class="contact-item"><span>suporte@localbarber.com.br</span></div>
             <div class="contact-item"><span>(11) 4002-8922</span></div>
             <div class="contact-item"><span>WhatsApp: (11) 98765-4321</span></div>
             <div class="contact-item"><span>Seg – Sex: 09h às 18h</span></div>
@@ -275,7 +354,7 @@
   </div>
 
   <!-- ===================== TERMOS DE USO (SEGURANÇA) ===================== -->
-  <div id="page-seguranca" class="page">
+  <div id="page-seguranca" class="page" data-scroll-panel>
     <div class="sidebar-layout">
       <aside class="sidebar-nav">
         <h3>Termos de uso</h3>
@@ -288,7 +367,7 @@
       </aside>
       <article class="sidebar-content">
         <span class="page-badge">Termos de uso</span>
-        <h1 class="page-title">Termos de Uso</h1>
+        <h1 class="page-title" data-split-title>Termos de Uso</h1>
         <p class="page-subtitle">Regras e diretrizes para o uso adequado e seguro da plataforma LocalBarber.</p>
         
 
@@ -348,7 +427,7 @@
   </div>
 
   <!-- ===================== FAQ ===================== -->
-  <div id="page-faq" class="page">
+  <div id="page-faq" class="page" data-scroll-panel>
     <div class="sidebar-layout">
       <aside class="sidebar-nav">
         <h3>Ajuda</h3>
@@ -361,7 +440,7 @@
       </aside>
       <article class="sidebar-content">
         <span class="page-badge">Perguntas Frequentes</span>
-        <h1 class="page-title">FAQ</h1>
+        <h1 class="page-title" data-split-title>FAQ</h1>
         <p class="page-subtitle">Encontre respostas rápidas para as dúvidas mais comuns sobre o LocalBarber.</p>
         <hr class="divider" />
 
@@ -453,7 +532,7 @@
              
             </div>
             <div class="faq-a">
-              Você pode falar com nossa equipe pelo chat dentro da plataforma, por e-mail (contato@localbarber.com.br) ou pelo WhatsApp (11) 98765-4321. O atendimento é de segunda a sexta, das 9h às 18h. Clientes nos planos Pro e Business têm suporte prioritário com tempo de resposta reduzido.
+              Você pode falar com nossa equipe pelo chat dentro da plataforma, por e-mail (suporte@localbarber.com.br) ou pelo WhatsApp (11) 98765-4321. O atendimento é de segunda a sexta, das 9h às 18h. Clientes nos planos Pro e Business têm suporte prioritário com tempo de resposta reduzido.
             </div>
           </div>
 
@@ -475,39 +554,27 @@
     </div>
   </div>
 
-  <script>
-    const PAGES = ['sobre','termos','privacidade','contato','seguranca','faq'];
+  <footer class="info-footer">
+    <div class="info-footer-inner">
+      <a class="info-footer-brand" href="../index.html" aria-label="Voltar para a página inicial">
+        <img src="../assets/images/logo.png" alt="LocalBarber">
+        <p>Gestão simples para uma rotina mais organizada.</p>
+      </a>
+      <nav class="info-footer-links" aria-label="Links institucionais">
+        <a href="#sobre" data-info-link="sobre">Sobre nós</a>
+        <a href="#privacidade" data-info-link="privacidade">Privacidade</a>
+        <a href="#termos" data-info-link="termos">Termos</a>
+        <a href="#contato" data-info-link="contato">Contato</a>
+      </nav>
+    </div>
+  </footer>
 
-    function showPage(id){
-      PAGES.forEach(page => {
-        const el = document.getElementById('page-' + page);
-        if(el) el.classList.remove('active');
-      });
-      const target = document.getElementById('page-' + id);
-      if(target){
-        target.classList.add('active');
-        window.scrollTo({ top:0, behavior:'smooth' });
-      }
-      document.querySelectorAll('.sidebar-nav a').forEach(link => link.classList.remove('active'));
-    }
-
-    function toggleFaq(el){
-      el.closest('.faq-item').classList.toggle('open');
-    }
-
-    function submitForm(){
-      const name  = document.getElementById('c-name').value.trim();
-      const email = document.getElementById('c-email').value.trim();
-      const msg   = document.getElementById('c-msg').value.trim();
-      if(!name || !email || !msg){ alert('Preencha todos os campos obrigatórios.'); return; }
-      document.getElementById('form-alert').classList.add('show');
-      document.getElementById('c-name').value  = '';
-      document.getElementById('c-email').value = '';
-      document.getElementById('c-msg').value   = '';
-    }
-  </script>
-
-<script src="../assets/js/theme-toggle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/SplitText.min.js"></script>
+  <script src="../assets/js/inicio-split-text.js?v=2"></script>
+  <script src="../assets/js/theme-toggle.js"></script>
+  <script src="../assets/js/central-informacoes-motion.js?v=1"></script>
+  <script src="../assets/js/central-informacoes.js?v=3"></script>
 </body>
 </html>
 

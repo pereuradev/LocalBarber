@@ -1,6 +1,8 @@
 (function () {
   const storageKey = "localbarber-theme";
+  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
   let transitionTimer;
+  let selectedTheme = "system";
 
   function enableThemeTransition() {
     window.clearTimeout(transitionTimer);
@@ -50,24 +52,27 @@
     const button = document.getElementById("themeToggle");
     const themeText = button && button.querySelector(".theme-toggle-text");
     const themeIcon = button && button.querySelector(".theme-toggle-icon");
-    const isDark = theme === "dark";
+    const preference = ["light", "dark", "system"].includes(theme) ? theme : "system";
+    const resolvedTheme = preference === "system" ? (systemTheme.matches ? "dark" : "light") : preference;
+    const isDark = resolvedTheme === "dark";
 
     if (animate) enableThemeTransition();
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
-    document.body.dataset.theme = theme;
-    localStorage.setItem(storageKey, theme);
+    selectedTheme = preference;
+    document.documentElement.dataset.theme = resolvedTheme;
+    document.documentElement.style.colorScheme = resolvedTheme;
+    document.body.dataset.theme = resolvedTheme;
+    localStorage.setItem(storageKey, preference);
 
     if (!button) return;
     button.setAttribute("aria-pressed", String(isDark));
-    button.setAttribute("aria-label", isDark ? "Ativar modo claro" : "Ativar modo escuro");
-    if (themeText) themeText.textContent = isDark ? "Claro" : "Escuro";
-    if (themeIcon) themeIcon.innerHTML = isDark ? "&#9728;" : "&#9790;";
+    button.setAttribute("aria-label", preference === "system" ? "Tema do sistema ativo" : (isDark ? "Ativar modo claro" : "Ativar modo escuro"));
+    if (themeText) themeText.textContent = preference === "system" ? "Sistema" : (isDark ? "Claro" : "Escuro");
+    if (themeIcon) themeIcon.innerHTML = preference === "system" ? "&#9635;" : (isDark ? "&#9728;" : "&#9790;");
   }
 
   function initThemeToggle() {
     const button = createThemeButton();
-    setTheme(localStorage.getItem(storageKey) || "light", false);
+    setTheme(localStorage.getItem(storageKey) || "system", false);
 
     if (button.dataset.themeToggleReady === "true") return;
     button.dataset.themeToggleReady = "true";
@@ -75,6 +80,12 @@
       const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
       setTheme(nextTheme, true);
     });
+
+    const followSystemTheme = () => {
+      if (selectedTheme === "system") setTheme("system", true);
+    };
+    if (typeof systemTheme.addEventListener === "function") systemTheme.addEventListener("change", followSystemTheme);
+    else systemTheme.addListener(followSystemTheme);
   }
 
   if (document.readyState === "loading") {

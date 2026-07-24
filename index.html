@@ -6,16 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LocalBarber | Gestão para barbearias</title>
   <link rel="icon" type="image/png" href="assets/images/favicon.png?v=20260715" />
-  <meta name="description" content="Centralize agenda, clientes, serviços, equipe e controle financeiro da sua barbearia com o LocalBarber." />
+  <meta name="description"
+    content="Centralize agenda, clientes, serviços, equipe e controle financeiro da sua barbearia com o LocalBarber." />
   <link rel="preload" href="assets/images/mascote-localbarber.png?v=2" as="image" type="image/png" />
-  
-  <script src="assets/js/theme-init.js"></script>
+
+  <script src="assets/js/theme-init.js?v=2"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
-    
-    <link rel="stylesheet" href="assets/css/inicio.css?v=10">
+
+  <link rel="stylesheet" href="assets/css/inicio.css?v=12">
   <link rel="stylesheet" href="assets/css/responsivo.css">
+  <link rel="stylesheet" href="assets/css/inicio-horizontal.css?v=5">
 </head>
 
 <body>
@@ -31,157 +33,291 @@
       <li><a href="#contato">Contato</a></li>
     </ul>
     <div class="nav-cta">
-      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Ativar modo escuro" aria-pressed="false">
-        <span class="theme-toggle-icon" aria-hidden="true">☾</span>
-      <span class="theme-toggle-text">Tema</span>
-      </button>
-      <a href="#" onclick="abrirModal()" class="btn btn-outline">Entrar</a>
+      <div class="theme-selector" id="themeSelector">
+        <button type="button" class="theme-selector-trigger" id="themeToggle" aria-haspopup="menu"
+          aria-expanded="false" aria-controls="themeMenu" aria-label="Tema atual: Sistema. Alterar tema">
+          <span class="theme-selector-current-icon" data-theme-icon aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          </span>
+          <span class="theme-selector-label" data-theme-label>Sistema</span>
+          <svg class="theme-selector-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+        </button>
+
+        <div class="theme-selector-menu" id="themeMenu" role="menu" aria-label="Escolher tema" hidden>
+          <button type="button" class="theme-selector-option" role="menuitemradio" aria-checked="false" data-theme-option="light">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
+            <span>Claro</span>
+            <svg class="theme-selector-check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+          </button>
+          <button type="button" class="theme-selector-option" role="menuitemradio" aria-checked="false" data-theme-option="dark">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.7 13.1A8 8 0 1 1 10.9 3.3a6.5 6.5 0 0 0 9.8 9.8Z"/></svg>
+            <span>Escuro</span>
+            <svg class="theme-selector-check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+          </button>
+          <button type="button" class="theme-selector-option" role="menuitemradio" aria-checked="true" data-theme-option="system">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <span>Sistema</span>
+            <svg class="theme-selector-check" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+          </button>
+        </div>
+      </div>
+      <a href="#" onclick="abrirModal(); return false;" class="btn btn-outline">Entrar</a>
       <a href="cadastro-empresa.php" class="btn btn-gold">Cadastrar</a>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-copy">
-      <h1 class="fade-up">A barbearia<br /><span>no ponto</span><br />todos os dias</h1>
-      <p class="fade-up delay-1">Agenda, clientes, serviços e caixa em um painel simples, com a identidade azul da LocalBarber.</p>
-      <div class="hero-actions fade-up delay-2">
-        <a href="cadastro-empresa.php" class="btn btn-gold btn-hero">Cadastrar barbearia</a>
-        <a href="#features" class="btn btn-outline btn-hero">Conhecer recursos</a>
-      </div>
-    </div>
-    <div class="hero-system hero-mascot">
-      <img
-        class="hero-mascot-image"
-        src="assets/images/mascote-localbarber.png?v=2"
-        alt="Barbeiro LocalBarber organizando a agenda de atendimentos"
-        width="1672"
-        height="941"
-        decoding="async" />
-    </div>
-  </section>
+  <main class="horizontal-home" id="horizontalHome">
+    <div class="horizontal-stage">
+      <div class="horizontal-track" id="horizontalTrack">
+        <!-- HERO -->
+        <section class="scroll-panel hero is-active" id="home" data-scroll-panel data-nav-section="home">
+          <div class="hero-copy panel-reveal">
 
-  <!-- FEATURES -->
-  <section class="section" id="features">
-    <div class="section-label">Recursos</div>
-    <h2>Gestão com cara de barbearia</h2>
-    <p class="section-sub">As telas foram pensadas para resolver tarefas comuns: marcar horários, consultar clientes, cuidar dos serviços e acompanhar o dinheiro entrando.</p>
-    <div class="features-grid">
-      <div class="feature-card">
-        <h3>Agenda</h3>
-        <p>Veja os horários da semana, cadastre atendimentos e acompanhe quem será atendido por cada barbeiro.</p>
-      </div>
-      <div class="feature-card">
-        <h3>Financeiro</h3>
-        <p>Acompanhe faturamento, transações recentes e serviços mais vendidos sem depender de planilhas soltas.</p>
-      </div>
-      <div class="feature-card">
-        <h3>Clientes</h3>
-        <p>Mantenha nome, telefone, cidade e observações dos clientes em uma lista fácil de buscar.</p>
-      </div>
-      <div class="feature-card">
-        <h3>Serviços e preços</h3>
-        <p>Cadastre cortes, barba, combos, valores, duração e comissão dos profissionais.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- GALERIA / CARROSSEL -->
-  <section class="carousel-section">
-    <div class="section" style="padding-top:60px; padding-bottom:24px;">
-      <h2>Galeria da barbearia</h2>
-    </div>
-
-    <div class="carousel-container">
-      <!-- seta anterior -->
-      <button class="carousel-button btn-prev" id="prevBtn" aria-label="Anterior">&#10094;</button>
-
-      <!-- wrapper com overflow:hidden -->
-      <div class="carousel-track-wrapper">
-        <!-- trilha dos slides — transition via CSS, transform via JS -->
-        <div class="carousel-track" id="track">
-          <div class="carousel-item">
-            <img src="assets/images/carrossel-1.jpg" alt="Corte 1">
+            <h1 data-split-title>A barbearia<br /><span>no ponto</span><br />todos os dias</h1>
+            <p>Agenda, clientes, serviços e caixa em um painel simples, com a identidade azul da LocalBarber.</p>
+            <div class="hero-actions">
+              <a href="cadastro-empresa.php" class="btn btn-gold btn-hero">Cadastrar barbearia</a>
+              <a href="#features" class="btn btn-outline btn-hero">Conhecer recursos</a>
+            </div>
           </div>
-          <div class="carousel-item">
-            <img src="assets/images/carrossel-2.jpg" alt="Corte 2">
+          <div class="hero-system hero-mascot panel-visual" data-mascot-stage>
+            <span class="hero-mascot-aura" aria-hidden="true"></span>
+            <span class="hero-mascot-scan" aria-hidden="true"></span>
+            <img class="hero-mascot-image" src="assets/images/mascote-localbarber.png?v=2"
+              alt="Barbeiro LocalBarber organizando a agenda de atendimentos" width="1672" height="941"
+              decoding="async" />
           </div>
-          <div class="carousel-item">
-            <img src="assets/images/carrossel-3.jpg" alt="Corte 3">
+        </section>
+
+        <!-- FEATURES -->
+        <section class="scroll-panel section feature-panel" id="features" data-scroll-panel data-nav-section="features">
+          <div class="feature-heading panel-reveal">
+            <div class="section-label">Painel em ação</div>
+            <h2 data-split-title>Quatro áreas.<br /><span class="motion-word">Uma rotina que flui.</span></h2>
+            <p class="section-sub">Escolha um recurso e veja como o LocalBarber organiza cada etapa sem tirar o foco do atendimento.</p>
+            <div class="feature-tabs" role="tablist" aria-label="Recursos do LocalBarber">
+              <button class="feature-tab active" type="button" role="tab" aria-selected="true" data-feature-target="agenda">
+                <span>01</span>
+                <span><strong>Agenda</strong><small>Horários e equipe</small></span>
+              </button>
+              <button class="feature-tab" type="button" role="tab" aria-selected="false" data-feature-target="financeiro">
+                <span>02</span>
+                <span><strong>Financeiro</strong><small>Caixa sem planilhas</small></span>
+              </button>
+              <button class="feature-tab" type="button" role="tab" aria-selected="false" data-feature-target="clientes">
+                <span>03</span>
+                <span><strong>Clientes</strong><small>Histórico sempre perto</small></span>
+              </button>
+              <button class="feature-tab" type="button" role="tab" aria-selected="false" data-feature-target="servicos">
+                <span>04</span>
+                <span><strong>Serviços</strong><small>Preços e comissões</small></span>
+              </button>
+            </div>
           </div>
-        </div>
+          <div class="feature-showcase panel-visual">
+            <div class="feature-preview">
+              <div class="feature-preview-topbar">
+                <span class="feature-preview-brand"><i aria-hidden="true"></i> LocalBarber</span>
+                <span>Visão da barbearia</span>
+                <b aria-label="Sistema online">online</b>
+              </div>
+
+              <section class="feature-screen active" data-feature-screen="agenda" role="tabpanel">
+                <header class="feature-screen-heading">
+                  <div><span>Agenda da semana</span><small>19 a 24 de julho</small></div>
+                  <strong>18 atendimentos</strong>
+                </header>
+                <div class="agenda-week" aria-hidden="true">
+                  <div class="agenda-day"><span>SEG</span><b>19</b></div>
+                  <div class="agenda-day is-today"><span>TER</span><b>20</b></div>
+                  <div class="agenda-day"><span>QUA</span><b>21</b></div>
+                  <div class="agenda-day"><span>QUI</span><b>22</b></div>
+                  <div class="agenda-day"><span>SEX</span><b>23</b></div>
+                </div>
+                <div class="agenda-list">
+                  <article><time>09:00</time><i></i><div><strong>Lucas Andrade</strong><span>Corte degradê · Rafael</span></div><b>Confirmado</b></article>
+                  <article><time>10:30</time><i></i><div><strong>Matheus Lima</strong><span>Corte + barba · Diego</span></div><b>Confirmado</b></article>
+                  <article><time>13:00</time><i></i><div><strong>Bruno Ferreira</strong><span>Barba completa · Rafael</span></div><b>Aguardando</b></article>
+                </div>
+              </section>
+
+              <section class="feature-screen" data-feature-screen="financeiro" role="tabpanel" hidden>
+                <header class="feature-screen-heading">
+                  <div><span>Resumo financeiro</span><small>Julho de 2026</small></div>
+                  <strong>Caixa atualizado</strong>
+                </header>
+                <div class="finance-metrics">
+                  <article><span>Faturamento</span><strong>R$ 12.840</strong><small>+12% no mês</small></article>
+                  <article><span>Ticket médio</span><strong>R$ 68,40</strong><small>188 atendimentos</small></article>
+                </div>
+                <div class="finance-chart" aria-label="Faturamento por semana">
+                  <span style="--bar:46%"></span><span style="--bar:63%"></span><span style="--bar:54%"></span><span style="--bar:82%"></span><span style="--bar:74%"></span><span style="--bar:92%"></span>
+                </div>
+                <div class="finance-legend"><span>Semanas do mês</span><b>Meta: R$ 14.000</b></div>
+              </section>
+
+              <section class="feature-screen" data-feature-screen="clientes" role="tabpanel" hidden>
+                <header class="feature-screen-heading">
+                  <div><span>Clientes ativos</span><small>Contatos e preferências</small></div>
+                  <strong>+ Novo cliente</strong>
+                </header>
+                <div class="client-list">
+                  <article><i>LA</i><div><strong>Lucas Andrade</strong><span>Última visita: hoje</span></div><b>12 visitas</b></article>
+                  <article><i>ML</i><div><strong>Matheus Lima</strong><span>Prefere corte degradê</span></div><b>8 visitas</b></article>
+                  <article><i>BF</i><div><strong>Bruno Ferreira</strong><span>Retorno em 15 dias</span></div><b>5 visitas</b></article>
+                  <article><i>GC</i><div><strong>Gabriel Costa</strong><span>Aniversário neste mês</span></div><b>9 visitas</b></article>
+                </div>
+              </section>
+
+              <section class="feature-screen" data-feature-screen="servicos" role="tabpanel" hidden>
+                <header class="feature-screen-heading">
+                  <div><span>Catálogo de serviços</span><small>Valores e duração</small></div>
+                  <strong>8 serviços</strong>
+                </header>
+                <div class="service-list">
+                  <article><i aria-hidden="true">✂</i><div><strong>Corte degradê</strong><span>45 min · Comissão 40%</span></div><b>R$ 55</b></article>
+                  <article><i aria-hidden="true">✦</i><div><strong>Corte + barba</strong><span>75 min · Comissão 40%</span></div><b>R$ 90</b></article>
+                  <article><i aria-hidden="true">◆</i><div><strong>Barba completa</strong><span>30 min · Comissão 35%</span></div><b>R$ 40</b></article>
+                  <article><i aria-hidden="true">↗</i><div><strong>Pigmentação</strong><span>40 min · Comissão 35%</span></div><b>R$ 48</b></article>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <!-- GALERIA HORIZONTAL -->
+        <section class="scroll-panel gallery-section" id="galeria" data-scroll-panel data-nav-section="features">
+          <div class="gallery-heading panel-reveal">
+            <div class="section-label">Identidade</div>
+            <h2 data-split-title>O cuidado aparece<br /><span class="motion-word">em cada detalhe.</span></h2>
+            <p>Um espaço para mostrar o estilo, a técnica e a experiência que fazem o cliente voltar.</p>
+          </div>
+
+          <div class="scroll-gallery panel-visual" data-horizontal-gallery>
+            <div class="scroll-gallery-viewport">
+              <div class="scroll-gallery-track">
+                <figure class="scroll-gallery-card">
+                  <div class="scroll-gallery-media">
+                    <img src="assets/images/carrossel-1.jpg" alt="Contorno de barba realizado com navalha">
+                  </div>
+                  <figcaption><span>01</span> Contorno com precisão</figcaption>
+                </figure>
+
+                <figure class="scroll-gallery-card">
+                  <div class="scroll-gallery-media">
+                    <img src="assets/images/carrossel-2.jpg" alt="Barbeiro aplicando espuma para preparar a barba">
+                  </div>
+                  <figcaption><span>02</span> Preparo que faz diferença</figcaption>
+                </figure>
+
+                <figure class="scroll-gallery-card">
+                  <div class="scroll-gallery-media">
+                    <img src="assets/images/carrossel-3.jpg" alt="Barbeiro finalizando um penteado masculino com pente">
+                  </div>
+                  <figcaption><span>03</span> Finalização em cada detalhe</figcaption>
+                </figure>
+
+                <figure class="scroll-gallery-card">
+                  <div class="scroll-gallery-media">
+                    <img src="assets/images/carrossel-4.png" alt="Barbeiro realizando um degradê preciso com máquina">
+                  </div>
+                  <figcaption><span>04</span> Degradê com precisão</figcaption>
+                </figure>
+
+                <figure class="scroll-gallery-card">
+                  <div class="scroll-gallery-media">
+                    <img src="assets/images/carrossel-5.png" alt="Barbeiro finalizando um corte masculino com tesoura e pente">
+                  </div>
+                  <figcaption><span>05</span> Técnica em cada movimento</figcaption>
+                </figure>
+
+                <figure class="scroll-gallery-card">
+                  <div class="scroll-gallery-media">
+                    <img src="assets/images/carrossel-6.png" alt="Ferramentas profissionais organizadas em uma bancada de barbearia">
+                  </div>
+                  <figcaption><span>06</span> Ferramentas sempre prontas</figcaption>
+                </figure>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- DIFERENCIAL -->
+        <section class="scroll-panel promo-band" id="diferencial" data-scroll-panel data-nav-section="features">
+          <div class="promo-inner">
+            <div class="panel-reveal">
+              <div class="section-label">Diferencial</div>
+              <h2 data-split-title>Monte sua tabela<br /><span class="motion-word">do seu jeito.</span></h2>
+              <p>Cadastre nome, descrição, preço, duração e categoria. Seu catálogo acompanha a forma como sua equipe
+                realmente trabalha.</p>
+              <ul class="promo-list">
+                <li>Mais personalização para o barbeiro</li>
+                <li>Melhor organização do atendimento</li>
+                <li>Um diferencial competitivo real</li>
+              </ul>
+              <a href="cadastro-empresa.php" class="btn btn-gold promo-action">Começar cadastro</a>
+            </div>
+            <div class="promo-visual panel-visual">
+              <div class="promo-card-demo active">
+                <span>01</span>
+                <div>
+                  <h4>Corte + barba</h4>
+                  <p>Personalizado pelo cliente · R$ 65,00</p>
+                </div>
+              </div>
+              <div class="promo-card-demo">
+                <span>02</span>
+                <div>
+                  <h4>Corte simples</h4>
+                  <p>Padrão · R$ 40,00 · 30 min</p>
+                </div>
+              </div>
+              <div class="promo-card-demo">
+                <span>03</span>
+                <div>
+                  <h4>Barba completa</h4>
+                  <p>Com design · R$ 35,00 · 25 min</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="scroll-panel cta-section" id="contato" data-scroll-panel data-nav-section="contato">
+          <div class="cta-content panel-reveal">
+            <div class="section-label">Comece hoje</div>
+            <h2 data-split-title>Sua rotina fica<br /><span class="motion-word">mais clara.</span></h2>
+            <p>Cadastre a barbearia, organize os serviços e acompanhe os atendimentos em um só lugar.</p>
+            <div class="cta-actions">
+              <a href="cadastro-empresa.php" class="btn btn-gold btn-hero">Criar cadastro</a>
+              <button type="button" class="btn btn-outline btn-hero" onclick="abrirModal()">Entrar</button>
+            </div>
+          </div>
+        </section>
       </div>
-
-      <!-- seta próxima -->
-      <button class="carousel-button btn-next" id="nextBtn" aria-label="Próximo">&#10095;</button>
-
-      <!-- indicadores -->
-      <div class="carousel-dots" id="dots"></div>
-    </div>
-  </section>
-
-  <!-- PROMO BAND -->
-  <div class="promo-band">
-    <div class="promo-inner">
-      <div>
-        <div class="section-label">Diferencial</div>
-        <h2>Monte sua tabela<br />do seu jeito</h2>
-        <p>Nem toda barbearia trabalha igual. Por isso, os serviços podem ser cadastrados com nome, descrição, preço, duração e categoria.</p>
-        <p>Você deixa o catálogo com a cara do seu atendimento e evita confusão na hora de marcar ou cobrar.</p>
-        <ul class="promo-list">
-          <li>Mais personalização para o barbeiro</li>
-          <li>Melhor organização do atendimento</li>
-          <li>Um diferencial competitivo real</li>
-        </ul>
-        <a href="cadastro-empresa.php" class="btn btn-gold" style="margin-top:32px;padding:12px 28px;">Começar cadastro</a>
-      </div>
-      <div class="promo-visual">
-        <div class="promo-card-demo">
-          <div>
-            <h4>Corte + barba</h4>
-            <p>Personalizado pelo cliente · R$ 65,00</p>
-          </div>
-        </div>
-        <div class="promo-card-demo">
-          <div>
-            <h4>Corte simples</h4>
-            <p>Padrão · R$ 40,00 · 30 min</p>
-          </div>
-        </div>
-        <div class="promo-card-demo">
-          <div>
-            <h4>Barba completa</h4>
-            <p>Com design · R$ 35,00 · 25 min</p>
-          </div>
-        </div>
+      <div class="scroll-cue" aria-hidden="true">
+        <span>Role para explorar</span>
+        <i>→</i>
       </div>
     </div>
-  </div>
-
-  <!-- CTA -->
-  <section class="cta-section" id="contato">
-    <div class="section-label" style="justify-content:center">Comece Hoje</div>
-    <h2>Sua rotina fica mais clara</h2>
-    <p>Cadastre a barbearia, organize os serviços e acompanhe os atendimentos em um só lugar.</p>
-    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <a href="cadastro-empresa.php" class="btn btn-gold btn-hero">Criar cadastro</a>
-    </div>
-  </section>
+  </main>
 
   <!-- FOOTER -->
   <footer>
     <div class="footer-top">
       <div class="footer-brand">
-        
-          <img src="assets/images/logo.png" width="250" alt="LocalBarber">
-       
-        <p><br>Sistema de gestão para barbearias pequenas e médias.</p>
+
+        <img src="assets/images/logo.png" width="250" alt="LocalBarber">
+
+        <p>Sistema de gestão para barbearias pequenas e médias.</p>
       </div>
       <div class="footer-col">
         <h4>Empresa</h4>
         <ul>
           <li><a href="pages/central-informacoes.html">Sobre Nós</a></li>
-          
+
         </ul>
       </div>
       <div class="footer-col">
@@ -197,7 +333,7 @@
         <ul>
           <li><a href="pages/central-informacoes.html">Política de privacidade</a></li>
           <li><a href="pages/central-informacoes.html">Termos de uso</a></li>
-          
+
         </ul>
       </div>
     </div>
@@ -207,10 +343,21 @@
   </footer>
 
   <script>
+    const themeSelector = document.getElementById('themeSelector');
     const themeToggle = document.getElementById('themeToggle');
-    const themeText = themeToggle.querySelector('.theme-toggle-text');
-    const themeIcon = themeToggle.querySelector('.theme-toggle-icon');
+    const themeMenu = document.getElementById('themeMenu');
+    const themeText = themeToggle.querySelector('[data-theme-label]');
+    const themeIcon = themeToggle.querySelector('[data-theme-icon]');
+    const themeOptions = Array.from(themeMenu.querySelectorAll('[data-theme-option]'));
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const themeLabels = { light: 'Claro', dark: 'Escuro', system: 'Sistema' };
+    const themeIcons = {
+      light: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>',
+      dark: '<svg viewBox="0 0 24 24"><path d="M20.7 13.1A8 8 0 1 1 10.9 3.3a6.5 6.5 0 0 0 9.8 9.8Z"/></svg>',
+      system: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
+    };
     let themeTransitionTimer;
+    let selectedTheme = 'system';
 
     function enableThemeTransition() {
       window.clearTimeout(themeTransitionTimer);
@@ -220,125 +367,100 @@
       }, 460);
     }
 
-    function setTheme(theme, animate = false) {
-      if (animate) enableThemeTransition();
-      const isDark = theme === 'dark';
-      document.documentElement.dataset.theme = theme;
-      document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
-      document.body.dataset.theme = theme;
-      localStorage.setItem('localbarber-theme', theme);
-      themeToggle.setAttribute('aria-pressed', String(isDark));
-      themeToggle.setAttribute('aria-label', isDark ? 'Ativar modo claro' : 'Ativar modo escuro');
-      themeText.textContent = isDark ? 'Claro' : 'Escuro';
-      themeIcon.textContent = isDark ? '☀' : '☾';
+    function normalizeTheme(theme) {
+      return ['light', 'dark', 'system'].includes(theme) ? theme : 'system';
     }
 
-    setTheme(localStorage.getItem('localbarber-theme') || 'light');
+    function resolveTheme(theme) {
+      return theme === 'system' ? (systemTheme.matches ? 'dark' : 'light') : theme;
+    }
+
+    function updateThemeControl(theme) {
+      themeText.textContent = themeLabels[theme];
+      themeIcon.innerHTML = themeIcons[theme];
+      themeToggle.setAttribute('aria-label', `Tema atual: ${themeLabels[theme]}. Alterar tema`);
+
+      themeOptions.forEach(option => {
+        const isSelected = option.dataset.themeOption === theme;
+        option.classList.toggle('is-active', isSelected);
+        option.setAttribute('aria-checked', String(isSelected));
+      });
+    }
+
+    function setTheme(theme, animate = false, persist = true) {
+      const preference = normalizeTheme(theme);
+      const resolvedTheme = resolveTheme(preference);
+      if (animate) enableThemeTransition();
+      selectedTheme = preference;
+      document.documentElement.dataset.theme = resolvedTheme;
+      document.documentElement.style.colorScheme = resolvedTheme;
+      document.body.dataset.theme = resolvedTheme;
+      if (persist) localStorage.setItem('localbarber-theme', preference);
+      updateThemeControl(preference);
+    }
+
+    function closeThemeMenu(returnFocus = false) {
+      themeMenu.hidden = true;
+      themeToggle.setAttribute('aria-expanded', 'false');
+      themeSelector.classList.remove('is-open');
+      if (returnFocus) themeToggle.focus();
+    }
+
+    function openThemeMenu(focusSelected = false) {
+      themeMenu.hidden = false;
+      themeToggle.setAttribute('aria-expanded', 'true');
+      themeSelector.classList.add('is-open');
+      if (focusSelected) {
+        const selectedOption = themeMenu.querySelector('.is-active') || themeOptions[0];
+        window.requestAnimationFrame(() => selectedOption.focus());
+      }
+    }
+
+    setTheme(localStorage.getItem('localbarber-theme') || 'system', false, false);
 
     themeToggle.addEventListener('click', () => {
-      const nextTheme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-      setTheme(nextTheme, true);
+      if (themeMenu.hidden) openThemeMenu();
+      else closeThemeMenu();
     });
 
-    /* ── Scroll-triggered fade-up para cards ── */
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.animation = entry.target.dataset.revealAnimation;
-          window.setTimeout(() => {
-            entry.target.style.opacity = '1';
-            entry.target.style.animation = '';
-          }, 1400);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15 });
-
-    document.querySelectorAll('.feature-card, .promo-card-demo, .carousel-track-wrapper, .cta-section, .footer-brand, .footer-col').forEach((el, i) => {
-      el.style.opacity = '0';
-      el.dataset.revealAnimation = `fadeUp .6s ease ${i * 0.06}s both`;
-      observer.observe(el);
+    themeToggle.addEventListener('keydown', event => {
+      if (event.key !== 'ArrowDown') return;
+      event.preventDefault();
+      if (themeMenu.hidden) openThemeMenu(true);
     });
 
-    /* ── Highlight nav ao rolar ── */
-    const sections = document.querySelectorAll('section[id], div[id]');
-    const navLinks = document.querySelectorAll('.nav-links a');
-
-    window.addEventListener('scroll', () => {
-      let current = '';
-      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
-      navLinks.forEach(a => {
-        a.style.background = a.getAttribute('href') === '#' + current ? 'rgba(43,184,255,.14)' : '';
-        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--gold)' : '';
+    themeOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        setTheme(option.dataset.themeOption, true);
+        closeThemeMenu(true);
       });
     });
 
-    /* ════════════════════════════════════════
-       CARROSSEL — CORRIGIDO
-       • overflow:hidden movido para .carousel-track-wrapper
-       • gap removido do track (era a causa do desalinhamento)
-       • slideWidth = track.offsetWidth (largura real do container visível)
-       • transition via CSS, não via JS
-    ════════════════════════════════════════ */
-    (function initCarousel() {
-      const track    = document.getElementById('track');
-      const slides   = Array.from(track.children);
-      const prevBtn  = document.getElementById('prevBtn');
-      const nextBtn  = document.getElementById('nextBtn');
-      const dotsWrap = document.getElementById('dots');
-
-      let current = 0;
-      let autoTimer;
-
-      /* Cria os dots dinamicamente */
-      slides.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-        dot.setAttribute('aria-label', `Slide ${i + 1}`);
-        dot.addEventListener('click', () => { resetTimer(); goTo(i); });
-        dotsWrap.appendChild(dot);
-      });
-
-      const dots = Array.from(dotsWrap.children);
-
-      /* Desloca a trilha para o slide n */
-      function goTo(n) {
-        current = ((n % slides.length) + slides.length) % slides.length;
-
-        /* ← CORREÇÃO: usa a largura real do track (sem gap) */
-        const slideWidth = track.offsetWidth;
-        track.style.transform = `translateX(-${current * slideWidth}px)`;
-        /* transition já está no CSS (.carousel-track) */
-
-        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    themeMenu.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeThemeMenu(true);
+        return;
       }
 
-      prevBtn.addEventListener('click', () => { resetTimer(); goTo(current - 1); });
-      nextBtn.addEventListener('click', () => { resetTimer(); goTo(current + 1); });
-      track.parentElement.addEventListener('mouseenter', () => clearInterval(autoTimer));
-      track.parentElement.addEventListener('mouseleave', () => resetTimer());
-
-      function startTimer() { autoTimer = setInterval(() => goTo(current + 1), 5000); }
-      function resetTimer() { clearInterval(autoTimer); startTimer(); }
-
-      /* Recalcula posição ao redimensionar */
-      window.addEventListener('resize', () => goTo(current));
-
-      startTimer();
-    })();
-
-    function abrirModal() {
-      document.getElementById("modal").style.display = "flex";
-    }
-
-    function fecharModal() {
-      document.getElementById("modal").style.display = "none";
-    }
-
-    window.addEventListener("click", function (e) {
-      const modal = document.getElementById("modal");
-      if (e.target === modal) fecharModal();
+      if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const currentIndex = themeOptions.indexOf(document.activeElement);
+      let nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? themeOptions.length - 1 : currentIndex;
+      if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % themeOptions.length;
+      if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + themeOptions.length) % themeOptions.length;
+      themeOptions[nextIndex].focus();
     });
+
+    document.addEventListener('click', event => {
+      if (!themeSelector.contains(event.target)) closeThemeMenu();
+    });
+
+    const followSystemTheme = () => {
+      if (selectedTheme === 'system') setTheme('system', true, false);
+    };
+    if (typeof systemTheme.addEventListener === 'function') systemTheme.addEventListener('change', followSystemTheme);
+    else systemTheme.addListener(followSystemTheme);
 
     function mostrarLoginPopup(mensagem, tipo = "erro") {
       const popup = document.getElementById("login-popup");
@@ -402,52 +524,146 @@
       });
     });
 
-    document.querySelectorAll('.feature-card').forEach(card => {
-      card.addEventListener('mouseenter', () => {
-        document.querySelectorAll('.feature-card').forEach(item => item.classList.remove('active'));
-        card.classList.add('active');
+    const featureTabs = Array.from(document.querySelectorAll('.feature-tab'));
+    const featureScreens = Array.from(document.querySelectorAll('[data-feature-screen]'));
+
+    function activateFeature(tab) {
+      const target = tab.dataset.featureTarget;
+      const activeScreen = featureScreens.find(screen => screen.dataset.featureScreen === target);
+      if (!activeScreen || tab.classList.contains('active')) return;
+
+      featureTabs.forEach(item => {
+        const selected = item === tab;
+        item.classList.toggle('active', selected);
+        item.setAttribute('aria-selected', String(selected));
+      });
+
+      featureScreens.forEach(screen => {
+        const selected = screen === activeScreen;
+        screen.classList.toggle('active', selected);
+        screen.hidden = !selected;
+      });
+
+      if (window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window.gsap.fromTo(activeScreen,
+          { autoAlpha: 0, x: 24 },
+          { autoAlpha: 1, x: 0, duration: .42, ease: 'power3.out', overwrite: 'auto' }
+        );
+      }
+    }
+
+    featureTabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activateFeature(tab));
+      tab.addEventListener('mouseenter', () => {
+        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) activateFeature(tab);
+      });
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(event.key)) return;
+        event.preventDefault();
+        const direction = ['ArrowDown', 'ArrowRight'].includes(event.key) ? 1 : -1;
+        const next = featureTabs[(index + direction + featureTabs.length) % featureTabs.length];
+        next.focus();
+        activateFeature(next);
       });
     });
 
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/SplitText.min.js"></script>
+  <script src="assets/js/inicio-magnetic-buttons.js?v=2"></script>
+  <script src="assets/js/inicio-scroll.js?v=6"></script>
+  <script src="assets/js/inicio-horizontal-gallery.js?v=3"></script>
+  <script src="assets/js/inicio-split-text.js?v=1"></script>
+  <script src="assets/js/inicio-mascot.js?v=1"></script>
 
   <!-- MODAL -->
-  <div id="modal" class="modal">
-    <div class="modal-box login-modal">
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-box login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
       <button type="button" class="modal-close" onclick="fecharModal()" aria-label="Fechar modal">×</button>
 
       <div class="login-aside">
-        <img src="assets/images/logo.png" alt="LocalBarber">
-        <div>
-          <span class="login-kicker">Painel LocalBarber</span>
-          <h3>Volte para sua rotina de atendimentos</h3>
-          <p>Acesse agenda, clientes, serviços e caixa sem sair do fluxo da barbearia.</p>
+        <div class="login-aside-top">
+          <img src="assets/images/logo.png" alt="LocalBarber">
+        </div>
+        <div class="login-aside-copy">
+          <h3>Seu dia começa<br><strong>por aqui.</strong></h3>
+          <p>Retome o atendimento com as informações da sua barbearia à mão.</p>
         </div>
         <div class="login-mini-list">
-          <span>Agenda do dia</span>
-          <span>Clientes ativos</span>
-          <span>Financeiro organizado</span>
+          <span><b>01</b>Próximos horários</span>
+          <span><b>02</b>Histórico de clientes</span>
+          <span><b>03</b>Movimento do caixa</span>
         </div>
       </div>
 
       <div class="login-panel">
+        <div class="login-mobile-brand">
+          <img src="assets/images/logo.png" alt="LocalBarber">
+        </div>
         <div class="login-heading">
-          <span class="login-badge">Acesso</span>
-          <h2>Entrar</h2>
-          <p>Use o email cadastrado para acessar o painel.</p>
+          <h2 id="login-title">Acesse sua conta</h2>
+          <p>Informe o email e a senha cadastrados no LocalBarber.</p>
         </div>
 
         <div id="login-popup" class="auth-popup" role="alert" aria-live="polite"></div>
 
+        <button class="google-auth-button" id="google-auth-button" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.91h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.33 2.98-7.4Z"/>
+            <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.63-2.43l-3.24-2.54c-.9.6-2.05.96-3.39.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.62A10 10 0 0 0 12 22Z"/>
+            <path fill="#FBBC05" d="M6.39 13.86A6.02 6.02 0 0 1 6.07 12c0-.65.11-1.28.32-1.86V7.52H3.04A10 10 0 0 0 2 12c0 1.61.38 3.13 1.04 4.48l3.35-2.62Z"/>
+            <path fill="#EA4335" d="M12 6.01c1.47 0 2.79.51 3.83 1.5l2.87-2.88A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.52l3.35 2.62C7.18 7.77 9.39 6.01 12 6.01Z"/>
+          </svg>
+          <span>Continuar com Google</span>
+        </button>
+
+        <div class="social-auth-buttons" aria-label="Outras formas de acesso">
+          <button class="social-auth-button social-auth-button--github" type="button"
+            aria-label="Continuar com GitHub" title="Continuar com GitHub"
+            onclick="mostrarLoginPopup('O acesso com GitHub estará disponível em breve.', 'info')">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 3.7 5 5 0 0 0 19.3.2S18.1-.2 15 1.9a13.4 13.4 0 0 0-7 0C4.9-.2 3.7.2 3.7.2a5 5 0 0 0-.1 3.5 5.4 5.4 0 0 0-1.4 3.8c0 5.4 3.5 6.6 6.8 7A4.8 4.8 0 0 0 8 18v4" />
+              <path d="M8 19c-3 .9-3-1.5-4-2" />
+            </svg>
+          </button>
+          <button class="social-auth-button social-auth-button--instagram" type="button"
+            aria-label="Continuar com Instagram" title="Continuar com Instagram"
+            onclick="mostrarLoginPopup('O acesso com Instagram estará disponível em breve.', 'info')">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+              <path d="M16 11.4A4 4 0 1 1 12.6 8 4 4 0 0 1 16 11.4Z" />
+              <path d="M17.5 6.5h.01" />
+            </svg>
+          </button>
+          <button class="social-auth-button social-auth-button--facebook" type="button"
+            aria-label="Continuar com Facebook" title="Continuar com Facebook"
+            onclick="mostrarLoginPopup('O acesso com Facebook estará disponível em breve.', 'info')">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3Z" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="login-auth-divider" aria-hidden="true"><span>ou entre com email</span></div>
+
         <form class="login-form" id="login-form" onsubmit="enviarLogin(event)">
           <div class="login-field">
             <label for="login-email">Email</label>
-            <input id="login-email" name="email" type="email" placeholder="seu@email.com" autocomplete="email" required>
+            <div class="login-input-shell">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v11H4zM4.5 7l7.5 6 7.5-6" /></svg>
+              <input id="login-email" name="email" type="email" placeholder="seu@email.com" autocomplete="email" required>
+            </div>
           </div>
 
           <div class="login-field">
             <label for="login-password">Senha</label>
-            <input id="login-password" name="senha" type="password" placeholder="••••••••" autocomplete="current-password" required>
+            <div class="login-input-shell">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2M5 10h14v10H5z" /></svg>
+              <input id="login-password" name="senha" type="password" placeholder="••••••••" autocomplete="current-password" required>
+              <button class="password-toggle" type="button" onclick="alternarSenhaLogin(this)" aria-label="Mostrar senha" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z" /><circle cx="12" cy="12" r="2.5" /></svg>
+              </button>
+            </div>
           </div>
 
           <div class="form-check-container">
@@ -469,10 +685,9 @@
     </div>
   </div>
 
+  <script src="assets/js/inicio-login-modal.js?v=3"></script>
+  <script type="module" src="assets/js/supabase-auth.js?v=3"></script>
+
 </body>
 
 </html>
-
-
-
-
