@@ -302,10 +302,12 @@ body.login-modal-open {
   max-height: calc(100vh - 36px) !important;
   grid-template-columns: .92fr 1.08fr;
   overflow: hidden !important;
-  border: 1px solid rgba(43, 184, 255, .52);
+  border: 1px solid color-mix(in srgb, var(--brand-light) 62%, var(--line));
   border-radius: 26px;
   background: var(--surface);
-  box-shadow: 0 30px 90px rgba(0, 18, 48, .42), 0 0 0 1px rgba(43, 184, 255, .14), 0 0 42px rgba(43, 184, 255, .18);
+  box-shadow: 0 30px 90px rgba(0, 18, 48, .42),
+    0 0 0 1px color-mix(in srgb, var(--brand-light) 18%, transparent),
+    0 0 42px color-mix(in srgb, var(--brand-light) 22%, transparent);
   isolation: isolate;
 }
 
@@ -330,7 +332,9 @@ body.login-modal-open {
   gap: 28px;
   overflow: hidden;
   border-right: 1px solid rgba(142, 220, 255, .22);
-  background: linear-gradient(145deg, #0b3768 0%, #07264c 46%, #03142c 100%);
+  background:
+    radial-gradient(circle at 18% 16%, color-mix(in srgb, var(--brand-light) 22%, transparent), transparent 32%),
+    linear-gradient(145deg, color-mix(in srgb, var(--brand) 46%, #0b3768) 0%, color-mix(in srgb, var(--brand-2) 26%, #07264c) 46%, #03142c 100%);
 }
 
 .login-aside > * {
@@ -424,6 +428,7 @@ body.login-modal-open {
 
 .login-heading h2 {
   max-width: 390px;
+  color: var(--brand);
   font-size: clamp(2rem, 3vw, 2.55rem);
   line-height: 1.04;
   letter-spacing: -.035em;
@@ -900,6 +905,7 @@ body.login-modal-open {
 .feature-heading h2,
 .promo-inner h2,
 .cta-content h2 {
+  color: var(--brand);
   line-height: 1.04;
 }
 

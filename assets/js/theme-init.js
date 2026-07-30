@@ -10,6 +10,7 @@
     preto: "#000000",
     branco: "#FFFFFF",
   };
+  let corTemaAtiva = COR_TEMA_PADRAO;
 
   function corHexValida(cor) {
     return /^#[0-9A-F]{6}$/i.test(String(cor || ""));
@@ -79,6 +80,14 @@
     return corDeAjuste;
   }
 
+  function aplicarTokensCor(alvo, tokens) {
+    if (!alvo) return;
+
+    Object.entries(tokens).forEach(([nome, valor]) => {
+      alvo.style.setProperty(nome, valor);
+    });
+  }
+
   function aplicarCorTema(cor, salvar = true) {
     const corBase = normalizarCorHex(cor);
     const raiz = document.documentElement;
@@ -92,17 +101,33 @@
       temaEscuro ? 0.12 : 0.18
     );
     const corPrimariaSuave = misturarCores(corBase, fundo, temaEscuro ? 0.82 : 0.9);
+    const corPrimariaBrilho = misturarCores(
+      corBase,
+      CORES_REFERENCIA.branco,
+      temaEscuro ? 0.28 : 0.1
+    );
     const contrasteBranco = calcularContraste(corPrimaria, CORES_REFERENCIA.branco);
     const contrastePreto = calcularContraste(corPrimaria, CORES_REFERENCIA.preto);
     const textoSobrePrimaria = contrasteBranco >= contrastePreto
       ? CORES_REFERENCIA.branco
       : CORES_REFERENCIA.preto;
+    const tokens = {
+      "--cor-tema-original": corBase,
+      "--primaria": corPrimaria,
+      "--primaria-forte": corPrimariaForte,
+      "--primaria-suave": corPrimariaSuave,
+      "--primaria-brilho": corPrimariaBrilho,
+      "--texto-sobre-primaria": textoSobrePrimaria,
+      "--brand": corPrimaria,
+      "--brand-2": corPrimariaForte,
+      "--brand-light": corPrimariaBrilho,
+      "--btn-blue": corPrimaria,
+      "--btn-blue-hover": corPrimariaForte,
+    };
 
-    raiz.style.setProperty("--cor-tema-original", corBase);
-    raiz.style.setProperty("--primaria", corPrimaria);
-    raiz.style.setProperty("--primaria-forte", corPrimariaForte);
-    raiz.style.setProperty("--primaria-suave", corPrimariaSuave);
-    raiz.style.setProperty("--texto-sobre-primaria", textoSobrePrimaria);
+    corTemaAtiva = corBase;
+    aplicarTokensCor(raiz, tokens);
+    aplicarTokensCor(document.body, tokens);
 
     if (salvar) {
       localStorage.setItem(CHAVE_COR_TEMA, corBase);
@@ -135,16 +160,17 @@
 
   const observarMudancaTema = new MutationObserver((alteracoes) => {
     if (alteracoes.some((alteracao) => alteracao.attributeName === "data-theme")) {
-      aplicarCorTema(
-        localStorage.getItem(CHAVE_COR_TEMA) || COR_TEMA_PADRAO,
-        false
-      );
+      aplicarCorTema(corTemaAtiva, false);
     }
   });
   observarMudancaTema.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ["data-theme"],
   });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    aplicarCorTema(corTemaAtiva, false);
+  }, { once: true });
 
   window.addEventListener("pageshow", (evento) => {
     if (evento.persisted) {

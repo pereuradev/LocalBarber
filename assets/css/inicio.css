@@ -7,18 +7,19 @@
   --text: #10284f;
   --muted: #58708f;
   --line: #b8d4f3;
-  --brand: #045fbe;
-  --brand-2: #003f94;
-  --brand-light: #2bb8ff;
+  --brand: var(--primaria, #045fbe);
+  --brand-2: var(--primaria-forte, #003f94);
+  --brand-light: var(--primaria-brilho, #2bb8ff);
   --silver: #f4f8fc;
   --dark: #071934;
   --white: #ffffff;
   --radius: 8px;
   --shadow: 0 16px 36px rgba(0, 72, 150, .14);
   --gold: var(--brand);
-  --glow-border: #2bb8ff;
-  --glow-border-soft: rgba(43, 184, 255, .42);
-  --glow-shadow: 0 0 0 1px rgba(43, 184, 255, .38), 0 0 24px rgba(43, 184, 255, .24);
+  --glow-border: var(--brand-light);
+  --glow-border-soft: color-mix(in srgb, var(--brand-light) 42%, transparent);
+  --glow-shadow: 0 0 0 1px color-mix(in srgb, var(--brand-light) 38%, transparent),
+    0 0 24px color-mix(in srgb, var(--brand-light) 24%, transparent);
 }
 
 body[data-theme="dark"],
@@ -29,16 +30,17 @@ html[data-theme="dark"] body {
   --text: #f5fbff;
   --muted: #aac5df;
   --line: #23558c;
-  --brand: #3ab7ff;
-  --brand-2: #85d5ff;
-  --brand-light: #8edcff;
+  --brand: var(--primaria, #3ab7ff);
+  --brand-2: var(--primaria-forte, #85d5ff);
+  --brand-light: var(--primaria-brilho, #8edcff);
   --silver: #dcecff;
   --dark: #031025;
   --white: #ffffff;
   --shadow: 0 18px 42px rgba(0, 0, 0, .34);
-  --glow-border: #8edcff;
-  --glow-border-soft: rgba(142, 220, 255, .48);
-  --glow-shadow: 0 0 0 1px rgba(142, 220, 255, .40), 0 0 26px rgba(43, 184, 255, .28);
+  --glow-border: var(--brand-light);
+  --glow-border-soft: color-mix(in srgb, var(--brand-light) 48%, transparent);
+  --glow-shadow: 0 0 0 1px color-mix(in srgb, var(--brand-light) 40%, transparent),
+    0 0 26px color-mix(in srgb, var(--brand-light) 28%, transparent);
 }
 
 *,
@@ -72,19 +74,6 @@ body {
   font-family: "Inter", Arial, sans-serif;
   line-height: 1.55;
   overflow-x: hidden;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: .28;
-  background:
-    linear-gradient(90deg, rgba(4, 95, 190, .05) 1px, transparent 1px),
-    linear-gradient(rgba(4, 95, 190, .04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  z-index: -1;
 }
 
 nav {
@@ -264,14 +253,17 @@ html.theme-transition .theme-toggle-icon {
 }
 
 .btn-gold {
-  color: var(--white);
-  background: linear-gradient(180deg, #0a72d4, #044faa 44%, #002f78);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 8px 18px rgba(0, 47, 120, .30);
+  color: var(--texto-sobre-primaria, var(--white));
+  background: linear-gradient(110deg, var(--brand), var(--brand-2));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
+    0 8px 18px color-mix(in srgb, var(--brand) 30%, transparent);
 }
 
 .btn-gold:hover {
-  background: linear-gradient(180deg, #075db5, #03418f 45%, #00245d);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 12px 24px rgba(0, 47, 120, .36), var(--glow-shadow);
+  background: linear-gradient(110deg, var(--brand-2), var(--brand));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
+    0 12px 24px color-mix(in srgb, var(--brand) 36%, transparent),
+    var(--glow-shadow);
 }
 
 .hero {
@@ -306,6 +298,7 @@ html.theme-transition .theme-toggle-icon {
 
 .hero h1 {
   max-width: 620px;
+  color: var(--brand);
   font-size: clamp(2.55rem, 5.2vw, 4.35rem);
   line-height: 1.02;
   letter-spacing: 0;
@@ -1612,7 +1605,7 @@ footer {
 }
 
 .login-heading h2 {
-  color: var(--text);
+  color: var(--brand);
   font-size: 2rem;
   line-height: 1.1;
   font-weight: 800;
@@ -1790,20 +1783,22 @@ html[data-theme="dark"] body .auth-popup.sucesso {
   border-radius: 6px;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #0a72d4, #044faa 44%, #002f78);
-  color: white;
+  background: linear-gradient(110deg, var(--brand), var(--brand-2));
+  color: var(--texto-sobre-primaria, #ffffff);
   font-family: inherit;
   font-size: .96rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 8px 18px rgba(0, 47, 120, .30);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
+    0 8px 18px color-mix(in srgb, var(--brand) 30%, transparent);
   transition: transform .18s, box-shadow .18s, background .18s;
 }
 
 .btnentrar:hover {
   transform: translateY(-1px);
-  background: linear-gradient(180deg, #075db5, #03418f 45%, #00245d);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 12px 24px rgba(0, 47, 120, .34);
+  background: linear-gradient(110deg, var(--brand-2), var(--brand));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
+    0 12px 24px color-mix(in srgb, var(--brand) 34%, transparent);
 }
 
 .login-footer {

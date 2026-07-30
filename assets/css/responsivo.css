@@ -389,34 +389,6 @@ html.theme-transition *::after {
     filter .42s ease;
 }
 
-body:has(.sidebar)::before,
-body:has(.sidebar-layout)::before,
-body:has(.form-container)::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: .28;
-  background:
-    linear-gradient(90deg, rgba(4, 95, 190, .05) 1px, transparent 1px),
-    linear-gradient(rgba(4, 95, 190, .04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  z-index: -1;
-}
-
-body[data-theme="dark"]:has(.sidebar)::before,
-body[data-theme="dark"]:has(.sidebar-layout)::before,
-body[data-theme="dark"]:has(.form-container)::before,
-html[data-theme="dark"] body:has(.sidebar)::before,
-html[data-theme="dark"] body:has(.sidebar-layout)::before,
-html[data-theme="dark"] body:has(.form-container)::before {
-  opacity: .18;
-  background:
-    linear-gradient(90deg, rgba(142, 220, 255, .08) 1px, transparent 1px),
-    linear-gradient(rgba(142, 220, 255, .06) 1px, transparent 1px);
-  background-size: 44px 44px;
-}
-
 .theme-toggle {
   min-height: 40px;
   padding: 0 12px;

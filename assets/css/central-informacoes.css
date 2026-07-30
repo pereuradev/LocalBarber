@@ -7,14 +7,15 @@
   --text: #10284f;
   --muted: #58708f;
   --line: #b8d4f3;
-  --brand: #045fbe;
-  --brand-2: #003f94;
-  --brand-light: #2bb8ff;
+  --brand: var(--primaria, #045fbe);
+  --brand-2: var(--primaria-forte, #003f94);
+  --brand-light: var(--primaria-brilho, #2bb8ff);
   --dark: #071934;
   --success-bg: #dff8eb;
   --success-text: #12603e;
-  --glow-border-soft: rgba(43, 184, 255, .42);
-  --glow-shadow: 0 0 0 1px rgba(43, 184, 255, .32), 0 0 24px rgba(43, 184, 255, .18);
+  --glow-border-soft: color-mix(in srgb, var(--brand-light) 42%, transparent);
+  --glow-shadow: 0 0 0 1px color-mix(in srgb, var(--brand-light) 32%, transparent),
+    0 0 24px color-mix(in srgb, var(--brand-light) 18%, transparent);
   --shadow: 0 22px 58px rgba(0, 72, 150, .12);
 }
 
@@ -26,14 +27,15 @@ html[data-theme="dark"] body {
   --text: #f5fbff;
   --muted: #aac5df;
   --line: #23558c;
-  --brand: #3ab7ff;
-  --brand-2: #85d5ff;
-  --brand-light: #8edcff;
+  --brand: var(--primaria, #3ab7ff);
+  --brand-2: var(--primaria-forte, #85d5ff);
+  --brand-light: var(--primaria-brilho, #8edcff);
   --dark: #031025;
   --success-bg: #103d34;
   --success-text: #b8f6db;
-  --glow-border-soft: rgba(142, 220, 255, .48);
-  --glow-shadow: 0 0 0 1px rgba(142, 220, 255, .35), 0 0 26px rgba(43, 184, 255, .22);
+  --glow-border-soft: color-mix(in srgb, var(--brand-light) 48%, transparent);
+  --glow-shadow: 0 0 0 1px color-mix(in srgb, var(--brand-light) 35%, transparent),
+    0 0 26px color-mix(in srgb, var(--brand-light) 22%, transparent);
   --shadow: 0 24px 64px rgba(0, 0, 0, .30);
 }
 
@@ -66,20 +68,6 @@ body {
     var(--bg);
   font-family: "Inter", Arial, sans-serif;
   line-height: 1.6;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  z-index: -1;
-  inset: 0;
-  pointer-events: none;
-  opacity: .48;
-  background:
-    linear-gradient(90deg, rgba(4, 95, 190, .055) 1px, transparent 1px),
-    linear-gradient(rgba(4, 95, 190, .045) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: linear-gradient(to bottom, #000 0 72%, transparent 100%);
 }
 
 a {
@@ -395,7 +383,7 @@ body.motion-ready .page.active {
 .page-title {
   max-width: 830px;
   margin-bottom: 22px;
-  color: var(--text);
+  color: var(--brand);
   font-size: clamp(3rem, 6.4vw, 6rem);
   font-weight: 800;
   line-height: .98;
@@ -448,7 +436,7 @@ body.motion-ready .page.active {
 
 .section-title {
   margin-bottom: 18px;
-  color: var(--text);
+  color: var(--brand);
   font-size: clamp(1.7rem, 3vw, 2.35rem);
   line-height: 1.14;
   letter-spacing: -.035em;
@@ -496,7 +484,7 @@ body.motion-ready .page.active {
 .about-origin-copy h2 {
   max-width: 680px;
   margin-bottom: 22px;
-  color: var(--text);
+  color: var(--brand);
   font-size: clamp(2rem, 4vw, 3.55rem);
   line-height: 1.05;
   letter-spacing: -.05em;
@@ -532,7 +520,7 @@ body.motion-ready .page.active {
 
 .about-section-heading h2 {
   margin-top: 13px;
-  color: var(--text);
+  color: var(--brand);
   font-size: clamp(2rem, 4.4vw, 3.8rem);
   line-height: 1.04;
   letter-spacing: -.055em;
@@ -670,7 +658,7 @@ body.motion-ready .page.active {
 .about-audience h2 {
   max-width: 650px;
   margin-top: 14px;
-  color: var(--text);
+  color: var(--brand);
   font-size: clamp(2rem, 4.2vw, 3.5rem);
   line-height: 1.04;
   letter-spacing: -.05em;
@@ -898,7 +886,7 @@ body.motion-ready .page.active {
 
 .legal-section h2 {
   margin-bottom: 13px;
-  color: var(--text);
+  color: var(--brand);
   font-size: clamp(1.15rem, 2vw, 1.4rem);
   line-height: 1.35;
   letter-spacing: -.02em;

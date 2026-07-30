@@ -258,11 +258,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>LocalBarber | Cadastrar Barbearia</title>
     <link rel="icon" type="image/png" href="assets/images/favicon.png?v=20260715">
     
-  <script src="assets/js/theme-init.js"></script>
+  <script src="assets/js/theme-init.js?v=6"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/cadastro-empresa.css?v=10">
+  <link rel="stylesheet" href="assets/css/cadastro-empresa.css?v=12">
 </head>
 <body class="cadastro-empresa-page">
 
@@ -707,7 +707,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="assets/js/cadastro-empresa-motion.js?v=1"></script>
 </body>
 </html>
-
-
-
 
