@@ -10,14 +10,14 @@
     content="Centralize agenda, clientes, serviços, equipe e controle financeiro da sua barbearia com o LocalBarber." />
   <link rel="preload" href="assets/images/mascote-localbarber.png?v=2" as="image" type="image/png" />
 
-  <script src="assets/js/theme-init.js?v=2"></script>
+  <script src="assets/js/theme-init.js?v=4"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/css/inicio.css?v=12">
   <link rel="stylesheet" href="assets/css/responsivo.css">
-  <link rel="stylesheet" href="assets/css/inicio-horizontal.css?v=5">
+  <link rel="stylesheet" href="assets/css/inicio-horizontal.css?v=7">
 </head>
 
 <body>
@@ -124,36 +124,34 @@
 
               <section class="feature-screen active" data-feature-screen="agenda" role="tabpanel">
                 <header class="feature-screen-heading">
-                  <div><span>Agenda da semana</span><small>19 a 24 de julho</small></div>
-                  <strong>18 atendimentos</strong>
+                  <div><span>Agenda da semana</span><small>Período atual</small></div>
+                  <strong>Dados em tempo real</strong>
                 </header>
                 <div class="agenda-week" aria-hidden="true">
-                  <div class="agenda-day"><span>SEG</span><b>19</b></div>
-                  <div class="agenda-day is-today"><span>TER</span><b>20</b></div>
-                  <div class="agenda-day"><span>QUA</span><b>21</b></div>
-                  <div class="agenda-day"><span>QUI</span><b>22</b></div>
-                  <div class="agenda-day"><span>SEX</span><b>23</b></div>
+                  <div class="agenda-day"><span>SEG</span><b>—</b></div>
+                  <div class="agenda-day is-today"><span>TER</span><b>—</b></div>
+                  <div class="agenda-day"><span>QUA</span><b>—</b></div>
+                  <div class="agenda-day"><span>QUI</span><b>—</b></div>
+                  <div class="agenda-day"><span>SEX</span><b>—</b></div>
                 </div>
                 <div class="agenda-list">
-                  <article><time>09:00</time><i></i><div><strong>Lucas Andrade</strong><span>Corte degradê · Rafael</span></div><b>Confirmado</b></article>
-                  <article><time>10:30</time><i></i><div><strong>Matheus Lima</strong><span>Corte + barba · Diego</span></div><b>Confirmado</b></article>
-                  <article><time>13:00</time><i></i><div><strong>Bruno Ferreira</strong><span>Barba completa · Rafael</span></div><b>Aguardando</b></article>
+                  <article><time>—</time><i></i><div><strong>Sem agendamentos fictícios</strong><span>Os registros aparecem após o cadastro</span></div><b>Banco real</b></article>
                 </div>
               </section>
 
               <section class="feature-screen" data-feature-screen="financeiro" role="tabpanel" hidden>
                 <header class="feature-screen-heading">
-                  <div><span>Resumo financeiro</span><small>Julho de 2026</small></div>
+                  <div><span>Resumo financeiro</span><small>Período selecionado</small></div>
                   <strong>Caixa atualizado</strong>
                 </header>
                 <div class="finance-metrics">
-                  <article><span>Faturamento</span><strong>R$ 12.840</strong><small>+12% no mês</small></article>
-                  <article><span>Ticket médio</span><strong>R$ 68,40</strong><small>188 atendimentos</small></article>
+                  <article><span>Faturamento</span><strong>R$ —</strong><small>Calculado pelas transações</small></article>
+                  <article><span>Ticket médio</span><strong>R$ —</strong><small>Sem valor simulado</small></article>
                 </div>
                 <div class="finance-chart" aria-label="Faturamento por semana">
-                  <span style="--bar:46%"></span><span style="--bar:63%"></span><span style="--bar:54%"></span><span style="--bar:82%"></span><span style="--bar:74%"></span><span style="--bar:92%"></span>
+                  <span style="--bar:4%"></span><span style="--bar:4%"></span><span style="--bar:4%"></span><span style="--bar:4%"></span><span style="--bar:4%"></span><span style="--bar:4%"></span>
                 </div>
-                <div class="finance-legend"><span>Semanas do mês</span><b>Meta: R$ 14.000</b></div>
+                <div class="finance-legend"><span>Entradas do período</span><b>Fonte: banco de dados</b></div>
               </section>
 
               <section class="feature-screen" data-feature-screen="clientes" role="tabpanel" hidden>
@@ -162,23 +160,17 @@
                   <strong>+ Novo cliente</strong>
                 </header>
                 <div class="client-list">
-                  <article><i>LA</i><div><strong>Lucas Andrade</strong><span>Última visita: hoje</span></div><b>12 visitas</b></article>
-                  <article><i>ML</i><div><strong>Matheus Lima</strong><span>Prefere corte degradê</span></div><b>8 visitas</b></article>
-                  <article><i>BF</i><div><strong>Bruno Ferreira</strong><span>Retorno em 15 dias</span></div><b>5 visitas</b></article>
-                  <article><i>GC</i><div><strong>Gabriel Costa</strong><span>Aniversário neste mês</span></div><b>9 visitas</b></article>
+                  <article><i>+</i><div><strong>Nenhum cliente de exemplo</strong><span>Cadastre contatos reais no painel</span></div><b>Histórico real</b></article>
                 </div>
               </section>
 
               <section class="feature-screen" data-feature-screen="servicos" role="tabpanel" hidden>
                 <header class="feature-screen-heading">
                   <div><span>Catálogo de serviços</span><small>Valores e duração</small></div>
-                  <strong>8 serviços</strong>
+                  <strong>Seu catálogo</strong>
                 </header>
                 <div class="service-list">
-                  <article><i aria-hidden="true">✂</i><div><strong>Corte degradê</strong><span>45 min · Comissão 40%</span></div><b>R$ 55</b></article>
-                  <article><i aria-hidden="true">✦</i><div><strong>Corte + barba</strong><span>75 min · Comissão 40%</span></div><b>R$ 90</b></article>
-                  <article><i aria-hidden="true">◆</i><div><strong>Barba completa</strong><span>30 min · Comissão 35%</span></div><b>R$ 40</b></article>
-                  <article><i aria-hidden="true">↗</i><div><strong>Pigmentação</strong><span>40 min · Comissão 35%</span></div><b>R$ 48</b></article>
+                  <article><i aria-hidden="true">✂</i><div><strong>Serviços cadastrados por você</strong><span>Duração e comissão reais</span></div><b>R$ —</b></article>
                 </div>
               </section>
             </div>
@@ -262,22 +254,22 @@
               <div class="promo-card-demo active">
                 <span>01</span>
                 <div>
-                  <h4>Corte + barba</h4>
-                  <p>Personalizado pelo cliente · R$ 65,00</p>
+                  <h4>Nome do serviço</h4>
+                  <p>Descrição cadastrada pela barbearia</p>
                 </div>
               </div>
               <div class="promo-card-demo">
                 <span>02</span>
                 <div>
-                  <h4>Corte simples</h4>
-                  <p>Padrão · R$ 40,00 · 30 min</p>
+                  <h4>Preço e duração</h4>
+                  <p>Valores definidos por você</p>
                 </div>
               </div>
               <div class="promo-card-demo">
                 <span>03</span>
                 <div>
-                  <h4>Barba completa</h4>
-                  <p>Com design · R$ 35,00 · 25 min</p>
+                  <h4>Comissão da equipe</h4>
+                  <p>Percentual salvo no banco</p>
                 </div>
               </div>
             </div>
@@ -476,6 +468,7 @@
 
       const form = event.currentTarget;
       const botao = form.querySelector(".btnentrar");
+      form.elements.tipo_acesso.value = obterTipoAcessoLogin();
       const dados = new FormData(form);
 
       botao.disabled = true;
@@ -493,6 +486,21 @@
           return;
         }
 
+        if (retorno.sessao_visual) {
+          try {
+            sessionStorage.setItem(
+              "localbarber:sessao-visual",
+              JSON.stringify(retorno.sessao_visual)
+            );
+            const corTema = retorno.sessao_visual.barbearia?.cor_tema;
+            if (/^#[0-9A-F]{6}$/i.test(corTema || "")) {
+              localStorage.setItem("localbarber-cor-tema", corTema.toUpperCase());
+            }
+          } catch {
+            // O login continua mesmo se o navegador bloquear o armazenamento.
+          }
+        }
+
         mostrarLoginPopup(retorno.message || "Login realizado com sucesso.", "sucesso");
         setTimeout(() => {
           window.location.href = retorno.redirect || "dashboard.php";
@@ -505,7 +513,32 @@
       }
     }
 
+    function obterTipoAcessoLogin() {
+      return document.querySelector('input[name="perfil-acesso"]:checked')?.value || "administrador";
+    }
+
+    function configurarTipoAcessoLogin() {
+      const opcoes = document.querySelectorAll('input[name="perfil-acesso"]');
+      const campoOculto = document.getElementById("login-tipo-acesso");
+      const tipoSalvo = sessionStorage.getItem("localbarber-tipo-acesso");
+      const opcaoSalva = Array.from(opcoes).find(opcao => opcao.value === tipoSalvo);
+
+      if (opcaoSalva) opcaoSalva.checked = true;
+
+      const sincronizar = () => {
+        const tipoAcesso = obterTipoAcessoLogin();
+        if (campoOculto) campoOculto.value = tipoAcesso;
+        sessionStorage.setItem("localbarber-tipo-acesso", tipoAcesso);
+      };
+
+      opcoes.forEach(opcao => opcao.addEventListener("change", sincronizar));
+      sincronizar();
+    }
+
+    window.obterTipoAcessoLogin = obterTipoAcessoLogin;
+
     window.addEventListener("DOMContentLoaded", () => {
+      configurarTipoAcessoLogin();
       const params = new URLSearchParams(window.location.search);
       if (params.get("cadastro") === "ok") {
         abrirModal();
@@ -602,8 +635,32 @@
         </div>
         <div class="login-heading">
           <h2 id="login-title">Acesse sua conta</h2>
-          <p>Informe o email e a senha cadastrados no LocalBarber.</p>
+          <p>Escolha seu perfil e informe os dados cadastrados no LocalBarber.</p>
         </div>
+
+        <fieldset class="tipo-acesso" aria-label="Tipo de acesso">
+          <legend>Entrar como</legend>
+          <label class="tipo-acesso-opcao">
+            <input type="radio" name="perfil-acesso" value="administrador" checked>
+            <span class="tipo-acesso-conteudo">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 20 6v5c0 5-3.4 8.4-8 10-4.6-1.6-8-5-8-10V6l8-3Z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+              <span><strong>Administrador</strong><small>Gestão completa</small></span>
+            </span>
+          </label>
+          <label class="tipo-acesso-opcao">
+            <input type="radio" name="perfil-acesso" value="colaborador">
+            <span class="tipo-acesso-conteudo">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 21a8 8 0 0 1 16 0"/>
+              </svg>
+              <span><strong>Colaborador</strong><small>Equipe da barbearia</small></span>
+            </span>
+          </label>
+        </fieldset>
 
         <div id="login-popup" class="auth-popup" role="alert" aria-live="polite"></div>
 
@@ -617,36 +674,10 @@
           <span>Continuar com Google</span>
         </button>
 
-        <div class="social-auth-buttons" aria-label="Outras formas de acesso">
-          <button class="social-auth-button social-auth-button--github" type="button"
-            aria-label="Continuar com GitHub" title="Continuar com GitHub"
-            onclick="mostrarLoginPopup('O acesso com GitHub estará disponível em breve.', 'info')">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 3.7 5 5 0 0 0 19.3.2S18.1-.2 15 1.9a13.4 13.4 0 0 0-7 0C4.9-.2 3.7.2 3.7.2a5 5 0 0 0-.1 3.5 5.4 5.4 0 0 0-1.4 3.8c0 5.4 3.5 6.6 6.8 7A4.8 4.8 0 0 0 8 18v4" />
-              <path d="M8 19c-3 .9-3-1.5-4-2" />
-            </svg>
-          </button>
-          <button class="social-auth-button social-auth-button--instagram" type="button"
-            aria-label="Continuar com Instagram" title="Continuar com Instagram"
-            onclick="mostrarLoginPopup('O acesso com Instagram estará disponível em breve.', 'info')">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-              <path d="M16 11.4A4 4 0 1 1 12.6 8 4 4 0 0 1 16 11.4Z" />
-              <path d="M17.5 6.5h.01" />
-            </svg>
-          </button>
-          <button class="social-auth-button social-auth-button--facebook" type="button"
-            aria-label="Continuar com Facebook" title="Continuar com Facebook"
-            onclick="mostrarLoginPopup('O acesso com Facebook estará disponível em breve.', 'info')">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3Z" />
-            </svg>
-          </button>
-        </div>
-
         <div class="login-auth-divider" aria-hidden="true"><span>ou entre com email</span></div>
 
         <form class="login-form" id="login-form" onsubmit="enviarLogin(event)">
+          <input id="login-tipo-acesso" name="tipo_acesso" type="hidden" value="administrador">
           <div class="login-field">
             <label for="login-email">Email</label>
             <div class="login-input-shell">
@@ -685,8 +716,8 @@
     </div>
   </div>
 
-  <script src="assets/js/inicio-login-modal.js?v=3"></script>
-  <script type="module" src="assets/js/supabase-auth.js?v=3"></script>
+  <script src="assets/js/inicio-login-modal.js?v=5"></script>
+  <script type="module" src="assets/js/supabase-auth.js?v=6"></script>
 
 </body>
 

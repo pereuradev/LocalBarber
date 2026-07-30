@@ -13,7 +13,7 @@
     '.login-aside-top, .login-aside-copy > *, .login-mini-list span',
   ));
   const panelItems = Array.from(panel.querySelectorAll(
-    '.login-mobile-brand, .login-heading > *, .google-auth-button, .social-auth-buttons, .login-auth-divider, .login-field, .form-check-container, .btnentrar, .login-footer',
+    '.login-mobile-brand, .login-heading > *, .tipo-acesso, .google-auth-button, .login-auth-divider, .login-field, .form-check-container, .btnentrar, .login-footer',
   ));
 
   let timeline = null;

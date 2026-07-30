@@ -23,6 +23,17 @@ function requiredEnvironmentVariable(string $name): string
     return trim($value);
 }
 
+function optionalBooleanEnvironmentVariable(string $name, bool $default): bool
+{
+    $value = getenv($name);
+
+    if ($value === false || trim($value) === '') {
+        return $default;
+    }
+
+    return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $default;
+}
+
 try {
     $host = requiredEnvironmentVariable('SUPABASE_DB_HOST');
     $port = requiredEnvironmentVariable('SUPABASE_DB_PORT');
@@ -30,23 +41,33 @@ try {
     $user = requiredEnvironmentVariable('SUPABASE_DB_USER');
     $password = requiredEnvironmentVariable('SUPABASE_DB_PASSWORD');
     $schema = requiredEnvironmentVariable('SUPABASE_DB_SCHEMA');
+    $persistentConnection = optionalBooleanEnvironmentVariable('SUPABASE_DB_PERSISTENT', true);
 
     if (filter_var($port, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]]) === false) {
         throw new RuntimeException('SUPABASE_DB_PORT deve conter uma porta válida.');
     }
 
+    if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $schema) !== 1) {
+        throw new RuntimeException('SUPABASE_DB_SCHEMA deve conter um identificador valido.');
+    }
+
     $pdo = new PDO(
-        "pgsql:host={$host};port={$port};dbname={$dbname};sslmode=require",
+        "pgsql:host={$host};port={$port};dbname={$dbname};sslmode=require;" .
+        "options='--search_path={$schema},public'",
         $user,
         $password,
         [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_PERSISTENT => $persistentConnection,
         ]
     );
 
-    $pdo->exec('SET search_path TO "' . str_replace('"', '""', $schema) . '", public');
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
 } catch (Throwable $exception) {
     error_log('[LocalBarber] Falha ao inicializar o banco de dados: ' . $exception->getMessage());
     http_response_code(500);

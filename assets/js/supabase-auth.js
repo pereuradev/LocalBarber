@@ -1,9 +1,10 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.106.2/+esm';
+import { createClient as criarCliente } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.106.2/+esm';
 
-const SUPABASE_URL = 'https://rkxqylhrwyxuockhsoad.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_hJ9J4fsSX2doHzCZ5Uw5fw_1EHB4SPh';
+const URL_SUPABASE = 'https://rkxqylhrwyxuockhsoad.supabase.co';
+const CHAVE_PUBLICAVEL_SUPABASE = 'sb_publishable_hJ9J4fsSX2doHzCZ5Uw5fw_1EHB4SPh';
+const CHAVE_TIPO_ACESSO = 'localbarber-tipo-acesso';
 
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+const clienteSupabase = criarCliente(URL_SUPABASE, CHAVE_PUBLICAVEL_SUPABASE, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -11,126 +12,163 @@ const supabaseClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   },
 });
 
-const googleButton = document.getElementById('google-auth-button');
-const pageUrl = new URL(window.location.href);
-const isGoogleReturn = pageUrl.searchParams.get('oauth') === 'google';
-let sessionSyncStarted = false;
-let providerSettingsPromise = null;
+const botaoGoogle = document.getElementById('google-auth-button');
+const enderecoPagina = new URL(window.location.href);
+const retornandoDoGoogle = enderecoPagina.searchParams.get('oauth') === 'google';
+let sincronizacaoIniciada = false;
+let promessaConfiguracaoProvedor = null;
 
-function showMessage(message, type = 'erro') {
+function obterTipoAcesso() {
+  const tipoSelecionado = window.obterTipoAcessoLogin?.()
+    || sessionStorage.getItem(CHAVE_TIPO_ACESSO)
+    || 'administrador';
+
+  return ['administrador', 'colaborador'].includes(tipoSelecionado)
+    ? tipoSelecionado
+    : 'administrador';
+}
+
+function mostrarMensagem(mensagem, tipo = 'erro') {
   if (typeof window.mostrarLoginPopup === 'function') {
-    window.mostrarLoginPopup(message, type);
+    window.mostrarLoginPopup(mensagem, tipo);
   }
 }
 
-function setGoogleButtonLoading(loading) {
-  if (!(googleButton instanceof HTMLButtonElement)) return;
-  googleButton.disabled = loading;
-  const label = googleButton.querySelector('span');
-  if (label) label.textContent = loading ? 'Conectando ao Google...' : 'Continuar com Google';
+function definirCarregamentoGoogle(carregando) {
+  if (!(botaoGoogle instanceof HTMLButtonElement)) return;
+  botaoGoogle.disabled = carregando;
+  const rotulo = botaoGoogle.querySelector('span');
+  if (rotulo) {
+    rotulo.textContent = carregando ? 'Conectando ao Google...' : 'Continuar com Google';
+  }
 }
 
-async function isGoogleProviderEnabled() {
-  if (!providerSettingsPromise) {
-    providerSettingsPromise = fetch(`${SUPABASE_URL}/auth/v1/settings`, {
-      headers: { apikey: SUPABASE_PUBLISHABLE_KEY },
+async function provedorGoogleEstaAtivo() {
+  if (!promessaConfiguracaoProvedor) {
+    promessaConfiguracaoProvedor = fetch(`${URL_SUPABASE}/auth/v1/settings`, {
+      headers: { apikey: CHAVE_PUBLICAVEL_SUPABASE },
     })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((settings) => settings?.external?.google ?? null)
+      .then((resposta) => (resposta.ok ? resposta.json() : null))
+      .then((configuracoes) => configuracoes?.external?.google ?? null)
       .catch(() => null);
   }
 
-  return providerSettingsPromise;
+  return promessaConfiguracaoProvedor;
 }
 
-function cleanOAuthUrl() {
-  const cleanUrl = new URL(window.location.href);
-  cleanUrl.searchParams.delete('oauth');
-  cleanUrl.searchParams.delete('logout');
-  cleanUrl.hash = '';
-  window.history.replaceState({}, '', `${cleanUrl.pathname}${cleanUrl.search}`);
+function limparEnderecoOAuth() {
+  const enderecoLimpo = new URL(window.location.href);
+  enderecoLimpo.searchParams.delete('oauth');
+  enderecoLimpo.searchParams.delete('logout');
+  enderecoLimpo.hash = '';
+  window.history.replaceState({}, '', `${enderecoLimpo.pathname}${enderecoLimpo.search}`);
 }
 
-async function syncGoogleSession(session) {
-  if (sessionSyncStarted || !session?.access_token) return;
-  sessionSyncStarted = true;
-  setGoogleButtonLoading(true);
+async function sincronizarSessaoGoogle(sessao) {
+  if (sincronizacaoIniciada || !sessao?.access_token) return;
+  sincronizacaoIniciada = true;
+  definirCarregamentoGoogle(true);
 
   try {
-    const response = await fetch('auth/google-session.php', {
+    const resposta = await fetch('auth/google-session.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ access_token: session.access_token }),
+      body: JSON.stringify({
+        access_token: sessao.access_token,
+        tipo_acesso: obterTipoAcesso(),
+      }),
     });
-    const result = await response.json();
+    const retorno = await resposta.json();
 
-    if (!response.ok || !result.ok) {
-      await supabaseClient.auth.signOut({ scope: 'local' });
-      showMessage(result.message || 'Nao foi possivel entrar com Google.', 'erro');
-      cleanOAuthUrl();
+    if (!resposta.ok || !retorno.ok) {
+      await clienteSupabase.auth.signOut({ scope: 'local' });
+      mostrarMensagem(retorno.message || 'Não foi possível entrar com Google.', 'erro');
+      limparEnderecoOAuth();
       return;
     }
 
-    showMessage(result.message || 'Autenticacao concluida.', 'sucesso');
-    cleanOAuthUrl();
+    mostrarMensagem(retorno.message || 'Autenticação concluída.', 'sucesso');
+    limparEnderecoOAuth();
+
+    if (retorno.sessao_visual) {
+      try {
+        sessionStorage.setItem(
+          'localbarber:sessao-visual',
+          JSON.stringify(retorno.sessao_visual)
+        );
+        const corTema = retorno.sessao_visual.barbearia?.cor_tema;
+        if (/^#[0-9A-F]{6}$/i.test(corTema || '')) {
+          localStorage.setItem('localbarber-cor-tema', corTema.toUpperCase());
+        }
+      } catch {
+        // O login continua mesmo se o navegador bloquear o armazenamento.
+      }
+    }
+
     window.setTimeout(() => {
-      window.location.href = result.redirect || 'dashboard.php';
+      window.location.href = retorno.redirect || 'dashboard.php';
     }, 500);
-  } catch (error) {
-    showMessage('Erro de conexao ao concluir o login com Google.', 'erro');
-    cleanOAuthUrl();
+  } catch (erro) {
+    mostrarMensagem('Erro de conexão ao concluir o login com Google.', 'erro');
+    limparEnderecoOAuth();
   } finally {
-    setGoogleButtonLoading(false);
+    definirCarregamentoGoogle(false);
   }
 }
 
-async function startGoogleLogin() {
-  setGoogleButtonLoading(true);
+async function iniciarLoginGoogle() {
+  definirCarregamentoGoogle(true);
+  sessionStorage.setItem(CHAVE_TIPO_ACESSO, obterTipoAcesso());
 
-  const googleEnabled = await isGoogleProviderEnabled();
-  if (googleEnabled === false) {
-    setGoogleButtonLoading(false);
-    showMessage('O acesso pelo Google ainda precisa ser ativado no Supabase.', 'erro');
+  const googleAtivo = await provedorGoogleEstaAtivo();
+  if (googleAtivo === false) {
+    definirCarregamentoGoogle(false);
+    mostrarMensagem('O acesso pelo Google ainda precisa ser ativado no Supabase.', 'erro');
     return;
   }
 
-  const redirectUrl = new URL('index.html', window.location.href);
-  redirectUrl.searchParams.set('oauth', 'google');
-  redirectUrl.hash = '';
+  const enderecoRetorno = new URL('index.html', window.location.href);
+  enderecoRetorno.searchParams.set('oauth', 'google');
+  enderecoRetorno.hash = '';
 
-  const { error } = await supabaseClient.auth.signInWithOAuth({
+  const { error: erro } = await clienteSupabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: redirectUrl.toString() },
+    options: { redirectTo: enderecoRetorno.toString() },
   });
 
-  if (error) {
-    setGoogleButtonLoading(false);
-    showMessage('O login com Google ainda nao esta disponivel. Verifique o provedor no Supabase.', 'erro');
+  if (erro) {
+    definirCarregamentoGoogle(false);
+    mostrarMensagem(
+      'O login com Google ainda não está disponível. Verifique o provedor no Supabase.',
+      'erro'
+    );
   }
 }
 
-googleButton?.addEventListener('click', startGoogleLogin);
+botaoGoogle?.addEventListener('click', iniciarLoginGoogle);
 
-if (pageUrl.searchParams.get('logout') === '1') {
-  supabaseClient.auth.signOut({ scope: 'local' }).finally(cleanOAuthUrl);
+if (enderecoPagina.searchParams.get('logout') === '1') {
+  clienteSupabase.auth.signOut({ scope: 'local' }).finally(limparEnderecoOAuth);
 }
 
-if (isGoogleReturn) {
+if (retornandoDoGoogle) {
   window.abrirModal?.();
-  setGoogleButtonLoading(true);
+  definirCarregamentoGoogle(true);
 
-  const { data, error } = await supabaseClient.auth.getSession();
-  if (error) {
-    showMessage('Nao foi possivel recuperar a sessao do Google.', 'erro');
-    cleanOAuthUrl();
-    setGoogleButtonLoading(false);
-  } else if (data.session) {
-    await syncGoogleSession(data.session);
+  const { data: dadosSessao, error: erroSessao } = await clienteSupabase.auth.getSession();
+  if (erroSessao) {
+    mostrarMensagem('Não foi possível recuperar a sessão do Google.', 'erro');
+    limparEnderecoOAuth();
+    definirCarregamentoGoogle(false);
+  } else if (dadosSessao.session) {
+    await sincronizarSessaoGoogle(dadosSessao.session);
   }
 }
 
-supabaseClient.auth.onAuthStateChange((event, session) => {
-  if (isGoogleReturn && session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
-    window.setTimeout(() => syncGoogleSession(session), 0);
+clienteSupabase.auth.onAuthStateChange((evento, sessao) => {
+  const eventoDeEntrada = evento === 'SIGNED_IN' || evento === 'INITIAL_SESSION';
+
+  if (retornandoDoGoogle && sessao && eventoDeEntrada) {
+    window.setTimeout(() => sincronizarSessaoGoogle(sessao), 0);
   }
 });

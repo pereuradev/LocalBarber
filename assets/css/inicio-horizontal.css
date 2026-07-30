@@ -407,6 +407,7 @@ body.login-modal-open {
 
 .login-panel {
   min-width: 0;
+  min-height: 0;
   padding: 52px 56px 34px;
   justify-content: center;
   overflow-y: auto;
@@ -432,6 +433,102 @@ body.login-modal-open {
   max-width: 390px;
   margin-top: 11px;
   font-size: .96rem;
+}
+
+.tipo-acesso {
+  margin: -4px 0 20px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  border: 0;
+}
+
+.tipo-acesso legend {
+  width: 100%;
+  margin-bottom: 9px;
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.tipo-acesso-opcao {
+  min-width: 0;
+  cursor: pointer;
+}
+
+.tipo-acesso-opcao > input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tipo-acesso-conteudo {
+  min-height: 66px;
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, var(--brand-light));
+  border-radius: 14px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-2) 52%, var(--surface));
+  transition: color .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.tipo-acesso-conteudo > svg {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tipo-acesso-conteudo strong,
+.tipo-acesso-conteudo small {
+  display: block;
+}
+
+.tipo-acesso-conteudo strong {
+  color: var(--text);
+  font-size: .8rem;
+  line-height: 1.15;
+}
+
+.tipo-acesso-conteudo small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: .66rem;
+  line-height: 1.2;
+}
+
+.tipo-acesso-opcao:hover .tipo-acesso-conteudo {
+  border-color: color-mix(in srgb, var(--brand-light) 60%, var(--line));
+  transform: translateY(-1px);
+}
+
+.tipo-acesso-opcao > input:focus-visible + .tipo-acesso-conteudo {
+  outline: 3px solid color-mix(in srgb, var(--brand-light) 22%, transparent);
+  outline-offset: 2px;
+}
+
+.tipo-acesso-opcao > input:checked + .tipo-acesso-conteudo {
+  color: var(--brand);
+  border-color: var(--brand-light);
+  background: color-mix(in srgb, var(--brand-light) 11%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand-light) 22%, transparent), 0 8px 20px rgba(0, 74, 150, .09);
+}
+
+.tipo-acesso-opcao > input:checked + .tipo-acesso-conteudo strong {
+  color: var(--brand);
 }
 
 .auth-popup.show {
@@ -487,69 +584,6 @@ body.login-modal-open {
   opacity: .64;
   cursor: wait;
   transform: none;
-}
-
-.social-auth-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.social-auth-button {
-  min-width: 0;
-  min-height: 46px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text);
-  background: color-mix(in srgb, var(--surface-2) 62%, var(--surface));
-  border: 1px solid color-mix(in srgb, var(--line) 72%, var(--brand-light));
-  border-radius: 14px;
-  cursor: pointer;
-  transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
-}
-
-.social-auth-button svg {
-  width: 19px;
-  height: 19px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.social-auth-button:hover,
-.social-auth-button:focus-visible {
-  background: var(--surface);
-  outline: none;
-  transform: translateY(-2px);
-}
-
-.social-auth-button:active {
-  transform: translateY(0);
-}
-
-.social-auth-button--github:hover,
-.social-auth-button--github:focus-visible {
-  color: var(--text);
-  border-color: color-mix(in srgb, var(--text) 38%, var(--line));
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--text) 12%, transparent);
-}
-
-.social-auth-button--instagram:hover,
-.social-auth-button--instagram:focus-visible {
-  color: #d62976;
-  border-color: color-mix(in srgb, #d62976 58%, var(--line));
-  box-shadow: 0 10px 24px rgba(214, 41, 118, .14);
-}
-
-.social-auth-button--facebook:hover,
-.social-auth-button--facebook:focus-visible {
-  color: #1877f2;
-  border-color: color-mix(in srgb, #1877f2 58%, var(--line));
-  box-shadow: 0 10px 24px rgba(24, 119, 242, .14);
 }
 
 .login-auth-divider {
@@ -717,6 +751,7 @@ body.login-modal-open {
   .login-modal {
     width: min(540px, calc(100vw - 28px));
     max-width: min(540px, calc(100vw - 28px)) !important;
+    height: min(920px, calc(100dvh - 28px));
     min-height: 0;
     grid-template-columns: 1fr;
     border-radius: 22px;
