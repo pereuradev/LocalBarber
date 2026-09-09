@@ -9,6 +9,97 @@ function normalizarEspacosCampo(string $valor): string
     return preg_replace('/\s+/u', ' ', trim($valor)) ?? trim($valor);
 }
 
+function calcularDigitoCpfProfissional(string $base, int $pesoInicial): int
+{
+    $soma = 0;
+    foreach (str_split($base) as $indice => $digito) {
+        $soma += (int)$digito * ($pesoInicial - $indice);
+    }
+
+    $resto = $soma % 11;
+    return $resto < 2 ? 0 : 11 - $resto;
+}
+
+function exigirCpfProfissionalValido(array $dados): string
+{
+    $valor = exigirTexto($dados, 'cpf', 'CPF', 14);
+    if (preg_match('/^(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/', $valor) !== 1) {
+        throw new ExcecaoApi('Informe um CPF válido.', 422, 'cpf_invalido');
+    }
+
+    $cpf = preg_replace('/\D+/', '', $valor) ?? '';
+    if (strlen($cpf) !== 11 || preg_match('/^(\d)\1{10}$/', $cpf) === 1) {
+        throw new ExcecaoApi('Informe um CPF válido.', 422, 'cpf_invalido');
+    }
+
+    $primeiroDigito = calcularDigitoCpfProfissional(substr($cpf, 0, 9), 10);
+    $segundoDigito = calcularDigitoCpfProfissional(
+        substr($cpf, 0, 9) . $primeiroDigito,
+        11
+    );
+
+    if (!str_ends_with($cpf, (string)$primeiroDigito . $segundoDigito)) {
+        throw new ExcecaoApi('Informe um CPF válido.', 422, 'cpf_invalido');
+    }
+
+    return $cpf;
+}
+
+function garantirCpfProfissionalDisponivel(
+    PDO $pdo,
+    string $identificadorBarbearia,
+    string $cpf,
+    ?string $funcionarioIgnorado = null
+): void {
+    $filtroFuncionario = $funcionarioIgnorado === null
+        ? ''
+        : 'and id <> :funcionario_ignorado';
+    $consulta = $pdo->prepare(
+        "select 1
+         from funcionarios
+         where barbearia_id = :barbearia_id
+           and cpf = :cpf
+           {$filtroFuncionario}
+         limit 1"
+    );
+    $parametros = [
+        'barbearia_id' => $identificadorBarbearia,
+        'cpf' => $cpf,
+    ];
+    if ($funcionarioIgnorado !== null) {
+        $parametros['funcionario_ignorado'] = $funcionarioIgnorado;
+    }
+    $consulta->execute($parametros);
+
+    if ($consulta->fetchColumn()) {
+        throw new ExcecaoApi(
+            'Já existe um profissional cadastrado com este CPF.',
+            409,
+            'cpf_duplicado'
+        );
+    }
+}
+
+function executarGravacaoFuncionario(PDOStatement $comando, array $parametros): void
+{
+    try {
+        $comando->execute($parametros);
+    } catch (PDOException $excecao) {
+        if (
+            $excecao->getCode() === '23505'
+            && str_contains(mb_strtolower($excecao->getMessage()), 'cpf')
+        ) {
+            throw new ExcecaoApi(
+                'Já existe um profissional cadastrado com este CPF.',
+                409,
+                'cpf_duplicado'
+            );
+        }
+
+        throw $excecao;
+    }
+}
+
 function exigirNomeProfissional(array $dados): string
 {
     $nome = normalizarEspacosCampo(exigirTexto($dados, 'nome', 'nome', 160));
@@ -146,7 +237,7 @@ function obterFuncionarioComConta(
 ): array {
     $consulta = $pdo->prepare(
         'select
-            f.id, f.usuario_id, f.nome, f.email, f.ativo,
+            f.id, f.usuario_id, f.nome, f.cpf, f.email, f.ativo,
             u.papel as papel_usuario, u.ativo as usuario_ativo
          from funcionarios f
          left join usuarios u
@@ -246,6 +337,7 @@ executarApi(static function () use ($pdo): array {
         $situacao = parametroConsulta('situacao');
         $funcao = parametroConsulta('funcao');
         $termo = '%' . mb_strtolower($busca) . '%';
+        $cpfBusca = preg_replace('/\D+/', '', $busca) ?? '';
 
         $resultado = executarConsultaJson(
             $pdo,
@@ -254,12 +346,14 @@ executarApi(static function () use ($pdo): array {
                     cast(:barbearia_id as uuid) as barbearia_id,
                     cast(:busca as text) as busca,
                     cast(:termo as text) as termo,
+                    cast(:cpf_busca as text) as cpf_busca,
+                    cast(:cpf_termo as text) as cpf_termo,
                     cast(:situacao as text) as situacao,
                     cast(:funcao as text) as funcao
              ),
              funcionarios_filtrados as (
                 select
-                    f.id, f.usuario_id, f.nome, f.telefone, f.email, f.funcao, f.status,
+                    f.id, f.usuario_id, f.nome, f.cpf, f.telefone, f.email, f.funcao, f.status,
                     f.comissao_padrao_percentual, f.ativo,
                     u.papel as papel_usuario, u.ativo as usuario_ativo,
                     (
@@ -294,6 +388,7 @@ executarApi(static function () use ($pdo): array {
                     p.busca = \'\'
                     or lower(f.nome) like p.termo
                     or lower(coalesce(f.email, \'\')) like p.termo
+                    or (p.cpf_busca <> \'\' and coalesce(f.cpf, \'\') like p.cpf_termo)
                   )
                   and (p.situacao = \'\' or f.status = p.situacao)
                   and (p.funcao = \'\' or f.funcao = p.funcao)
@@ -322,6 +417,8 @@ executarApi(static function () use ($pdo): array {
                 'barbearia_id' => $identificadorBarbearia,
                 'busca' => $busca,
                 'termo' => $termo,
+                'cpf_busca' => $cpfBusca,
+                'cpf_termo' => '%' . $cpfBusca . '%',
                 'situacao' => $situacao,
                 'funcao' => $funcao,
             ]
@@ -397,6 +494,7 @@ executarApi(static function () use ($pdo): array {
     }
 
     $nome = exigirNomeProfissional($dados);
+    $cpf = exigirCpfProfissionalValido($dados);
     $telefone = telefoneProfissionalOpcional($dados);
     $email = exigirEmailAcesso($dados);
     $funcao = exigirFuncaoProfissional($dados);
@@ -422,6 +520,12 @@ executarApi(static function () use ($pdo): array {
     $papel = papelPorTipoAcesso($tipoAcesso);
     $situacaoEfetiva = $ativo ? $situacao : 'offline';
     $identificador = $metodo === 'PATCH' ? exigirUuid($dados) : null;
+    garantirCpfProfissionalDisponivel(
+        $pdo,
+        $identificadorBarbearia,
+        $cpf,
+        $identificador
+    );
     $pdo->beginTransaction();
 
     try {
@@ -513,10 +617,10 @@ executarApi(static function () use ($pdo): array {
         if ($metodo === 'POST') {
             $gravacaoFuncionario = $pdo->prepare(
                 'insert into funcionarios (
-                    barbearia_id, usuario_id, nome, telefone, email, funcao, status,
+                    barbearia_id, usuario_id, nome, cpf, telefone, email, funcao, status,
                     comissao_padrao_percentual, ativo
                  ) values (
-                    :barbearia_id, :usuario_id, :nome, :telefone, :email, :funcao, :status,
+                    :barbearia_id, :usuario_id, :nome, :cpf, :telefone, :email, :funcao, :status,
                     :comissao, :ativo
                  )
                  returning id'
@@ -527,6 +631,7 @@ executarApi(static function () use ($pdo): array {
                 'update funcionarios
                  set usuario_id = :usuario_id,
                      nome = :nome,
+                     cpf = :cpf,
                      telefone = :telefone,
                      email = :email,
                      funcao = :funcao,
@@ -540,10 +645,11 @@ executarApi(static function () use ($pdo): array {
             $parametrosFuncionario = ['id' => $identificador];
         }
 
-        $gravacaoFuncionario->execute(array_merge($parametrosFuncionario, [
+        executarGravacaoFuncionario($gravacaoFuncionario, array_merge($parametrosFuncionario, [
             'barbearia_id' => $identificadorBarbearia,
             'usuario_id' => $identificadorUsuario,
             'nome' => $nome,
+            'cpf' => $cpf,
             'telefone' => $telefone,
             'email' => $email,
             'funcao' => $funcao,

@@ -3,193 +3,333 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LocalBarber | Minha Barbearia</title>
+  <title>LocalBarber | Configurações</title>
   <link rel="icon" type="image/png" href="../assets/images/favicon.png?v=20260715">
   <script src="../assets/js/theme-init.js?v=6"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/sistema.css?v=10">
+  <link rel="stylesheet" href="../assets/css/sistema.css?v=17">
 </head>
 <body>
   <aside class="sidebar sidebar-carregando" id="barra-lateral" aria-busy="true"></aside>
   <div class="principal">
     <header id="barra-superior"></header>
     <main class="conteudo">
-      <form id="formulario-barbearia">
-        <section class="cabecalho-pagina">
+      <form class="formulario-configuracoes" id="formulario-barbearia" data-carregando="true">
+        <section class="cabecalho-pagina cabecalho-configuracoes">
           <div>
-            <h1>Minha Barbearia</h1>
-            <p>Informações públicas, endereço, horários e redes sociais salvos no banco.</p>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="botao" id="descartar-alteracoes" type="button">Descartar</button>
-            <button class="botao botao-primario" type="submit">Salvar alterações</button>
+            <span class="rotulo-pagina">Administração</span>
+            <h1>Configurações</h1>
+            <p>Gerencie as informações públicas e a identidade da sua barbearia.</p>
           </div>
         </section>
 
-        <section class="painel painel-aparencia" data-permissao="barbearia.gerenciar">
-          <div class="cabecalho-painel">
-            <div>
-              <h2>Aparência do sistema</h2>
-              <p>Defina a cor principal usada em todas as telas da sua barbearia.</p>
-            </div>
-            <span class="etiqueta">Somente administrador</span>
-          </div>
-          <div class="corpo-painel personalizacao-tema">
-            <div
-              class="seletor-cor-esfera"
-              id="seletor-cor-esfera"
-              role="slider"
-              tabindex="0"
-              aria-label="Selecionar a cor principal do sistema"
-              aria-describedby="ajuda-cor-tema valor-cor-tema"
-              aria-valuemin="0"
-              aria-valuemax="359"
-              aria-valuenow="226"
-              aria-valuetext="#244BC5"
-            >
-              <input
-                class="entrada-cor-esfera"
-                id="cor-tema"
-                name="cor_tema"
-                type="hidden"
-                value="#244BC5"
-              >
-              <span class="roda-cor" aria-hidden="true">
-                <span class="marcador-cor"></span>
-                <span class="amostra-cor-selecionada"></span>
-              </span>
-              <span class="texto-oculto">Clique ou arraste diretamente sobre a roda para escolher uma cor.</span>
-            </div>
+        <div class="carregamento-configuracoes" id="carregamento-configuracoes" role="status" aria-live="polite">
+          <span class="carregamento-configuracoes-spinner" aria-hidden="true"></span>
+          <span>Carregando dados</span>
+        </div>
 
-            <div class="detalhes-cor">
-              <span class="rotulo-configuracao">Cor principal</span>
-              <h3>Identidade visual da barbearia</h3>
-              <p id="ajuda-cor-tema">
-                A cor escolhida será aplicada em botões, gráficos, links, seleções
-                e destaques. Os tons são ajustados automaticamente para continuarem
-                legíveis nos modos claro e escuro.
-              </p>
-              <div class="linha-valor-cor">
-                <span class="amostra-cor-compacta" aria-hidden="true"></span>
-                <output id="valor-cor-tema" for="cor-tema">#244BC5</output>
-                <button class="botao" id="restaurar-cor-tema" type="button">
-                  Restaurar azul original
-                </button>
-              </div>
-              <small>
-                Clique ou arraste diretamente na roda. Use as setas do teclado para
-                ajustes finos e salve o formulário para aplicar a cor a todos.
-              </small>
-            </div>
-          </div>
-        </section>
+        <div class="configuracoes-layout" id="configuracoes-layout" aria-busy="true">
+          <aside class="configuracoes-indice" aria-label="Seções de configurações">
+            <span class="configuracoes-indice-titulo">Seções</span>
+            <nav class="configuracoes-nav">
+              <a class="configuracoes-nav-item ativo" href="#configuracao-perfil" data-config-link="configuracao-perfil">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 21v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7M8 12V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v7M9 7h6M9 9h6M9 16h2M15 16h2M9 19h2M15 19h2"/></svg>
+                <span>Perfil</span>
+              </a>
+              <a class="configuracoes-nav-item" href="#configuracao-seguranca" data-config-link="configuracao-seguranca">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6l-7-3Z"/><path d="M9.5 12.5 11 14l3.5-4"/></svg>
+                <span>Segurança</span>
+              </a>
+              <a class="configuracoes-nav-item" href="#configuracao-endereco" data-config-link="configuracao-endereco">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                <span>Endereço</span>
+              </a>
+              <a class="configuracoes-nav-item" href="#configuracao-horarios" data-config-link="configuracao-horarios">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                <span>Horários</span>
+              </a>
+              <a class="configuracoes-nav-item" href="#redes-sociais" data-config-link="redes-sociais">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>
+                <span>Redes sociais</span>
+              </a>
+              <a class="configuracoes-nav-item" href="#configuracao-aparencia" data-config-link="configuracao-aparencia" data-permissao="barbearia.gerenciar">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="11.5" r="2.5"/><circle cx="8" cy="8" r="2.5"/><path d="M12 3a9 9 0 1 0 0 18h1.2a1.8 1.8 0 0 0 1.3-3l-.5-.5a1.7 1.7 0 0 1 1.2-2.9H17A4 4 0 0 0 21 10.5 9 9 0 0 0 12 3Z"/></svg>
+                <span>Aparência</span>
+              </a>
+            </nav>
+          </aside>
 
-        <section class="painel">
-          <div class="cabecalho-painel"><h2>Informações básicas</h2></div>
-          <div class="corpo-painel">
-            <div class="grade-formulario">
-              <div class="grupo-campo">
-                <label for="nome-fantasia">Nome fantasia *</label>
-                <input class="campo" id="nome-fantasia" name="nome_fantasia" maxlength="160" required>
-              </div>
-              <div class="grupo-campo">
-                <label for="razao-social">Razão social</label>
-                <input class="campo" id="razao-social" name="razao_social" maxlength="180">
-              </div>
-              <div class="grupo-campo">
-                <label for="documento">CNPJ/CPF</label>
-                <input class="campo" id="documento" name="documento" maxlength="30">
-              </div>
-              <div class="grupo-campo">
-                <label for="categoria">Categoria *</label>
-                <input class="campo" id="categoria" name="categoria" maxlength="100" required>
-              </div>
-              <div class="grupo-campo">
-                <label for="telefone">Telefone</label>
-                <input class="campo" id="telefone" name="telefone" maxlength="30">
-              </div>
-              <div class="grupo-campo">
-                <label for="email">E-mail</label>
-                <input class="campo" id="email" name="email" type="email" maxlength="254">
-              </div>
-              <div class="grupo-campo campo-largo">
-                <label for="descricao">Descrição</label>
-                <textarea class="area-texto" id="descricao" name="descricao" maxlength="2000"></textarea>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="painel" style="margin-top:18px">
-          <div class="cabecalho-painel"><h2>Endereço</h2></div>
-          <div class="corpo-painel">
-            <div class="grade-formulario">
-              <div class="grupo-campo">
-                <label for="cep">CEP</label>
-                <div style="display:flex;gap:7px">
-                  <input class="campo" id="cep" name="cep" maxlength="12">
-                  <button class="botao" id="buscar-cep" type="button">Buscar</button>
+          <div class="configuracoes-conteudo">
+            <section class="painel configuracao-secao" id="configuracao-perfil">
+              <div class="cabecalho-painel configuracao-cabecalho">
+                <div class="configuracao-titulo">
+                  <span class="configuracao-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M4 21v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7M8 12V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v7M9 7h6M9 16h2M15 16h2M9 19h2M15 19h2"/></svg>
+                  </span>
+                  <div>
+                    <h2>Perfil da barbearia</h2>
+                    <p>Dados de identificação e contato do estabelecimento.</p>
+                  </div>
                 </div>
               </div>
-              <div class="grupo-campo">
-                <label for="logradouro">Logradouro</label>
-                <input class="campo" id="logradouro" name="logradouro" maxlength="180">
+              <div class="corpo-painel">
+                <div class="grade-formulario">
+                  <div class="grupo-campo">
+                    <label for="nome-fantasia">Nome fantasia *</label>
+                    <input class="campo" id="nome-fantasia" name="nome_fantasia" maxlength="160" required>
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="razao-social">Razão social</label>
+                    <input class="campo" id="razao-social" name="razao_social" maxlength="180">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="documento">CNPJ/CPF</label>
+                    <input class="campo" id="documento" name="documento" maxlength="30">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="categoria">Categoria *</label>
+                    <input class="campo" id="categoria" name="categoria" maxlength="100" required>
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="telefone">Telefone</label>
+                    <input class="campo" id="telefone" name="telefone" maxlength="30">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="email">E-mail</label>
+                    <input class="campo" id="email" name="email" type="email" maxlength="254">
+                  </div>
+                  <div class="grupo-campo campo-largo">
+                    <label for="descricao">Descrição</label>
+                    <textarea class="area-texto" id="descricao" name="descricao" maxlength="2000"></textarea>
+                  </div>
+                </div>
               </div>
-              <div class="grupo-campo">
-                <label for="numero">Número</label>
-                <input class="campo" id="numero" name="numero" maxlength="20">
+            </section>
+
+            <section class="painel configuracao-secao" id="configuracao-seguranca">
+              <div class="cabecalho-painel configuracao-cabecalho">
+                <div class="configuracao-titulo">
+                  <span class="configuracao-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 3 8.5 7 10 4-1.5 7-5.5 7-10V6l-7-3Z"/><path d="M9.5 12.5 11 14l3.5-4"/></svg>
+                  </span>
+                  <div>
+                    <h2>Segurança da conta</h2>
+                    <p>Altere a senha usada para entrar no sistema.</p>
+                  </div>
+                </div>
               </div>
-              <div class="grupo-campo">
-                <label for="complemento">Complemento</label>
-                <input class="campo" id="complemento" name="complemento" maxlength="120">
+              <div class="corpo-painel">
+                <div class="grade-formulario">
+                  <div class="grupo-campo campo-largo">
+                    <label for="senha-atual">Senha atual</label>
+                    <div class="campo-com-acao">
+                      <input class="campo" id="senha-atual" type="password" autocomplete="current-password" data-ignorar-alteracao>
+                      <button class="botao botao-campo" type="button" data-alternar-senha="senha-atual" aria-label="Mostrar senha atual" aria-pressed="false">Mostrar</button>
+                    </div>
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="nova-senha">Nova senha</label>
+                    <div class="campo-com-acao">
+                      <input class="campo" id="nova-senha" type="password" maxlength="72" autocomplete="new-password" data-ignorar-alteracao>
+                      <button class="botao botao-campo" type="button" data-alternar-senha="nova-senha" aria-label="Mostrar nova senha" aria-pressed="false">Mostrar</button>
+                    </div>
+                    <small class="ajuda-campo">Use entre 8 e 72 caracteres, com pelo menos uma letra e um número.</small>
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="confirmar-nova-senha">Confirmar nova senha</label>
+                    <div class="campo-com-acao">
+                      <input class="campo" id="confirmar-nova-senha" type="password" maxlength="72" autocomplete="new-password" data-ignorar-alteracao>
+                      <button class="botao botao-campo" type="button" data-alternar-senha="confirmar-nova-senha" aria-label="Mostrar confirmação da senha" aria-pressed="false">Mostrar</button>
+                    </div>
+                  </div>
+                  <div class="configuracao-senha-acoes campo-largo">
+                    <span class="ajuda-campo" id="senha-status" aria-live="polite">A alteração será aplicada apenas ao usuário conectado.</span>
+                    <button class="botao botao-primario" id="salvar-senha" type="button">Alterar senha</button>
+                  </div>
+                </div>
               </div>
-              <div class="grupo-campo">
-                <label for="bairro">Bairro</label>
-                <input class="campo" id="bairro" name="bairro" maxlength="120">
+            </section>
+
+            <section class="painel configuracao-secao" id="configuracao-endereco">
+              <div class="cabecalho-painel configuracao-cabecalho">
+                <div class="configuracao-titulo">
+                  <span class="configuracao-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                  </span>
+                  <div>
+                    <h2>Endereço</h2>
+                    <p>Localização exibida aos clientes.</p>
+                  </div>
+                </div>
               </div>
-              <div class="grupo-campo">
-                <label for="cidade">Cidade</label>
-                <input class="campo" id="cidade" name="cidade" maxlength="120">
+              <div class="corpo-painel">
+                <div class="grade-formulario">
+                  <div class="grupo-campo">
+                    <label for="cep">CEP</label>
+                    <div class="campo-cep">
+                      <input class="campo" id="cep" name="cep" inputmode="numeric" maxlength="12">
+                      <button class="botao" id="buscar-cep" type="button">
+                        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                        Buscar
+                      </button>
+                    </div>
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="logradouro">Logradouro</label>
+                    <input class="campo" id="logradouro" name="logradouro" maxlength="180">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="numero">Número</label>
+                    <input class="campo" id="numero" name="numero" maxlength="20">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="complemento">Complemento</label>
+                    <input class="campo" id="complemento" name="complemento" maxlength="120">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="bairro">Bairro</label>
+                    <input class="campo" id="bairro" name="bairro" maxlength="120">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="cidade">Cidade</label>
+                    <input class="campo" id="cidade" name="cidade" maxlength="120">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="uf">UF</label>
+                    <input class="campo" id="uf" name="uf" maxlength="2">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="pais">País</label>
+                    <input class="campo" id="pais" name="pais" maxlength="80" value="Brasil">
+                  </div>
+                </div>
               </div>
-              <div class="grupo-campo">
-                <label for="uf">UF</label>
-                <input class="campo" id="uf" name="uf" maxlength="2">
+            </section>
+
+            <section class="painel configuracao-secao" id="configuracao-horarios">
+              <div class="cabecalho-painel configuracao-cabecalho">
+                <div class="configuracao-titulo">
+                  <span class="configuracao-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                  </span>
+                  <div>
+                    <h2>Horários de funcionamento</h2>
+                    <p>Defina os dias e períodos de atendimento.</p>
+                  </div>
+                </div>
               </div>
-              <div class="grupo-campo">
-                <label for="pais">País</label>
-                <input class="campo" id="pais" name="pais" maxlength="80" value="Brasil">
+              <div class="corpo-painel">
+                <div class="horarios" id="horarios-funcionamento"></div>
               </div>
-            </div>
+            </section>
+
+            <section class="painel configuracao-secao" id="redes-sociais">
+              <div class="cabecalho-painel configuracao-cabecalho">
+                <div class="configuracao-titulo">
+                  <span class="configuracao-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>
+                  </span>
+                  <div>
+                    <h2>Redes sociais</h2>
+                    <p>Perfis vinculados aos atalhos da página inicial.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="corpo-painel">
+                <div class="grade-formulario">
+                  <div class="grupo-campo">
+                    <label for="rede-instagram">Instagram</label>
+                    <input class="campo" id="rede-instagram" data-rede="instagram" placeholder="@usuario ou URL">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="rede-facebook">Facebook</label>
+                    <input class="campo" id="rede-facebook" data-rede="facebook" placeholder="Página ou URL">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="rede-linkedin">LinkedIn</label>
+                    <input class="campo" id="rede-linkedin" data-rede="linkedin" placeholder="Perfil, empresa ou URL">
+                  </div>
+                  <div class="grupo-campo">
+                    <label for="rede-youtube">YouTube</label>
+                    <input class="campo" id="rede-youtube" data-rede="youtube" placeholder="@canal ou URL">
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="painel configuracao-secao painel-aparencia" id="configuracao-aparencia" data-permissao="barbearia.gerenciar">
+              <div class="cabecalho-painel configuracao-cabecalho">
+                <div class="configuracao-titulo">
+                  <span class="configuracao-icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="11.5" r="2.5"/><circle cx="8" cy="8" r="2.5"/><path d="M12 3a9 9 0 1 0 0 18h1.2a1.8 1.8 0 0 0 1.3-3l-.5-.5a1.7 1.7 0 0 1 1.2-2.9H17A4 4 0 0 0 21 10.5 9 9 0 0 0 12 3Z"/></svg>
+                  </span>
+                  <div>
+                    <h2>Aparência do sistema</h2>
+                    <p>Cor principal aplicada aos controles e destaques.</p>
+                  </div>
+                </div>
+                <span class="etiqueta">Administrador</span>
+              </div>
+              <div class="corpo-painel personalizacao-tema">
+                <div
+                  class="seletor-cor-esfera"
+                  id="seletor-cor-esfera"
+                  role="slider"
+                  tabindex="0"
+                  aria-label="Selecionar a cor principal do sistema"
+                  aria-describedby="valor-cor-tema"
+                  aria-valuemin="0"
+                  aria-valuemax="359"
+                  aria-valuenow="226"
+                  aria-valuetext="#244BC5"
+                >
+                  <input class="entrada-cor-esfera" id="cor-tema" name="cor_tema" type="hidden" value="#244BC5">
+                  <span class="roda-cor" aria-hidden="true">
+                    <span class="marcador-cor"></span>
+                    <span class="amostra-cor-selecionada"></span>
+                  </span>
+                </div>
+
+                <div class="detalhes-cor">
+                  <span class="rotulo-configuracao">Cor principal</span>
+                  <h3>Identidade visual</h3>
+                  <div class="paleta-presets" role="group" aria-label="Cores sugeridas">
+                    <button class="cor-preset" type="button" data-cor-preset="#244BC5" style="--cor-preset:#244BC5" aria-label="Azul" aria-pressed="true"></button>
+                    <button class="cor-preset" type="button" data-cor-preset="#0F766E" style="--cor-preset:#0F766E" aria-label="Verde petróleo" aria-pressed="false"></button>
+                    <button class="cor-preset" type="button" data-cor-preset="#B4235A" style="--cor-preset:#B4235A" aria-label="Rosa escuro" aria-pressed="false"></button>
+                    <button class="cor-preset" type="button" data-cor-preset="#7C3AED" style="--cor-preset:#7C3AED" aria-label="Violeta" aria-pressed="false"></button>
+                    <button class="cor-preset" type="button" data-cor-preset="#B45309" style="--cor-preset:#B45309" aria-label="Âmbar" aria-pressed="false"></button>
+                  </div>
+                  <div class="linha-valor-cor">
+                    <span class="amostra-cor-compacta" aria-hidden="true"></span>
+                    <output id="valor-cor-tema" for="cor-tema">#244BC5</output>
+                    <button class="botao" id="restaurar-cor-tema" type="button">Restaurar padrão</button>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
-        </section>
+        </div>
 
-        <section class="painel" style="margin-top:18px">
-          <div class="cabecalho-painel"><h2>Horários de funcionamento</h2></div>
-          <div class="corpo-painel"><div class="horarios" id="horarios-funcionamento"></div></div>
-        </section>
-
-        <section class="painel" style="margin-top:18px">
-          <div class="cabecalho-painel"><h2>Redes sociais e site</h2></div>
-          <div class="corpo-painel">
-            <div class="grade-formulario">
-              <div class="grupo-campo"><label for="rede-instagram">Instagram</label><input class="campo" id="rede-instagram" data-rede="instagram" placeholder="@usuario ou URL"></div>
-              <div class="grupo-campo"><label for="rede-facebook">Facebook</label><input class="campo" id="rede-facebook" data-rede="facebook" placeholder="Página ou URL"></div>
-              <div class="grupo-campo"><label for="rede-whatsapp">WhatsApp</label><input class="campo" id="rede-whatsapp" data-rede="whatsapp" placeholder="5511999999999"></div>
-              <div class="grupo-campo"><label for="rede-site">Site</label><input class="campo" id="rede-site" data-rede="site" placeholder="https://"></div>
-            </div>
+        <div class="configuracoes-acoes" id="configuracoes-acoes" data-estado="carregando">
+          <div class="configuracoes-status" aria-live="polite">
+            <span class="configuracoes-status-ponto" aria-hidden="true"></span>
+            <span id="configuracoes-status-texto">Carregando configurações</span>
           </div>
-        </section>
-
-        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px">
-          <button class="botao" type="button" data-acao-descartar>Descartar</button>
-          <button class="botao botao-primario" type="submit">Salvar alterações</button>
+          <div class="configuracoes-botoes">
+            <button class="botao" id="descartar-alteracoes" type="button" disabled>Descartar</button>
+            <button class="botao botao-primario" id="salvar-configuracoes" type="submit" disabled>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+              Salvar alterações
+            </button>
+          </div>
         </div>
       </form>
     </main>
   </div>
 
-  <script src="../assets/js/api-localbarber.js?v=7"></script>
-  <script src="../assets/js/barbearia-dados.js?v=4"></script>
-  <script src="../assets/js/theme-toggle.js"></script>
+  <script src="../assets/js/api-localbarber.js?v=8"></script>
+  <script src="../assets/js/barbearia-dados.js?v=9"></script>
+  <script src="../assets/js/theme-toggle.js?v=2"></script>
 </body>
 </html>

@@ -33,6 +33,222 @@ function validarHorarioFuncionamento(array $horario): array
     ];
 }
 
+function urlComProtocolo(string $valor): string
+{
+    return preg_match('/^https?:\/\//i', $valor) === 1 ? $valor : "https://{$valor}";
+}
+
+function primeiroSegmentoCaminho(?string $caminho): string
+{
+    $segmentos = array_values(array_filter(explode('/', trim((string)$caminho, '/'))));
+    return trim((string)($segmentos[0] ?? ''));
+}
+
+function caminhoUrl(string $url): ?string
+{
+    $caminho = parse_url($url, PHP_URL_PATH);
+    return is_string($caminho) ? $caminho : null;
+}
+
+function falharPerfilSocial(string $plataforma): never
+{
+    $rotulos = [
+        'instagram' => 'Instagram',
+        'facebook' => 'Facebook',
+        'linkedin' => 'LinkedIn',
+        'youtube' => 'YouTube',
+    ];
+    $rotulo = $rotulos[$plataforma] ?? 'perfil';
+
+    throw new ExcecaoApi(
+        "O perfil informado para {$rotulo} não foi encontrado ou não existe. Por favor, tente novamente.",
+        422,
+        'perfil_social_nao_encontrado'
+    );
+}
+
+function obterStatusHttp(string $url): ?int
+{
+    if (function_exists('curl_init')) {
+        $curl = curl_init($url);
+        curl_setopt_array($curl, [
+            CURLOPT_NOBODY => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 4,
+            CURLOPT_TIMEOUT => 7,
+            CURLOPT_USERAGENT => 'Mozilla/5.0 LocalBarber/1.0',
+        ]);
+        curl_exec($curl);
+        $status = (int)curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+        curl_close($curl);
+
+        return $status > 0 ? $status : null;
+    }
+
+    $cabecalhos = @get_headers($url);
+    if (!is_array($cabecalhos) || !isset($cabecalhos[0])) {
+        return null;
+    }
+
+    return preg_match('/\s(\d{3})\s/', (string)$cabecalhos[0], $resultado) === 1
+        ? (int)$resultado[1]
+        : null;
+}
+
+function validarPerfilSocialExiste(string $plataforma, string $url): void
+{
+    $status = obterStatusHttp($url);
+
+    if (in_array($status, [404, 410], true)) {
+        falharPerfilSocial($plataforma);
+    }
+}
+
+function normalizarRedeSocial(string $plataforma, ?string $identificador, ?string $url): array
+{
+    $valor = trim((string)($url ?: $identificador ?: ''));
+
+    if ($valor === '') {
+        return [
+            'identificador' => null,
+            'url' => null,
+            'ativo' => false,
+        ];
+    }
+
+    $valorMinusculo = mb_strtolower($valor);
+
+    if ($plataforma === 'instagram') {
+        $valorAnalise = str_contains($valorMinusculo, 'instagram.com') ? urlComProtocolo($valor) : $valor;
+        $usuario = str_contains($valorAnalise, '://')
+            ? primeiroSegmentoCaminho(caminhoUrl($valorAnalise))
+            : ltrim($valorAnalise, '@');
+
+        if (preg_match('/^[A-Za-z0-9._]{1,30}$/', $usuario) !== 1 || str_contains($usuario, '..')) {
+            falharPerfilSocial($plataforma);
+        }
+
+        $urlFinal = "https://www.instagram.com/{$usuario}/";
+        validarPerfilSocialExiste($plataforma, $urlFinal);
+
+        return [
+            'identificador' => $usuario,
+            'url' => $urlFinal,
+            'ativo' => true,
+        ];
+    }
+
+    if ($plataforma === 'facebook') {
+        $valorAnalise = str_contains($valorMinusculo, 'facebook.com') || str_contains($valorMinusculo, 'fb.com')
+            ? urlComProtocolo($valor)
+            : $valor;
+        $pagina = str_contains($valorAnalise, '://')
+            ? primeiroSegmentoCaminho(caminhoUrl($valorAnalise))
+            : ltrim($valorAnalise, '@');
+
+        if (preg_match('/^[A-Za-z0-9._-]{3,80}$/', $pagina) !== 1) {
+            falharPerfilSocial($plataforma);
+        }
+
+        $urlFinal = "https://www.facebook.com/{$pagina}";
+        validarPerfilSocialExiste($plataforma, $urlFinal);
+
+        return [
+            'identificador' => $pagina,
+            'url' => $urlFinal,
+            'ativo' => true,
+        ];
+    }
+
+    if ($plataforma === 'linkedin') {
+        $tiposPermitidos = ['in', 'company', 'school', 'showcase'];
+        $tipo = 'in';
+        $perfil = '';
+
+        if (str_contains($valorMinusculo, 'linkedin.com')) {
+            $urlInformada = urlComProtocolo($valor);
+            $host = mb_strtolower((string)parse_url($urlInformada, PHP_URL_HOST));
+            if (preg_match('/(^|\.)linkedin\.com$/', $host) !== 1) {
+                falharPerfilSocial($plataforma);
+            }
+
+            $partes = array_values(array_filter(explode('/', trim((string)caminhoUrl($urlInformada), '/'))));
+            $tipo = mb_strtolower((string)($partes[0] ?? ''));
+            $perfil = (string)($partes[1] ?? '');
+        } else {
+            $partes = array_values(array_filter(explode('/', trim($valor, '@/'))));
+            if (count($partes) > 1 && in_array(mb_strtolower($partes[0]), $tiposPermitidos, true)) {
+                $tipo = mb_strtolower($partes[0]);
+                $perfil = (string)$partes[1];
+            } else {
+                $perfil = (string)($partes[0] ?? '');
+            }
+        }
+
+        if (
+            !in_array($tipo, $tiposPermitidos, true)
+            || preg_match('/^[A-Za-z0-9._-]{2,120}$/', $perfil) !== 1
+        ) {
+            falharPerfilSocial($plataforma);
+        }
+
+        $identificadorFinal = "{$tipo}/{$perfil}";
+        $urlFinal = "https://www.linkedin.com/{$identificadorFinal}/";
+        validarPerfilSocialExiste($plataforma, $urlFinal);
+
+        return [
+            'identificador' => $identificadorFinal,
+            'url' => $urlFinal,
+            'ativo' => true,
+        ];
+    }
+
+    if ($plataforma === 'youtube') {
+        $caminhoCanal = '';
+
+        if (str_contains($valorMinusculo, 'youtube.com')) {
+            $urlInformada = urlComProtocolo($valor);
+            $host = mb_strtolower((string)parse_url($urlInformada, PHP_URL_HOST));
+            if (preg_match('/(^|\.)youtube\.com$/', $host) !== 1) {
+                falharPerfilSocial($plataforma);
+            }
+
+            $caminhoCanal = trim((string)caminhoUrl($urlInformada), '/');
+        } else {
+            $valorCanal = trim($valor, '/');
+            $caminhoCanal = str_contains($valorCanal, '/') || str_starts_with($valorCanal, '@')
+                ? $valorCanal
+                : "@{$valorCanal}";
+        }
+
+        $partes = array_values(array_filter(explode('/', $caminhoCanal)));
+        $primeiraParte = (string)($partes[0] ?? '');
+        $identificadorCanal = (string)($partes[1] ?? '');
+        $caminhoValido = str_starts_with($primeiraParte, '@')
+            ? count($partes) === 1
+                && preg_match('/^@[A-Za-z0-9._-]{3,100}$/', $primeiraParte) === 1
+            : in_array(mb_strtolower($primeiraParte), ['channel', 'c', 'user'], true)
+                && count($partes) === 2
+                && preg_match('/^[A-Za-z0-9._-]{3,120}$/', $identificadorCanal) === 1;
+
+        if (!$caminhoValido) {
+            falharPerfilSocial($plataforma);
+        }
+
+        $urlFinal = "https://www.youtube.com/{$caminhoCanal}";
+        validarPerfilSocialExiste($plataforma, $urlFinal);
+
+        return [
+            'identificador' => $caminhoCanal,
+            'url' => $urlFinal,
+            'ativo' => true,
+        ];
+    }
+
+    falharPerfilSocial($plataforma);
+}
+
 executarApi(static function () use ($pdo): array {
     $metodo = exigirMetodo('GET', 'PATCH');
     $sessao = exigirAutenticacao($pdo);
@@ -217,7 +433,7 @@ executarApi(static function () use ($pdo): array {
             ]);
         }
 
-        $plataformasPermitidas = ['instagram', 'facebook', 'whatsapp', 'site'];
+        $plataformasPermitidas = ['instagram', 'facebook', 'linkedin', 'youtube'];
         $gravacaoRede = $pdo->prepare(
             'insert into redes_sociais (
                 barbearia_id, plataforma, identificador, url, ativo
@@ -241,14 +457,17 @@ executarApi(static function () use ($pdo): array {
                 'plataforma',
                 $plataformasPermitidas
             );
-            $identificador = textoOpcional($rede, 'identificador', 255);
-            $url = urlOpcional($rede, 'url');
+            $redeNormalizada = normalizarRedeSocial(
+                $plataforma,
+                textoOpcional($rede, 'identificador', 255),
+                textoOpcional($rede, 'url', 2048)
+            );
             $gravacaoRede->execute([
                 'barbearia_id' => $identificadorBarbearia,
                 'plataforma' => $plataforma,
-                'identificador' => $identificador,
-                'url' => $url,
-                'ativo' => ($identificador !== null || $url !== null) ? 'true' : 'false',
+                'identificador' => $redeNormalizada['identificador'],
+                'url' => $redeNormalizada['url'],
+                'ativo' => $redeNormalizada['ativo'] ? 'true' : 'false',
             ]);
         }
 

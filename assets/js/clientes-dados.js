@@ -18,6 +18,46 @@
   let identificadorEmEdicao = null;
   let temporizadorBusca = null;
 
+  function obterDigitosCpf(valor) {
+    return String(valor || "").replace(/\D/g, "").slice(0, 11);
+  }
+
+  function formatarCpf(valor) {
+    const digitos = obterDigitosCpf(valor);
+    return digitos
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+  }
+
+  function calcularDigitoCpf(base, pesoInicial) {
+    const soma = base
+      .split("")
+      .reduce((total, digito, indice) => total + Number(digito) * (pesoInicial - indice), 0);
+    const resto = soma % 11;
+    return resto < 2 ? 0 : 11 - resto;
+  }
+
+  function cpfValido(valor) {
+    const cpf = obterDigitosCpf(valor);
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+
+    const primeiroDigito = calcularDigitoCpf(cpf.slice(0, 9), 10);
+    const segundoDigito = calcularDigitoCpf(`${cpf.slice(0, 9)}${primeiroDigito}`, 11);
+    return cpf.endsWith(`${primeiroDigito}${segundoDigito}`);
+  }
+
+  function validarCampoCpf(exibirMensagem = true) {
+    const campo = document.getElementById("cliente-cpf");
+    const mensagem = cpfValido(campo.value) ? "" : "Informe um CPF válido.";
+    campo.setCustomValidity(mensagem);
+    campo.classList.toggle("campo-invalido", Boolean(mensagem));
+    if (mensagem) campo.setAttribute("aria-invalid", "true");
+    else campo.removeAttribute("aria-invalid");
+    if (mensagem && exibirMensagem) campo.reportValidity();
+    return mensagem === "";
+  }
+
   function clientePorId(identificador) {
     return clientes.find((cliente) => cliente.id === identificador);
   }
@@ -26,12 +66,16 @@
     identificadorEmEdicao = cliente?.id || null;
     const formulario = document.getElementById("formulario-cliente");
     formulario.reset();
+    formulario.elements.cpf.setCustomValidity("");
+    formulario.elements.cpf.classList.remove("campo-invalido");
+    formulario.elements.cpf.removeAttribute("aria-invalid");
     document.getElementById("titulo-modal-cliente").textContent =
       cliente ? "Editar cliente" : "Novo cliente";
     document.getElementById("grupo-cliente-ativo").classList.toggle("oculto", !cliente);
 
     if (cliente) {
       formulario.elements.nome.value = cliente.nome || "";
+      formulario.elements.cpf.value = formatarCpf(cliente.cpf || "");
       formulario.elements.telefone.value = cliente.telefone || "";
       formulario.elements.email.value = cliente.email || "";
       formulario.elements.cidade.value = cliente.cidade || "";
@@ -70,7 +114,7 @@
         <tbody>${clientes.map((cliente) => `
           <tr>
             <td><strong>${escaparHtml(cliente.nome)}</strong><br><span class="texto-suave">${escaparHtml(cliente.cidade || "Cidade não informada")}</span></td>
-            <td>${escaparHtml(cliente.telefone)}<br><span class="texto-suave">${escaparHtml(cliente.email || "E-mail não informado")}</span></td>
+            <td>${escaparHtml(cliente.telefone)}<br><span class="texto-suave">${escaparHtml(cliente.email || "E-mail não informado")}</span><br><span class="texto-suave">${cliente.cpf ? `CPF ${escaparHtml(formatarCpf(cliente.cpf))}` : "CPF não informado"}</span></td>
             <td>${cliente.ultima_visita ? formatarData(cliente.ultima_visita) : "Sem visita"}</td>
             <td>${Number(cliente.total_visitas || 0)}</td>
             <td>${formatarMoeda(cliente.total_gasto)}</td>
@@ -105,7 +149,9 @@
   async function salvarCliente(evento) {
     evento.preventDefault();
     const formulario = evento.currentTarget;
+    if (!validarCampoCpf()) return;
     const dadosFormulario = Object.fromEntries(new FormData(formulario));
+    dadosFormulario.cpf = obterDigitosCpf(dadosFormulario.cpf);
     dadosFormulario.ativo = formulario.elements.ativo.checked;
     const estavaEditando = Boolean(identificadorEmEdicao);
 
@@ -118,6 +164,16 @@
       mostrarAviso(estavaEditando ? "Cliente atualizado." : "Cliente cadastrado.");
       await carregarClientes();
     } catch (erro) {
+      if (["cpf_invalido", "cpf_duplicado"].includes(erro.codigo)) {
+        const campoCpf = formulario.elements.cpf;
+        campoCpf.setCustomValidity(erro.message);
+        campoCpf.classList.add("campo-invalido");
+        campoCpf.setAttribute("aria-invalid", "true");
+        campoCpf.focus();
+        campoCpf.reportValidity();
+        return;
+      }
+
       mostrarAviso(erro.message, "erro");
     }
   }
@@ -156,6 +212,11 @@
     if (evento.target.id === "modal-cliente") fecharFormulario();
   });
   document.getElementById("formulario-cliente").addEventListener("submit", salvarCliente);
+  document.getElementById("cliente-cpf").addEventListener("input", (evento) => {
+    evento.currentTarget.value = formatarCpf(evento.currentTarget.value);
+    validarCampoCpf(false);
+  });
+  document.getElementById("cliente-cpf").addEventListener("blur", () => validarCampoCpf(false));
   document.getElementById("busca-clientes").addEventListener("input", () => {
     clearTimeout(temporizadorBusca);
     temporizadorBusca = setTimeout(() => carregarClientes().catch((erro) => mostrarAviso(erro.message, "erro")), 280);

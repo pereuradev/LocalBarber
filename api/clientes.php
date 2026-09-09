@@ -4,6 +4,93 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_inicializacao.php';
 
+function calcularDigitoCpf(string $base, int $pesoInicial): int
+{
+    $soma = 0;
+    foreach (str_split($base) as $indice => $digito) {
+        $soma += (int)$digito * ($pesoInicial - $indice);
+    }
+
+    $resto = $soma % 11;
+    return $resto < 2 ? 0 : 11 - $resto;
+}
+
+function exigirCpfValido(array $dados): string
+{
+    $valor = exigirTexto($dados, 'cpf', 'CPF', 14);
+    if (preg_match('/^(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$/', $valor) !== 1) {
+        throw new ExcecaoApi('Informe um CPF válido.', 422, 'cpf_invalido');
+    }
+
+    $cpf = preg_replace('/\D+/', '', $valor) ?? '';
+
+    if (strlen($cpf) !== 11 || preg_match('/^(\d)\1{10}$/', $cpf) === 1) {
+        throw new ExcecaoApi('Informe um CPF válido.', 422, 'cpf_invalido');
+    }
+
+    $primeiroDigito = calcularDigitoCpf(substr($cpf, 0, 9), 10);
+    $segundoDigito = calcularDigitoCpf(substr($cpf, 0, 9) . $primeiroDigito, 11);
+
+    if (!str_ends_with($cpf, (string)$primeiroDigito . $segundoDigito)) {
+        throw new ExcecaoApi('Informe um CPF válido.', 422, 'cpf_invalido');
+    }
+
+    return $cpf;
+}
+
+function garantirCpfDisponivel(
+    PDO $pdo,
+    string $barbeariaId,
+    string $cpf,
+    ?string $clienteIgnorado = null
+): void {
+    $filtroCliente = $clienteIgnorado === null ? '' : 'and id <> :cliente_ignorado';
+    $consulta = $pdo->prepare(
+        "select 1
+         from clientes
+         where barbearia_id = :barbearia_id
+           and cpf = :cpf
+           {$filtroCliente}
+         limit 1"
+    );
+    $parametros = [
+        'barbearia_id' => $barbeariaId,
+        'cpf' => $cpf,
+    ];
+    if ($clienteIgnorado !== null) {
+        $parametros['cliente_ignorado'] = $clienteIgnorado;
+    }
+    $consulta->execute($parametros);
+
+    if ($consulta->fetchColumn()) {
+        throw new ExcecaoApi(
+            'Já existe um cliente cadastrado com este CPF.',
+            409,
+            'cpf_duplicado'
+        );
+    }
+}
+
+function executarGravacaoCliente(PDOStatement $comando, array $parametros): void
+{
+    try {
+        $comando->execute($parametros);
+    } catch (PDOException $excecao) {
+        if (
+            $excecao->getCode() === '23505'
+            && str_contains(mb_strtolower($excecao->getMessage()), 'cpf')
+        ) {
+            throw new ExcecaoApi(
+                'Já existe um cliente cadastrado com este CPF.',
+                409,
+                'cpf_duplicado'
+            );
+        }
+
+        throw $excecao;
+    }
+}
+
 executarApi(static function () use ($pdo): array {
     $metodo = exigirMetodo('GET', 'POST', 'PATCH', 'DELETE');
     $sessao = exigirAutenticacao($pdo);
@@ -29,11 +116,13 @@ executarApi(static function () use ($pdo): array {
                 select
                     cast(:barbearia_id as uuid) as barbearia_id,
                     cast(:busca as text) as busca,
-                    cast(:termo as text) as termo
+                    cast(:termo as text) as termo,
+                    cast(:cpf_busca as text) as cpf_busca,
+                    cast(:cpf_termo as text) as cpf_termo
              ),
              clientes_filtrados as (
                 select
-                    c.id, c.nome, c.email, c.telefone, c.cidade, c.observacoes,
+                    c.id, c.nome, c.cpf, c.email, c.telefone, c.cidade, c.observacoes,
                     c.ultima_visita, c.total_visitas, c.total_gasto, c.ativo, c.created_at
                 from clientes c
                 cross join parametros p
@@ -43,6 +132,7 @@ executarApi(static function () use ($pdo): array {
                     or lower(c.nome) like p.termo
                     or lower(c.telefone) like p.termo
                     or lower(coalesce(c.email, '')) like p.termo
+                    or (p.cpf_busca <> '' and coalesce(c.cpf, '') like p.cpf_termo)
                   )
                   {$filtroSituacao}
                 order by c.ativo desc, c.nome asc
@@ -71,6 +161,8 @@ executarApi(static function () use ($pdo): array {
                 'barbearia_id' => $identificadorBarbearia,
                 'busca' => $busca,
                 'termo' => $termo,
+                'cpf_busca' => preg_replace('/\D+/', '', $busca) ?? '',
+                'cpf_termo' => '%' . (preg_replace('/\D+/', '', $busca) ?? '') . '%',
             ]
         );
     }
@@ -80,23 +172,26 @@ executarApi(static function () use ($pdo): array {
 
     if ($metodo === 'POST') {
         $nome = exigirTexto($dados, 'nome', 'nome', 160);
+        $cpf = exigirCpfValido($dados);
         $telefone = exigirTexto($dados, 'telefone', 'telefone', 30);
         $email = emailOpcional($dados);
         $cidade = textoOpcional($dados, 'cidade', 120);
         $observacoes = textoOpcional($dados, 'observacoes', 1500);
+        garantirCpfDisponivel($pdo, $identificadorBarbearia, $cpf);
 
         $insercao = $pdo->prepare(
             'insert into clientes (
-                barbearia_id, nome, email, telefone, cidade, observacoes, ativo
+                barbearia_id, nome, cpf, email, telefone, cidade, observacoes, ativo
              ) values (
-                :barbearia_id, :nome, :email, :telefone, :cidade, :observacoes, true
+                :barbearia_id, :nome, :cpf, :email, :telefone, :cidade, :observacoes, true
              )
-             returning id, nome, email, telefone, cidade, observacoes,
+             returning id, nome, cpf, email, telefone, cidade, observacoes,
                        ultima_visita, total_visitas, total_gasto, ativo, created_at'
         );
-        $insercao->execute([
+        executarGravacaoCliente($insercao, [
             'barbearia_id' => $identificadorBarbearia,
             'nome' => $nome,
+            'cpf' => $cpf,
             'email' => $email,
             'telefone' => $telefone,
             'cidade' => $cidade,
@@ -128,28 +223,32 @@ executarApi(static function () use ($pdo): array {
     }
 
     $nome = exigirTexto($dados, 'nome', 'nome', 160);
+    $cpf = exigirCpfValido($dados);
     $telefone = exigirTexto($dados, 'telefone', 'telefone', 30);
     $email = emailOpcional($dados);
     $cidade = textoOpcional($dados, 'cidade', 120);
     $observacoes = textoOpcional($dados, 'observacoes', 1500);
     $ativo = valorBooleano($dados['ativo'] ?? null);
+    garantirCpfDisponivel($pdo, $identificadorBarbearia, $cpf, $identificador);
 
     $atualizacao = $pdo->prepare(
         'update clientes
          set nome = :nome,
+             cpf = :cpf,
              email = :email,
              telefone = :telefone,
              cidade = :cidade,
              observacoes = :observacoes,
              ativo = :ativo
          where id = :id and barbearia_id = :barbearia_id
-         returning id, nome, email, telefone, cidade, observacoes,
+         returning id, nome, cpf, email, telefone, cidade, observacoes,
                    ultima_visita, total_visitas, total_gasto, ativo, created_at'
     );
-    $atualizacao->execute([
+    executarGravacaoCliente($atualizacao, [
         'id' => $identificador,
         'barbearia_id' => $identificadorBarbearia,
         'nome' => $nome,
+        'cpf' => $cpf,
         'email' => $email,
         'telefone' => $telefone,
         'cidade' => $cidade,

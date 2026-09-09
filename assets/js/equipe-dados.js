@@ -42,6 +42,35 @@
     return String(valor || "").trim().replace(/\s+/g, " ");
   }
 
+  function obterDigitosCpf(valor) {
+    return String(valor || "").replace(/\D/g, "").slice(0, 11);
+  }
+
+  function formatarCpf(valor) {
+    const digitos = obterDigitosCpf(valor);
+    return digitos
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+  }
+
+  function calcularDigitoCpf(base, pesoInicial) {
+    const soma = base
+      .split("")
+      .reduce((total, digito, indice) => total + Number(digito) * (pesoInicial - indice), 0);
+    const resto = soma % 11;
+    return resto < 2 ? 0 : 11 - resto;
+  }
+
+  function cpfValido(valor) {
+    const cpf = obterDigitosCpf(valor);
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+
+    const primeiroDigito = calcularDigitoCpf(cpf.slice(0, 9), 10);
+    const segundoDigito = calcularDigitoCpf(`${cpf.slice(0, 9)}${primeiroDigito}`, 11);
+    return cpf.endsWith(`${primeiroDigito}${segundoDigito}`);
+  }
+
   function obterDigitosTelefone(valor) {
     return String(valor || "").replace(/\D/g, "").slice(0, 11);
   }
@@ -85,6 +114,12 @@
       mensagem = "Use um nome com pelo menos 2 caracteres e apenas letras.";
     }
 
+    return definirValidade(campo, mensagem);
+  }
+
+  function validarCpf() {
+    const campo = document.getElementById("funcionario-cpf");
+    const mensagem = cpfValido(campo.value) ? "" : "Informe um CPF válido.";
     return definirValidade(campo, mensagem);
   }
 
@@ -169,6 +204,7 @@
   function validarFormulario() {
     return [
       validarNome(),
+      validarCpf(),
       validarTelefone(),
       validarEmail(),
       validarFuncao(),
@@ -186,6 +222,7 @@
   function configurarValidacaoFormulario() {
     const formulario = document.getElementById("formulario-funcionario");
     const campoNome = document.getElementById("funcionario-nome");
+    const campoCpf = document.getElementById("funcionario-cpf");
     const campoTelefone = document.getElementById("funcionario-telefone");
     const campoEmail = document.getElementById("funcionario-email");
     const campoFuncao = document.getElementById("funcionario-funcao");
@@ -200,6 +237,12 @@
       campoNome.value = normalizarEspacos(campoNome.value);
       validarNome();
     });
+
+    campoCpf.addEventListener("input", () => {
+      campoCpf.value = formatarCpf(campoCpf.value);
+      validarCpf();
+    });
+    campoCpf.addEventListener("blur", validarCpf);
 
     campoTelefone.addEventListener("keydown", (evento) => {
       const temAtalho = evento.ctrlKey || evento.metaKey || evento.altKey;
@@ -272,6 +315,13 @@
     botaoSenha.setAttribute("aria-pressed", "false");
   }
 
+  function atualizarControleAtivo() {
+    const campoAtivo = document.getElementById("funcionario-ativo");
+    document.getElementById("estado-funcionario-ativo").textContent = campoAtivo.checked
+      ? "Ativo"
+      : "Inativo";
+  }
+
   function abrirFormulario(funcionario = null) {
     identificadorEmEdicao = funcionario?.id || null;
     const formulario = document.getElementById("formulario-funcionario");
@@ -286,6 +336,7 @@
 
     if (funcionario) {
       formulario.elements.nome.value = funcionario.nome || "";
+      formulario.elements.cpf.value = formatarCpf(funcionario.cpf || "");
       formulario.elements.telefone.value = formatarTelefone(funcionario.telefone || "");
       formulario.elements.email.value = funcionario.email || "";
       formulario.elements.funcao.value = funcionario.funcao || "";
@@ -297,6 +348,7 @@
 
     configurarCampoSenha(funcionario);
     atualizarResumoPerfil();
+    atualizarControleAtivo();
     abrirModal("modal-funcionario");
   }
 
@@ -326,10 +378,10 @@
 
     recipiente.innerHTML = `
       <table class="tabela">
-        <thead><tr><th>Profissional</th><th>Função</th><th>Acesso</th><th>Status</th><th>Hoje</th><th>No mês</th><th>Avaliação</th><th>Comissão</th><th></th></tr></thead>
+        <thead><tr><th>Profissional</th><th>Função</th><th>Acesso</th><th>Status</th><th>Hoje</th><th>No mês</th><th>Comissão</th><th></th></tr></thead>
         <tbody>${funcionarios.map((funcionario) => `
           <tr>
-            <td><strong>${escaparHtml(funcionario.nome)}</strong><br><span class="texto-suave">${escaparHtml(funcionario.email || funcionario.telefone || "Contato não informado")}</span></td>
+            <td><strong>${escaparHtml(funcionario.nome)}</strong><br><span class="texto-suave">${escaparHtml(funcionario.email || funcionario.telefone || "Contato não informado")}</span><br><span class="texto-suave">${funcionario.cpf ? `CPF ${escaparHtml(formatarCpf(funcionario.cpf))}` : "CPF não informado"}</span></td>
             <td>${escaparHtml(funcionario.funcao)}</td>
             <td><span class="etiqueta ${funcionario.tem_acesso && estaAtivo(funcionario.usuario_ativo) ? "sucesso" : "perigo"}">${
               funcionario.tem_acesso
@@ -339,7 +391,6 @@
             <td><span class="etiqueta ${classeStatus(funcionario.status)}">${rotulosStatus[funcionario.status] || funcionario.status}</span></td>
             <td>${Number(funcionario.atendimentos_hoje || 0)}</td>
             <td>${Number(funcionario.atendimentos_mes || 0)}</td>
-            <td>${Number(funcionario.avaliacao_media || 0).toFixed(1)}</td>
             <td>${Number(funcionario.comissao_padrao_percentual || 0)}%</td>
             <td><div class="acoes-tabela">
               <button class="botao botao-icone" type="button" data-editar="${funcionario.id}" aria-label="Editar ${escaparHtml(funcionario.nome)}">✎</button>
@@ -374,6 +425,7 @@
     const formulario = evento.currentTarget;
 
     formulario.elements.nome.value = normalizarEspacos(formulario.elements.nome.value);
+    formulario.elements.cpf.value = formatarCpf(formulario.elements.cpf.value);
     formulario.elements.telefone.value = formatarTelefone(formulario.elements.telefone.value);
     formulario.elements.email.value = formulario.elements.email.value.trim();
     formulario.elements.funcao.value = normalizarEspacos(formulario.elements.funcao.value);
@@ -383,6 +435,7 @@
     }
 
     const dadosFormulario = Object.fromEntries(new FormData(formulario));
+    dadosFormulario.cpf = obterDigitosCpf(dadosFormulario.cpf);
     dadosFormulario.ativo = formulario.elements.ativo.checked;
     const estavaEditando = Boolean(identificadorEmEdicao);
 
@@ -399,6 +452,14 @@
       );
       await carregarEquipe();
     } catch (erro) {
+      if (["cpf_invalido", "cpf_duplicado"].includes(erro.codigo)) {
+        const campoCpf = formulario.elements.cpf;
+        definirValidade(campoCpf, erro.message);
+        campoCpf.focus();
+        campoCpf.reportValidity();
+        return;
+      }
+
       mostrarAviso(erro.message, "erro");
     }
   }
@@ -435,6 +496,7 @@
   document.getElementById("cancelar-funcionario").addEventListener("click", fecharFormulario);
   document.getElementById("formulario-funcionario").addEventListener("submit", salvarFuncionario);
   document.getElementById("funcionario-perfil").addEventListener("change", atualizarResumoPerfil);
+  document.getElementById("funcionario-ativo").addEventListener("change", atualizarControleAtivo);
   document.getElementById("alternar-senha-funcionario").addEventListener("click", (evento) => {
     const campoSenha = document.getElementById("funcionario-senha");
     const vaiMostrar = campoSenha.type === "password";

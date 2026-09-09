@@ -7,89 +7,160 @@
   <link rel="icon" type="image/png" href="assets/images/favicon.png?v=20260715">
   <script src="assets/js/theme-init.js?v=6"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/sistema.css?v=10">
+  <link rel="stylesheet" href="assets/css/sistema.css?v=18">
 </head>
 <body>
   <aside class="sidebar sidebar-carregando" id="barra-lateral" aria-busy="true"></aside>
   <div class="principal">
     <header id="barra-superior"></header>
-    <main class="conteudo">
-      <section class="cabecalho-pagina">
+    <main class="conteudo dashboard-pagina" id="dashboard-pagina" data-carregando="true">
+      <section class="dashboard-cabecalho">
         <div>
+          <span class="dashboard-saudacao" id="dashboard-saudacao">Visão do negócio</span>
           <h1>Visão geral</h1>
-          <p>Indicadores calculados com os registros reais da sua barbearia.</p>
+          <p>Acompanhe o movimento da barbearia e o que precisa de atenção hoje.</p>
+        </div>
+        <div class="dashboard-atualizacao" role="status" aria-live="polite">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7L20 8.6M20 4v4.6h-4.6"/></svg>
+          <span id="dashboard-atualizado">Sincronizando dados</span>
         </div>
       </section>
 
-      <section class="grade-kpi" aria-label="Indicadores do dia">
-        <article class="cartao-kpi">
-          <div class="rotulo-kpi">Agendamentos hoje</div>
-          <div class="valor-kpi" id="kpi-agendamentos">—</div>
-        </article>
-        <article class="cartao-kpi">
-          <div class="rotulo-kpi">Faturamento hoje</div>
-          <div class="valor-kpi" id="kpi-faturamento">—</div>
-        </article>
-        <article class="cartao-kpi">
-          <div class="rotulo-kpi">Clientes ativos</div>
-          <div class="valor-kpi" id="kpi-clientes">—</div>
-        </article>
-        <article class="cartao-kpi">
-          <div class="rotulo-kpi">Agendamentos pendentes</div>
-          <div class="valor-kpi" id="kpi-pendentes">—</div>
-        </article>
-      </section>
+      <div class="dashboard-carregamento" id="dashboard-carregamento" role="status" aria-live="polite">
+        <span class="dashboard-carregamento-spinner" aria-hidden="true"></span>
+        <span>Carregando indicadores</span>
+      </div>
 
-      <section class="grade-2">
-        <article class="painel">
-          <div class="cabecalho-painel">
-            <h2>Agendamentos de hoje</h2>
-            <a class="botao" href="pages/agenda.html">Abrir agenda</a>
-          </div>
-          <div class="corpo-painel" id="lista-agendamentos"></div>
-        </article>
-
-        <article class="painel">
-          <div class="cabecalho-painel"><h2>Ações rápidas</h2></div>
-          <div class="corpo-painel">
-            <div class="acoes-rapidas">
-              <a class="botao" href="pages/agenda.html?novo=1">Novo agendamento</a>
-              <a class="botao" href="pages/clientes.html?novo=1">Novo cliente</a>
-              <a class="botao" href="pages/servicos.html?novo=1">Novo serviço</a>
-              <a class="botao" href="pages/transacoes.html?novo=1">Lançar transação</a>
-              <a class="botao" href="pages/faturamento.html">Ver relatório</a>
-              <a class="botao" href="pages/minha-barbearia.html">Configurações</a>
+      <div class="dashboard-conteudo" id="dashboard-conteudo" aria-busy="true">
+        <section class="dashboard-kpis" aria-label="Indicadores principais">
+          <article class="dashboard-kpi dashboard-kpi--agenda">
+            <div class="dashboard-kpi-topo">
+              <span class="dashboard-kpi-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+              </span>
+              <span class="dashboard-kpi-periodo">Hoje</span>
             </div>
-          </div>
-        </article>
-      </section>
+            <div class="dashboard-kpi-rotulo">Agendamentos</div>
+            <div class="dashboard-kpi-valor" id="kpi-agendamentos">—</div>
+          </article>
 
-      <section class="grade-3">
-        <article class="painel">
-          <div class="cabecalho-painel">
-            <h2>Faturamento nos últimos 7 dias</h2>
-            <strong id="total-sete-dias">—</strong>
-          </div>
-          <div class="corpo-painel">
-            <div class="grafico-barras" id="grafico-faturamento" aria-label="Gráfico de faturamento"></div>
-          </div>
-        </article>
+          <article class="dashboard-kpi dashboard-kpi--receita">
+            <div class="dashboard-kpi-topo">
+              <span class="dashboard-kpi-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M3 17 9 11l4 4 8-9M15 6h6v6"/></svg>
+              </span>
+              <span class="dashboard-kpi-periodo">Hoje</span>
+            </div>
+            <div class="dashboard-kpi-rotulo">Faturamento</div>
+            <div class="dashboard-kpi-valor" id="kpi-faturamento">—</div>
+          </article>
 
-        <article class="painel">
-          <div class="cabecalho-painel"><h2>Transações recentes</h2></div>
-          <div class="corpo-painel" id="lista-transacoes"></div>
-        </article>
+          <article class="dashboard-kpi dashboard-kpi--clientes">
+            <div class="dashboard-kpi-topo">
+              <span class="dashboard-kpi-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+              </span>
+              <span class="dashboard-kpi-periodo">Base atual</span>
+            </div>
+            <div class="dashboard-kpi-rotulo">Clientes ativos</div>
+            <div class="dashboard-kpi-valor" id="kpi-clientes">—</div>
+          </article>
 
-        <article class="painel">
-          <div class="cabecalho-painel"><h2>Equipe ativa</h2></div>
-          <div class="corpo-painel" id="lista-equipe"></div>
-        </article>
-      </section>
+          <article class="dashboard-kpi dashboard-kpi--pendentes">
+            <div class="dashboard-kpi-topo">
+              <span class="dashboard-kpi-icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M18.4 5.6 20 4"/></svg>
+              </span>
+              <span class="dashboard-kpi-periodo">Próximos</span>
+            </div>
+            <div class="dashboard-kpi-rotulo">Pendentes</div>
+            <div class="dashboard-kpi-valor" id="kpi-pendentes">—</div>
+          </article>
+        </section>
+
+        <section class="dashboard-grade-principal">
+          <article class="painel dashboard-painel dashboard-painel-agenda">
+            <div class="dashboard-painel-cabecalho">
+              <div>
+                <span class="dashboard-painel-rotulo">Operação do dia</span>
+                <h2>Agenda de hoje</h2>
+              </div>
+              <a class="dashboard-link" href="pages/agenda.html">
+                Ver agenda
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+            </div>
+            <div class="dashboard-painel-corpo dashboard-agenda-corpo" id="lista-agendamentos"></div>
+          </article>
+
+          <article class="painel dashboard-painel dashboard-painel-faturamento">
+            <div class="dashboard-painel-cabecalho">
+              <div>
+                <span class="dashboard-painel-rotulo">Últimos 7 dias</span>
+                <h2>Faturamento</h2>
+              </div>
+              <div class="dashboard-total-grafico">
+                <span>Total</span>
+                <strong id="total-sete-dias">—</strong>
+              </div>
+            </div>
+            <div class="dashboard-painel-corpo">
+              <div class="dashboard-grafico" id="grafico-faturamento" aria-label="Gráfico de faturamento dos últimos sete dias"></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="dashboard-grade-secundaria">
+          <article class="painel dashboard-painel">
+            <div class="dashboard-painel-cabecalho">
+              <div>
+                <span class="dashboard-painel-rotulo">Financeiro</span>
+                <h2>Transações recentes</h2>
+              </div>
+              <a class="dashboard-link" href="pages/transacoes.html">
+                Ver todas
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+            </div>
+            <div class="dashboard-painel-corpo" id="lista-transacoes"></div>
+          </article>
+
+          <article class="painel dashboard-painel">
+            <div class="dashboard-painel-cabecalho">
+              <div>
+                <span class="dashboard-painel-rotulo">Disponibilidade</span>
+                <h2>Equipe ativa</h2>
+              </div>
+              <a class="dashboard-link" href="pages/equipe.html">
+                Gerenciar
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+            </div>
+            <div class="dashboard-painel-corpo" id="lista-equipe"></div>
+          </article>
+        </section>
+
+        <section class="painel dashboard-painel dashboard-canais-painel">
+          <div class="dashboard-painel-cabecalho">
+            <div>
+              <span class="dashboard-painel-rotulo">Presença digital</span>
+              <h2>Canais da barbearia</h2>
+            </div>
+            <a class="dashboard-link" href="pages/minha-barbearia.html#redes-sociais">
+              Editar canais
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+          <div class="dashboard-painel-corpo">
+            <div class="redes-dashboard dashboard-redes" id="botoes-redes-dashboard"></div>
+          </div>
+        </section>
+      </div>
     </main>
   </div>
 
-  <script src="assets/js/api-localbarber.js?v=7"></script>
-  <script src="assets/js/dashboard-dados.js"></script>
-  <script src="assets/js/theme-toggle.js"></script>
+  <script src="assets/js/api-localbarber.js?v=8"></script>
+  <script src="assets/js/dashboard-dados.js?v=4"></script>
+  <script src="assets/js/theme-toggle.js?v=2"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@
     requisitarApi,
     inicializarLayout,
     mostrarAviso,
+    mostrarModalAviso,
     confirmar,
     previsualizarCorTema,
     atualizarCorTema,
@@ -17,6 +18,47 @@
   const SATURACAO_MINIMA_RODA = 68;
   const PASSO_TECLADO_GRAUS = 4;
   let dadosOriginais = null;
+  let formularioPronto = false;
+  let formularioAlterado = false;
+
+  function atualizarEstadoConfiguracoes(estado) {
+    const barraAcoes = document.getElementById("configuracoes-acoes");
+    const textoStatus = document.getElementById("configuracoes-status-texto");
+    const botaoSalvar = document.getElementById("salvar-configuracoes");
+    const botaoDescartar = document.getElementById("descartar-alteracoes");
+    const mensagens = {
+      carregando: "Carregando configurações",
+      salvo: "Tudo atualizado",
+      alterado: "Alterações não salvas",
+      salvando: "Salvando alterações",
+      erro: "Não foi possível carregar os dados",
+    };
+    const permiteAcao = estado === "alterado";
+
+    barraAcoes.dataset.estado = estado;
+    textoStatus.textContent = mensagens[estado] || mensagens.salvo;
+    botaoSalvar.disabled = !permiteAcao;
+    botaoDescartar.disabled = !permiteAcao;
+  }
+
+  function marcarFormularioAlterado() {
+    if (!formularioPronto || formularioAlterado) return;
+    formularioAlterado = true;
+    atualizarEstadoConfiguracoes("alterado");
+  }
+
+  function aoAlterarFormulario(evento) {
+    if (evento.target.closest("[data-ignorar-alteracao]")) return;
+    marcarFormularioAlterado();
+  }
+
+  function definirCarregamentoDados(ativo) {
+    const formulario = document.getElementById("formulario-barbearia");
+    const layout = document.getElementById("configuracoes-layout");
+
+    formulario.dataset.carregando = String(ativo);
+    layout.setAttribute("aria-busy", String(ativo));
+  }
 
   function limitar(valor, minimo, maximo) {
     return Math.min(maximo, Math.max(minimo, valor));
@@ -100,6 +142,11 @@
     campoCor.value = corNormalizada;
     valorCor.textContent = corNormalizada;
     atualizarIndicadorRoda(corNormalizada);
+    document.querySelectorAll("[data-cor-preset]").forEach((botao) => {
+      const selecionado = botao.dataset.corPreset === corNormalizada;
+      botao.classList.toggle("selecionado", selecionado);
+      botao.setAttribute("aria-pressed", String(selecionado));
+    });
 
     if (aplicarNoSistema) {
       previsualizarCorTema(corNormalizada);
@@ -118,6 +165,7 @@
     });
 
     atualizarSeletorCor(novaCor);
+    marcarFormularioAlterado();
   }
 
   function selecionarCorPelaPosicao(evento) {
@@ -188,32 +236,62 @@
     seletor.addEventListener("pointerup", finalizarSelecaoNaRoda);
     seletor.addEventListener("pointercancel", finalizarSelecaoNaRoda);
     seletor.addEventListener("keydown", selecionarCorPeloTeclado);
+
+    document.querySelectorAll("[data-cor-preset]").forEach((botao) => {
+      botao.addEventListener("click", () => {
+        atualizarSeletorCor(botao.dataset.corPreset);
+        marcarFormularioAlterado();
+      });
+    });
   }
 
   function renderizarHorarios(horarios) {
     const porDia = new Map(horarios.map((horario) => [Number(horario.dia_semana), horario]));
-    document.getElementById("horarios-funcionamento").innerHTML = diasSemana.map((dia, indice) => {
+    const linhas = diasSemana.map((dia, indice) => {
       const horario = porDia.get(indice);
       const ativo = horario ? estaAtivo(horario.ativo) : false;
       return `
         <div class="linha-horario" data-dia="${indice}">
           <strong>${dia}</strong>
-          <input class="campo" data-abertura type="time" value="${escaparHtml(horario?.abertura?.slice(0, 5) || "")}" ${ativo ? "" : "disabled"} aria-label="Abertura de ${dia}">
-          <input class="campo" data-fechamento type="time" value="${escaparHtml(horario?.fechamento?.slice(0, 5) || "")}" ${ativo ? "" : "disabled"} aria-label="Fechamento de ${dia}">
-          <label><input data-ativo type="checkbox" ${ativo ? "checked" : ""}> Aberto</label>
+          <label class="horario-campo">
+            <span>Abertura</span>
+            <input class="campo" data-abertura type="time" value="${escaparHtml(horario?.abertura?.slice(0, 5) || "")}" ${ativo ? "" : "disabled"} aria-label="Abertura de ${dia}">
+          </label>
+          <label class="horario-campo">
+            <span>Fechamento</span>
+            <input class="campo" data-fechamento type="time" value="${escaparHtml(horario?.fechamento?.slice(0, 5) || "")}" ${ativo ? "" : "disabled"} aria-label="Fechamento de ${dia}">
+          </label>
+          <label class="interruptor-horario">
+            <input data-ativo type="checkbox" ${ativo ? "checked" : ""} aria-label="Atendimento na ${dia}">
+            <span class="interruptor-trilho" aria-hidden="true"><span></span></span>
+            <span data-rotulo-horario>${ativo ? "Aberto" : "Fechado"}</span>
+          </label>
         </div>`;
     }).join("");
+    document.getElementById("horarios-funcionamento").innerHTML = `
+      <div class="horarios-cabecalho" aria-hidden="true">
+        <span>Dia</span>
+        <span>Abertura</span>
+        <span>Fechamento</span>
+        <span>Situação</span>
+      </div>
+      ${linhas}`;
 
     document.querySelectorAll("[data-ativo]").forEach((controle) => {
       controle.addEventListener("change", () => {
-        controle.closest(".linha-horario").querySelectorAll("input[type=time]").forEach((campo) => {
+        const linha = controle.closest(".linha-horario");
+        linha.querySelectorAll("input[type=time]").forEach((campo) => {
           campo.disabled = !controle.checked;
         });
+        linha.querySelector("[data-rotulo-horario]").textContent = controle.checked
+          ? "Aberto"
+          : "Fechado";
       });
     });
   }
 
   function preencherFormulario(dados) {
+    formularioPronto = false;
     dadosOriginais = dados;
     const formulario = document.getElementById("formulario-barbearia");
     Object.entries(dados.barbearia || {}).forEach(([nome, valor]) => {
@@ -231,11 +309,19 @@
       const rede = redes.get(campo.dataset.rede);
       campo.value = rede?.identificador || rede?.url || "";
     });
+    formularioAlterado = false;
+    formularioPronto = true;
+    atualizarEstadoConfiguracoes("salvo");
   }
 
   async function carregarBarbearia() {
-    const dados = await requisitarApi("barbearia.php");
-    preencherFormulario(dados);
+    definirCarregamentoDados(true);
+    try {
+      const dados = await requisitarApi("barbearia.php");
+      preencherFormulario(dados);
+    } finally {
+      definirCarregamentoDados(false);
+    }
   }
 
   function coletarHorarios() {
@@ -285,6 +371,7 @@
     };
 
     try {
+      atualizarEstadoConfiguracoes("salvando");
       const resultado = await requisitarApi("barbearia.php", {
         metodo: "PATCH",
         dados: {
@@ -298,6 +385,16 @@
       mostrarAviso("Dados da barbearia atualizados.");
       await carregarBarbearia();
     } catch (erro) {
+      formularioAlterado = true;
+      atualizarEstadoConfiguracoes("alterado");
+      if (erro.codigo === "perfil_social_nao_encontrado") {
+        mostrarModalAviso(
+          "Perfil não encontrado",
+          erro.message || "O perfil informado não existe. Por favor, tente novamente."
+        );
+        return;
+      }
+
       mostrarAviso(erro.message, "erro");
     }
   }
@@ -329,28 +426,214 @@
       document.getElementById("bairro").value = endereco.bairro || "";
       document.getElementById("cidade").value = endereco.localidade || "";
       document.getElementById("uf").value = endereco.uf || "";
+      marcarFormularioAlterado();
       mostrarAviso("Endereço preenchido. Revise antes de salvar.");
     } catch (erro) {
       mostrarAviso(erro.message || "Não foi possível consultar o CEP.", "erro");
     }
   }
 
+  function validarCamposSenha({ senhaAtual, novaSenha, confirmacaoSenha }) {
+    if (!senhaAtual) {
+      return {
+        valido: false,
+        campo: "senha-atual",
+        mensagem: "Informe sua senha atual.",
+      };
+    }
+
+    if (!novaSenha) {
+      return {
+        valido: false,
+        campo: "nova-senha",
+        mensagem: "Informe a nova senha.",
+      };
+    }
+
+    if (
+      novaSenha.length < 8
+      || novaSenha.length > 72
+      || !/\p{L}/u.test(novaSenha)
+      || !/\d/u.test(novaSenha)
+    ) {
+      return {
+        valido: false,
+        campo: "nova-senha",
+        mensagem: "A nova senha deve ter entre 8 e 72 caracteres, com pelo menos uma letra e um número.",
+      };
+    }
+
+    if (novaSenha !== confirmacaoSenha) {
+      return {
+        valido: false,
+        campo: "confirmar-nova-senha",
+        mensagem: "A confirmação da nova senha não confere.",
+      };
+    }
+
+    if (novaSenha === senhaAtual) {
+      return {
+        valido: false,
+        campo: "nova-senha",
+        mensagem: "A nova senha precisa ser diferente da senha atual.",
+      };
+    }
+
+    return { valido: true };
+  }
+
+  function definirSalvamentoSenha(ativo) {
+    document.querySelectorAll("#senha-atual, #nova-senha, #confirmar-nova-senha, #salvar-senha, [data-alternar-senha]")
+      .forEach((elemento) => {
+        elemento.disabled = ativo;
+      });
+    document.getElementById("salvar-senha").textContent = ativo
+      ? "Alterando..."
+      : "Alterar senha";
+  }
+
+  function limparCamposSenha() {
+    document.querySelectorAll("#senha-atual, #nova-senha, #confirmar-nova-senha")
+      .forEach((campo) => {
+        campo.value = "";
+        campo.type = "password";
+      });
+    document.querySelectorAll("[data-alternar-senha]").forEach((botao) => {
+      botao.textContent = "Mostrar";
+      botao.setAttribute("aria-pressed", "false");
+      const campo = document.getElementById(botao.dataset.alternarSenha);
+      botao.setAttribute("aria-label", `Mostrar ${campo?.labels?.[0]?.textContent?.toLowerCase() || "senha"}`);
+    });
+  }
+
+  async function salvarSenha() {
+    const senhaAtual = document.getElementById("senha-atual").value;
+    const novaSenha = document.getElementById("nova-senha").value;
+    const confirmacaoSenha = document.getElementById("confirmar-nova-senha").value;
+    const status = document.getElementById("senha-status");
+    const validacao = validarCamposSenha({ senhaAtual, novaSenha, confirmacaoSenha });
+
+    if (!validacao.valido) {
+      status.textContent = validacao.mensagem;
+      document.getElementById(validacao.campo)?.focus();
+      mostrarAviso(validacao.mensagem, "erro");
+      return;
+    }
+
+    try {
+      definirSalvamentoSenha(true);
+      status.textContent = "Alterando senha...";
+      await requisitarApi("senha.php", {
+        metodo: "PATCH",
+        dados: {
+          senha_atual: senhaAtual,
+          nova_senha: novaSenha,
+          confirmacao_senha: confirmacaoSenha,
+        },
+      });
+      limparCamposSenha();
+      status.textContent = "Senha atualizada com sucesso.";
+      mostrarAviso("Senha alterada com sucesso.");
+    } catch (erro) {
+      status.textContent = erro.message || "Não foi possível alterar a senha.";
+      mostrarAviso(status.textContent, "erro");
+    } finally {
+      definirSalvamentoSenha(false);
+    }
+  }
+
+  function alternarVisibilidadeSenha(evento) {
+    const botao = evento.currentTarget;
+    const campo = document.getElementById(botao.dataset.alternarSenha);
+    if (!campo) return;
+
+    const vaiMostrar = campo.type === "password";
+    campo.type = vaiMostrar ? "text" : "password";
+    botao.textContent = vaiMostrar ? "Ocultar" : "Mostrar";
+    botao.setAttribute("aria-pressed", String(vaiMostrar));
+    botao.setAttribute(
+      "aria-label",
+      `${vaiMostrar ? "Ocultar" : "Mostrar"} ${campo.labels?.[0]?.textContent?.toLowerCase() || "senha"}`
+    );
+  }
+
+  function configurarAlteracaoSenha() {
+    document.getElementById("salvar-senha").addEventListener("click", salvarSenha);
+    document.querySelectorAll("[data-alternar-senha]").forEach((botao) => {
+      botao.addEventListener("click", alternarVisibilidadeSenha);
+    });
+    document.querySelectorAll("#senha-atual, #nova-senha, #confirmar-nova-senha").forEach((campo) => {
+      campo.addEventListener("keydown", (evento) => {
+        if (evento.key !== "Enter") return;
+        evento.preventDefault();
+        salvarSenha();
+      });
+    });
+  }
+
   async function iniciarPagina() {
     try {
-      await inicializarLayout("barbearia", "Minha Barbearia");
+      await inicializarLayout("barbearia", "Configurações");
       await carregarBarbearia();
     } catch (erro) {
+      atualizarEstadoConfiguracoes("erro");
       mostrarAviso(erro.message, "erro");
     }
   }
 
-  document.getElementById("formulario-barbearia").addEventListener("submit", salvarBarbearia);
+  function configurarNavegacaoConfiguracoes() {
+    const links = Array.from(document.querySelectorAll("[data-config-link]"));
+    const secoes = links
+      .map((link) => document.getElementById(link.dataset.configLink))
+      .filter(Boolean);
+
+    function ativarLink(id) {
+      links.forEach((link) => {
+        const ativo = link.dataset.configLink === id;
+        link.classList.toggle("ativo", ativo);
+        if (ativo) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      });
+    }
+
+    links.forEach((link) => {
+      link.addEventListener("click", (evento) => {
+        const secao = document.getElementById(link.dataset.configLink);
+        if (!secao) return;
+        evento.preventDefault();
+        ativarLink(secao.id);
+        secao.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+
+    if (!("IntersectionObserver" in window)) return;
+    const observador = new IntersectionObserver((entradas) => {
+      const visiveis = entradas
+        .filter((entrada) => entrada.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+      if (visiveis[0]) ativarLink(visiveis[0].target.id);
+    }, { rootMargin: "-18% 0px -62%", threshold: [0, 0.2, 0.5] });
+
+    secoes.forEach((secao) => observador.observe(secao));
+  }
+
+  const formulario = document.getElementById("formulario-barbearia");
+  formulario.addEventListener("submit", salvarBarbearia);
+  formulario.addEventListener("input", aoAlterarFormulario);
+  formulario.addEventListener("change", aoAlterarFormulario);
   document.getElementById("buscar-cep").addEventListener("click", buscarCep);
   document.getElementById("descartar-alteracoes").addEventListener("click", descartarAlteracoes);
-  document.querySelector("[data-acao-descartar]").addEventListener("click", descartarAlteracoes);
   configurarSeletorCorDireto();
+  configurarNavegacaoConfiguracoes();
+  configurarAlteracaoSenha();
   document.getElementById("restaurar-cor-tema").addEventListener("click", () => {
     atualizarSeletorCor(COR_TEMA_PADRAO);
+    marcarFormularioAlterado();
+  });
+  window.addEventListener("beforeunload", (evento) => {
+    if (!formularioAlterado) return;
+    evento.preventDefault();
+    evento.returnValue = "";
   });
 
   iniciarPagina();

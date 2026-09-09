@@ -83,6 +83,14 @@ executarApi(static function () use ($pdo): array {
             where f.barbearia_id = p.barbearia_id and f.ativo
             order by f.nome
             limit 6
+         ),
+         redes_dashboard as (
+            select r.plataforma, r.identificador, r.url, r.ativo
+            from redes_sociais r
+            cross join parametros p
+            where r.barbearia_id = p.barbearia_id
+              and r.ativo
+              and (r.url is not null or r.identificador is not null)
          )
          select jsonb_build_object(
             \'resumo\', (select to_jsonb(r) from resumo r),
@@ -101,6 +109,10 @@ executarApi(static function () use ($pdo): array {
             \'equipe\', coalesce((
                 select jsonb_agg(to_jsonb(e) order by e.nome)
                 from equipe_dashboard e
+            ), \'[]\'::jsonb),
+            \'redes_sociais\', coalesce((
+                select jsonb_agg(to_jsonb(r) order by r.plataforma)
+                from redes_dashboard r
             ), \'[]\'::jsonb)
          )',
         ['barbearia_id' => $identificadorBarbearia]

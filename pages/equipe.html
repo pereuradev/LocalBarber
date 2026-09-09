@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="../assets/images/favicon.png?v=20260715">
   <script src="../assets/js/theme-init.js?v=6"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/sistema.css?v=10">
+  <link rel="stylesheet" href="../assets/css/sistema.css?v=17">
 </head>
 <body>
   <aside class="sidebar sidebar-carregando" id="barra-lateral" aria-busy="true"></aside>
@@ -30,7 +30,7 @@
       </section>
 
       <div class="barra-filtros">
-        <input class="campo campo-busca" id="busca-equipe" type="search" placeholder="Buscar profissional">
+        <input class="campo campo-busca" id="busca-equipe" type="search" placeholder="Buscar por nome, CPF ou e-mail">
         <select class="selecao" id="situacao-equipe">
           <option value="">Todos os status</option>
           <option value="online">Online</option>
@@ -64,6 +64,12 @@
                 minlength="2" maxlength="160" autocomplete="name"
                 pattern="[A-Za-zÀ-ÖØ-öø-ÿ'’ .-]{2,160}"
                 title="Use apenas letras, espaços, pontos, hífens e apóstrofos." required>
+            </div>
+            <div class="grupo-campo">
+              <label for="funcionario-cpf">CPF *</label>
+              <input class="campo" id="funcionario-cpf" name="cpf" type="text"
+                inputmode="numeric" autocomplete="off" maxlength="14"
+                placeholder="000.000.000-00" required>
             </div>
             <div class="grupo-campo">
               <label for="funcionario-telefone">Telefone</label>
@@ -120,8 +126,18 @@
               <small class="ajuda-campo" id="ajuda-funcionario-senha">Use entre 8 e 72 caracteres, com pelo menos uma letra e um número.</small>
             </div>
             <div class="resumo-perfil campo-largo" id="resumo-perfil-acesso" role="status"></div>
-            <div class="grupo-campo">
-              <label><input id="funcionario-ativo" name="ativo" type="checkbox" checked> Profissional ativo</label>
+            <div class="grupo-campo campo-largo grupo-campo-onoff">
+              <label class="controle-onoff" for="funcionario-ativo">
+                <span>
+                  <strong>Profissional ativo</strong>
+                  <small>Disponível para acesso e novos agendamentos.</small>
+                </span>
+                <span class="controle-onoff-acao">
+                  <input id="funcionario-ativo" name="ativo" type="checkbox" role="switch" checked>
+                  <span class="interruptor-trilho" aria-hidden="true"><span></span></span>
+                  <span class="controle-onoff-estado" id="estado-funcionario-ativo">Ativo</span>
+                </span>
+              </label>
             </div>
           </div>
         </div>
@@ -134,7 +150,7 @@
   </div>
 
   <script src="../assets/js/api-localbarber.js?v=7"></script>
-  <script src="../assets/js/equipe-dados.js?v=4"></script>
-  <script src="../assets/js/theme-toggle.js"></script>
+  <script src="../assets/js/equipe-dados.js?v=6"></script>
+  <script src="../assets/js/theme-toggle.js?v=2"></script>
 </body>
 </html>

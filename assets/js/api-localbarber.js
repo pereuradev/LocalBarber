@@ -150,7 +150,9 @@
     }
 
     if (!resposta.ok || !retorno.sucesso) {
-      throw new Error(retorno.mensagem || "Não foi possível concluir a operação.");
+      const erro = new Error(retorno.mensagem || "Não foi possível concluir a operação.");
+      erro.codigo = retorno.codigo || "erro_api";
+      throw erro;
     }
 
     return retorno.dados;
@@ -453,6 +455,45 @@
     acaoConfirmacao = null;
   }
 
+  function garantirModalAviso() {
+    if (document.getElementById("modal-aviso")) return;
+
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="modal-fundo" id="modal-aviso" role="dialog" aria-modal="true"
+           aria-labelledby="titulo-aviso">
+        <div class="modal modal-confirmacao">
+          <div class="modal-cabecalho">
+            <h2 id="titulo-aviso">Aviso</h2>
+            <button class="botao botao-icone" type="button" data-fechar-aviso aria-label="Fechar">×</button>
+          </div>
+          <div class="modal-corpo" id="mensagem-aviso"></div>
+          <div class="modal-rodape">
+            <button class="botao botao-primario" type="button" data-fechar-aviso>Entendi</button>
+          </div>
+        </div>
+      </div>
+    `);
+
+    document.querySelectorAll("[data-fechar-aviso]").forEach((botao) => {
+      botao.addEventListener("click", fecharModalAviso);
+    });
+    document.getElementById("modal-aviso").addEventListener("click", (evento) => {
+      if (evento.target.id === "modal-aviso") fecharModalAviso();
+    });
+  }
+
+  function mostrarModalAviso(titulo, mensagem) {
+    garantirModalAviso();
+    document.getElementById("titulo-aviso").textContent = titulo;
+    document.getElementById("mensagem-aviso").textContent = mensagem;
+    document.getElementById("modal-aviso").classList.add("aberto");
+    document.querySelector("#modal-aviso [data-fechar-aviso]")?.focus();
+  }
+
+  function fecharModalAviso() {
+    document.getElementById("modal-aviso")?.classList.remove("aberto");
+  }
+
   async function inicializarLayout(paginaAtual, tituloPagina) {
     const sessaoVisual = obterSessaoVisual();
     sessaoAtual = sessaoVisual;
@@ -474,6 +515,7 @@
     garantirModalConfirmacao();
     document.addEventListener("keydown", (evento) => {
       if (evento.key === "Escape") fecharConfirmacao();
+      if (evento.key === "Escape") fecharModalAviso();
     });
 
     aplicarPermissoes(sessao);
@@ -521,6 +563,7 @@
     previsualizarCorTema,
     atualizarCorTema,
     confirmar,
+    mostrarModalAviso,
     abrirModal,
     fecharModal,
   });
