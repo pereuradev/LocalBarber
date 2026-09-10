@@ -6,6 +6,9 @@
     formatarMoeda,
     estaAtivo,
     requisitarApi,
+    iniciarEnvioFormulario,
+    concluirEnvioFormulario,
+    renderizarPaginacao,
     inicializarLayout,
     temPermissao,
     mostrarAviso,
@@ -17,6 +20,8 @@
   let servicos = [];
   let identificadorEmEdicao = null;
   let temporizadorBusca = null;
+  let paginaAtual = 1;
+  let ultimaCarga = 0;
 
   function servicoPorId(identificador) {
     return servicos.find((servico) => servico.id === identificador);
@@ -100,10 +105,16 @@
       `<option value="${escaparHtml(categoria.nome)}"></option>`).join("");
   }
 
-  async function carregarServicos() {
+  async function carregarServicos(pagina = 1) {
+    const carga = ++ultimaCarga;
     const busca = encodeURIComponent(document.getElementById("busca-servicos").value.trim());
     const categoria = encodeURIComponent(document.getElementById("categoria-servicos").value);
-    const dados = await requisitarApi(`servicos.php?busca=${busca}&categoria=${categoria}`);
+    const dados = await requisitarApi(`servicos.php?busca=${busca}&categoria=${categoria}&pagina=${pagina}`);
+    if (carga !== ultimaCarga) return;
+    const ultimaPagina = Math.max(1, Math.ceil(dados.paginacao.total / dados.paginacao.por_pagina));
+    if (pagina > ultimaPagina) return carregarServicos(ultimaPagina);
+    paginaAtual = pagina;
+    renderizarPaginacao(dados.paginacao, "conteudo-servicos", carregarServicos);
     servicos = dados.servicos;
     renderizarCategorias(dados.categorias);
     document.getElementById("kpi-total").textContent = dados.resumo.total;
@@ -119,6 +130,7 @@
     const dadosFormulario = Object.fromEntries(new FormData(formulario));
     dadosFormulario.ativo = formulario.elements.ativo.checked;
 
+    if (!iniciarEnvioFormulario(formulario)) return;
     try {
       const estavaEditando = Boolean(identificadorEmEdicao);
       await requisitarApi("servicos.php", {
@@ -127,9 +139,11 @@
       });
       fecharFormulario();
       mostrarAviso(estavaEditando ? "Serviço atualizado." : "Serviço cadastrado.");
-      await carregarServicos();
+      await carregarServicos(paginaAtual);
     } catch (erro) {
       mostrarAviso(erro.message, "erro");
+    } finally {
+      concluirEnvioFormulario(formulario);
     }
   }
 
@@ -143,7 +157,7 @@
         try {
           await requisitarApi("servicos.php", { metodo: "DELETE", dados: { id: identificador } });
           mostrarAviso("Serviço desativado.");
-          await carregarServicos();
+          await carregarServicos(paginaAtual);
         } catch (erro) {
           mostrarAviso(erro.message, "erro");
         }
@@ -154,7 +168,7 @@
   async function iniciarPagina() {
     try {
       await inicializarLayout("servicos", "Serviços");
-      await carregarServicos();
+      await carregarServicos(paginaAtual);
       if (
         temPermissao("servicos.gerenciar")
         && new URLSearchParams(window.location.search).has("novo")

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/_inicializacao.php';
+require_once __DIR__ . '/../config/brasil-api.php';
 
 function validarHorarioFuncionamento(array $horario): array
 {
@@ -50,7 +51,7 @@ function caminhoUrl(string $url): ?string
     return is_string($caminho) ? $caminho : null;
 }
 
-function falharPerfilSocial(string $plataforma): never
+function falharPerfilSocial(string $plataforma): void
 {
     $rotulos = [
         'instagram' => 'Instagram',
@@ -310,6 +311,7 @@ executarApi(static function () use ($pdo): array {
             throw new ExcecaoApi('Barbearia não encontrada.', 404, 'barbearia_nao_encontrada');
         }
 
+        $resultado['barbearia']['documento_requer_regularizacao'] = !cnpjEhValido((string)$dadosBarbearia['documento']);
         return $resultado;
     }
 
@@ -323,6 +325,28 @@ executarApi(static function () use ($pdo): array {
     $nomeFantasia = exigirTexto($dadosBarbearia, 'nome_fantasia', 'nome fantasia', 160);
     $razaoSocial = textoOpcional($dadosBarbearia, 'razao_social', 180);
     $documento = textoOpcional($dadosBarbearia, 'documento', 30);
+    $consultaDocumento = $pdo->prepare('select documento from barbearias where id = :id');
+    $consultaDocumento->execute(['id' => $identificadorBarbearia]);
+    $documentoAtual = (string)$consultaDocumento->fetchColumn();
+    if (!array_key_exists('documento', $dadosBarbearia)
+        || somenteDigitos((string)$documento) === somenteDigitos($documentoAtual)) {
+        // Documentos históricos são preservados; não inventamos um CNPJ para a conta migrada.
+        $documento = $documentoAtual;
+    } else {
+        if ($documento === null || !cnpjEhValido($documento)) {
+            throw new ExcecaoApi('Informe um CNPJ válido.', 422, 'cnpj_invalido');
+        }
+        try {
+            $empresa = consultarCnpjNaBrasilApi($documento);
+        } catch (BrasilApiException $excecao) {
+            throw new ExcecaoApi($excecao->getMessage(), $excecao->getHttpStatus(), 'consulta_cnpj_falhou');
+        }
+        if (strtoupper(trim((string)($empresa['descricao_situacao_cadastral'] ?? ''))) !== 'ATIVA') {
+            throw new ExcecaoApi('O novo CNPJ precisa estar ativo.', 422, 'cnpj_inativo');
+        }
+        $documento = formatarCnpj($documento);
+        $razaoSocial = trim((string)($empresa['razao_social'] ?? $razaoSocial));
+    }
     $categoria = exigirTexto($dadosBarbearia, 'categoria', 'categoria', 100);
     $email = emailOpcional($dadosBarbearia);
     $telefone = textoOpcional($dadosBarbearia, 'telefone', 30);

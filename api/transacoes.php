@@ -60,6 +60,7 @@ executarApi(static function () use ($pdo): array {
     $identificadorBarbearia = $sessao['barbearia_id'];
 
     if ($metodo === 'GET') {
+        $paginacao = parametrosPaginacao();
         $busca = parametroConsulta('busca');
         $metodoPagamento = parametroConsulta('metodo');
         $situacao = parametroConsulta('situacao');
@@ -103,7 +104,9 @@ executarApi(static function () use ($pdo): array {
                   and (p.metodo = '' or t.metodo_pagamento = p.metodo)
                   and (p.situacao = '' or t.status = p.situacao)
                 order by t.data_transacao desc, t.id desc
-                limit 250
+             ),
+             transacoes_pagina as (
+                 select * from transacoes_filtradas order by data_transacao desc, id desc limit :limite offset :deslocamento
              ),
              resumo as (
                 select
@@ -132,7 +135,7 @@ executarApi(static function () use ($pdo): array {
                 cross join parametros p
                 where c.barbearia_id = p.barbearia_id and c.ativo
                 order by c.nome
-                limit 500
+                limit 50
              ),
              servicos_ativos as (
                 select s.id, s.nome
@@ -147,9 +150,14 @@ executarApi(static function () use ($pdo): array {
                 where f.barbearia_id = p.barbearia_id and f.ativo
              )
              select jsonb_build_object(
+                'paginacao', jsonb_build_object(
+                    'pagina', cast(:pagina as int),
+                    'por_pagina', cast(:tamanho_pagina as int),
+                    'total', (select count(*) from transacoes_filtradas)
+                ),
                 'transacoes', coalesce((
                     select jsonb_agg(to_jsonb(t) order by t.data_transacao desc, t.id desc)
-                    from transacoes_filtradas t
+                    from transacoes_pagina t
                 ), '[]'::jsonb),
                 'resumo', (select to_jsonb(r) from resumo r),
                 'clientes', coalesce((
@@ -167,6 +175,10 @@ executarApi(static function () use ($pdo): array {
              )",
             [
                 'barbearia_id' => $identificadorBarbearia,
+                'pagina' => $paginacao['pagina'],
+                'tamanho_pagina' => $paginacao['tamanho_pagina'],
+                'limite' => $paginacao['limite'],
+                'deslocamento' => $paginacao['deslocamento'],
                 'busca' => $busca,
                 'termo' => $termo,
                 'metodo' => $metodoPagamento,
@@ -240,7 +252,7 @@ executarApi(static function () use ($pdo): array {
         ['pendente', 'confirmado', 'concluido', 'cancelado']
     );
     $dataTransacao = exigirTexto($dados, 'data_transacao', 'data', 16);
-    $objetoData = DateTimeImmutable::createFromFormat('!Y-m-d\TH:i', $dataTransacao);
+    $objetoData = DateTimeImmutable::createFromFormat('!Y-m-d\TH:i', $dataTransacao, new DateTimeZone('America/Sao_Paulo'));
 
     if ($objetoData === false || $objetoData->format('Y-m-d\TH:i') !== $dataTransacao) {
         throw new ExcecaoApi('Informe uma data válida.', 422, 'data_invalida');
@@ -266,22 +278,44 @@ executarApi(static function () use ($pdo): array {
     );
     $observacoes = textoOpcional($dados, 'observacoes', 1500);
 
+    $dadosGravacao = [
+        'barbearia_id' => $identificadorBarbearia,
+        'cliente_id' => $identificadorCliente,
+        'servico_id' => $identificadorServico,
+        'funcionario_id' => $identificadorFuncionario,
+        'tipo' => $tipo,
+        'descricao' => $descricao,
+        'metodo_pagamento' => $metodoPagamento,
+        'valor' => $valor,
+        'status' => $situacao,
+        'data_transacao' => $objetoData->format('Y-m-d H:i:sP'),
+        'observacoes' => $observacoes,
+    ];
+    $chaveIdempotencia = '';
+    $hashRequisicao = '';
+
     if ($metodo === 'POST') {
+        $chaveIdempotencia = trim((string)($_SERVER['HTTP_IDEMPOTENCY_KEY'] ?? ''));
+        if (!identificadorUuidValido($chaveIdempotencia)) {
+            throw new ExcecaoApi('Atualize a página antes de registrar uma transação.', 422, 'idempotencia_obrigatoria');
+        }
+        $hashRequisicao = hash('sha256', $sessao['usuario_id'] . json_encode($dadosGravacao, JSON_UNESCAPED_UNICODE));
         $gravacao = $pdo->prepare(
             'insert into transacoes (
                 barbearia_id, codigo, cliente_id, servico_id, funcionario_id,
                 tipo, descricao, metodo_pagamento, valor, status,
-                data_transacao, observacoes
+                data_transacao, observacoes, chave_idempotencia, requisicao_hash
              ) values (
                 :barbearia_id,
                 concat(\'TX-\', upper(substr(replace(gen_random_uuid()::text, \'-\', \'\'), 1, 8))),
                 :cliente_id, :servico_id, :funcionario_id,
                 :tipo, :descricao, :metodo_pagamento, :valor, :status,
-                :data_transacao, :observacoes
+                :data_transacao, :observacoes, :chave_idempotencia, :requisicao_hash
              )
+             on conflict (barbearia_id, chave_idempotencia) where chave_idempotencia is not null do nothing
              returning id, codigo'
         );
-        $parametros = [];
+        $parametros = ['chave_idempotencia' => $chaveIdempotencia, 'requisicao_hash' => $hashRequisicao];
     } else {
         $gravacao = $pdo->prepare(
             'update transacoes
@@ -301,21 +335,21 @@ executarApi(static function () use ($pdo): array {
         $parametros = ['id' => $identificador];
     }
 
-    $gravacao->execute(array_merge($parametros, [
-        'barbearia_id' => $identificadorBarbearia,
-        'cliente_id' => $identificadorCliente,
-        'servico_id' => $identificadorServico,
-        'funcionario_id' => $identificadorFuncionario,
-        'tipo' => $tipo,
-        'descricao' => $descricao,
-        'metodo_pagamento' => $metodoPagamento,
-        'valor' => $valor,
-        'status' => $situacao,
-        'data_transacao' => $objetoData->format('Y-m-d H:i:s'),
-        'observacoes' => $observacoes,
-    ]));
+    $gravacao->execute(array_merge($parametros, $dadosGravacao));
     $transacao = $gravacao->fetch();
 
+    if (!$transacao && $metodo === 'POST') {
+        $consultaAnterior = $pdo->prepare(
+            'select id, codigo, requisicao_hash from transacoes
+             where barbearia_id = :barbearia_id and chave_idempotencia = :chave'
+        );
+        $consultaAnterior->execute(['barbearia_id' => $identificadorBarbearia, 'chave' => $chaveIdempotencia]);
+        $transacao = $consultaAnterior->fetch();
+        if (!$transacao || !hash_equals((string)$transacao['requisicao_hash'], $hashRequisicao)) {
+            throw new ExcecaoApi('Esta solicitação já foi usada com outros dados.', 409, 'idempotencia_conflitante');
+        }
+        unset($transacao['requisicao_hash']);
+    }
     if (!$transacao) {
         throw new ExcecaoApi('Transação não encontrada.', 404, 'transacao_nao_encontrada');
     }

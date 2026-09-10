@@ -38,6 +38,7 @@ executarApi(static function () use ($pdo): array {
     $identificadorBarbearia = $sessao['barbearia_id'];
 
     if ($metodo === 'GET') {
+        $paginacao = parametrosPaginacao();
         $busca = parametroConsulta('busca');
         $categoria = parametroConsulta('categoria');
         $termo = '%' . mb_strtolower($busca) . '%';
@@ -65,7 +66,9 @@ executarApi(static function () use ($pdo): array {
                   and (p.busca = \'\' or lower(s.nome) like p.termo)
                   and (p.categoria = \'\' or c.nome = p.categoria)
                 order by s.ativo desc, s.nome
-                limit 250
+             ),
+             servicos_pagina as (
+                 select * from servicos_filtrados order by ativo desc, nome, id limit :limite offset :deslocamento
              ),
              categorias_ativas as (
                 select c.id, c.nome
@@ -84,9 +87,14 @@ executarApi(static function () use ($pdo): array {
                 where s.barbearia_id = p.barbearia_id
              )
              select jsonb_build_object(
+                \'paginacao\', jsonb_build_object(
+                    \'pagina\', cast(:pagina as int),
+                    \'por_pagina\', cast(:tamanho_pagina as int),
+                    \'total\', (select count(*) from servicos_filtrados)
+                ),
                 \'servicos\', coalesce((
                     select jsonb_agg(to_jsonb(s) order by s.ativo desc, s.nome)
-                    from servicos_filtrados s
+                    from servicos_pagina s
                 ), \'[]\'::jsonb),
                 \'categorias\', coalesce((
                     select jsonb_agg(to_jsonb(c) order by c.nome)
@@ -96,6 +104,10 @@ executarApi(static function () use ($pdo): array {
              )',
             [
                 'barbearia_id' => $identificadorBarbearia,
+                'pagina' => $paginacao['pagina'],
+                'tamanho_pagina' => $paginacao['tamanho_pagina'],
+                'limite' => $paginacao['limite'],
+                'deslocamento' => $paginacao['deslocamento'],
                 'busca' => $busca,
                 'termo' => $termo,
                 'categoria' => $categoria,

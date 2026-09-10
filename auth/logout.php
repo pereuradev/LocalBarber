@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../config/sessao.php';
+iniciarSessaoSegura();
 $_SESSION = [];
 
 if (ini_get('session.use_cookies')) {

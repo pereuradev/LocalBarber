@@ -7,6 +7,9 @@
     formatarData,
     estaAtivo,
     requisitarApi,
+    iniciarEnvioFormulario,
+    concluirEnvioFormulario,
+    renderizarPaginacao,
     inicializarLayout,
     mostrarAviso,
     confirmar,
@@ -17,6 +20,8 @@
   let clientes = [];
   let identificadorEmEdicao = null;
   let temporizadorBusca = null;
+  let paginaAtual = 1;
+  let ultimaCarga = 0;
 
   function obterDigitosCpf(valor) {
     return String(valor || "").replace(/\D/g, "").slice(0, 11);
@@ -134,10 +139,16 @@
     });
   }
 
-  async function carregarClientes() {
+  async function carregarClientes(pagina = 1) {
+    const carga = ++ultimaCarga;
     const busca = encodeURIComponent(document.getElementById("busca-clientes").value.trim());
     const situacao = encodeURIComponent(document.getElementById("situacao-clientes").value);
-    const dados = await requisitarApi(`clientes.php?busca=${busca}&situacao=${situacao}`);
+    const dados = await requisitarApi(`clientes.php?busca=${busca}&situacao=${situacao}&pagina=${pagina}`);
+    if (carga !== ultimaCarga) return;
+    const ultimaPagina = Math.max(1, Math.ceil(dados.paginacao.total / dados.paginacao.por_pagina));
+    if (pagina > ultimaPagina) return carregarClientes(ultimaPagina);
+    paginaAtual = pagina;
+    renderizarPaginacao(dados.paginacao, "conteudo-clientes", carregarClientes);
     clientes = dados.clientes;
     document.getElementById("kpi-total").textContent = dados.resumo.total;
     document.getElementById("kpi-ativos").textContent = dados.resumo.ativos;
@@ -155,6 +166,7 @@
     dadosFormulario.ativo = formulario.elements.ativo.checked;
     const estavaEditando = Boolean(identificadorEmEdicao);
 
+    if (!iniciarEnvioFormulario(formulario)) return;
     try {
       await requisitarApi("clientes.php", {
         metodo: estavaEditando ? "PATCH" : "POST",
@@ -162,7 +174,7 @@
       });
       fecharFormulario();
       mostrarAviso(estavaEditando ? "Cliente atualizado." : "Cliente cadastrado.");
-      await carregarClientes();
+      await carregarClientes(paginaAtual);
     } catch (erro) {
       if (["cpf_invalido", "cpf_duplicado"].includes(erro.codigo)) {
         const campoCpf = formulario.elements.cpf;
@@ -175,6 +187,8 @@
       }
 
       mostrarAviso(erro.message, "erro");
+    } finally {
+      concluirEnvioFormulario(formulario);
     }
   }
 
@@ -188,7 +202,7 @@
         try {
           await requisitarApi("clientes.php", { metodo: "DELETE", dados: { id: identificador } });
           mostrarAviso("Cliente desativado.");
-          await carregarClientes();
+          await carregarClientes(paginaAtual);
         } catch (erro) {
           mostrarAviso(erro.message, "erro");
         }
@@ -199,7 +213,7 @@
   async function iniciarPagina() {
     try {
       await inicializarLayout("clientes", "Clientes");
-      await carregarClientes();
+      await carregarClientes(paginaAtual);
       if (new URLSearchParams(window.location.search).has("novo")) abrirFormulario();
     } catch (erro) {
       mostrarAviso(erro.message, "erro");

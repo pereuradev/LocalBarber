@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/../config/sessao.php';
+iniciarSessaoSegura();
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
@@ -12,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/supabase-auth.php';
 require_once __DIR__ . '/../config/perfis-acesso.php';
 
@@ -70,6 +70,8 @@ function criarSessaoLocal(array $usuario, string $tipoAcesso): void
 {
     session_regenerate_id(true);
     $_SESSION['usuario_id'] = $usuario['id'];
+    $_SESSION['versao_sessao'] = (int)$usuario['versao_sessao'];
+    $_SESSION['token_csrf'] = bin2hex(random_bytes(32));
     $_SESSION['barbearia_id'] = $usuario['barbearia_id'];
     $_SESSION['usuario_nome'] = $usuario['nome'];
     $_SESSION['usuario_email'] = $usuario['email'];
@@ -82,6 +84,7 @@ function criarSessaoLocal(array $usuario, string $tipoAcesso): void
 }
 
 try {
+    require_once __DIR__ . '/../config/database.php';
     $usuarioSupabase = obterUsuarioSupabase($tokenAcesso);
     $email = strtolower(trim((string)($usuarioSupabase['email'] ?? '')));
     $provedores = $usuarioSupabase['app_metadata']['providers'] ?? [];
@@ -105,6 +108,7 @@ try {
             u.email,
             u.papel,
             u.ativo,
+            u.versao_sessao,
             b.nome_fantasia,
             b.cor_tema
          from usuarios u
@@ -118,9 +122,9 @@ try {
     $perfilCompativel = $usuario && papelCompativelComTipoAcesso((string)$usuario['papel'], $tipoAcesso);
 
     if ($usuarioAtivo && $perfilCompativel) {
-        criarSessaoLocal($usuario, $tipoAcesso);
         $pdo->prepare('update usuarios set ultimo_acesso_at = now() where id = :id')
             ->execute(['id' => $usuario['id']]);
+        criarSessaoLocal($usuario, $tipoAcesso);
 
         echo json_encode([
             'ok' => true,

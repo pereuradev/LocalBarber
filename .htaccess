@@ -1,7 +1,11 @@
 DirectoryIndex index.html
 Options -Indexes
 
-# Impede acesso HTTP a .env, .git e outros arquivos ocultos.
+# Bloqueia também arquivos dentro de diretórios ocultos, como .git/config.
+# FilesMatch sozinho verifica somente o nome final do arquivo.
+RedirectMatch 403 "(^|/)\."
+
+# Impede acesso HTTP direto a .env e outros arquivos ocultos.
 <FilesMatch "^\.">
     Require all denied
 </FilesMatch>

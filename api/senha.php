@@ -104,18 +104,21 @@ executarApi(static function () use ($pdo): array {
         'update usuarios
          set senha_hash = :senha_hash
          where id = :usuario_id
-           and barbearia_id = :barbearia_id'
+           and barbearia_id = :barbearia_id
+         returning versao_sessao'
     );
     $atualizarSenha->execute([
         'senha_hash' => password_hash($novaSenha, PASSWORD_DEFAULT),
         'usuario_id' => $identificadorUsuario,
         'barbearia_id' => $sessao['barbearia_id'],
     ]);
+    $versaoSessao = (int)$atualizarSenha->fetchColumn();
 
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
     session_regenerate_id(true);
+    $_SESSION['versao_sessao'] = $versaoSessao;
     $_SESSION['usuario_validado_em'] = time();
     session_write_close();
 

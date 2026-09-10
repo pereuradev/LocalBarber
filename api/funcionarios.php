@@ -333,6 +333,7 @@ executarApi(static function () use ($pdo): array {
     $identificadorBarbearia = $sessao['barbearia_id'];
 
     if ($metodo === 'GET') {
+        $paginacao = parametrosPaginacao();
         $busca = parametroConsulta('busca');
         $situacao = parametroConsulta('situacao');
         $funcao = parametroConsulta('funcao');
@@ -393,7 +394,9 @@ executarApi(static function () use ($pdo): array {
                   and (p.situacao = \'\' or f.status = p.situacao)
                   and (p.funcao = \'\' or f.funcao = p.funcao)
                 order by f.ativo desc, f.nome
-                limit 250
+             ),
+             funcionarios_pagina as (
+                 select * from funcionarios_filtrados order by ativo desc, nome, id limit :limite offset :deslocamento
              ),
              resumo as (
                 select
@@ -407,14 +410,23 @@ executarApi(static function () use ($pdo): array {
                 where f.barbearia_id = p.barbearia_id
              )
              select jsonb_build_object(
+                \'paginacao\', jsonb_build_object(
+                    \'pagina\', cast(:pagina as int),
+                    \'por_pagina\', cast(:tamanho_pagina as int),
+                    \'total\', (select count(*) from funcionarios_filtrados)
+                ),
                 \'funcionarios\', coalesce((
                     select jsonb_agg(to_jsonb(f) order by f.ativo desc, f.nome)
-                    from funcionarios_filtrados f
+                    from funcionarios_pagina f
                 ), \'[]\'::jsonb),
                 \'resumo\', (select to_jsonb(r) from resumo r)
              )',
             [
                 'barbearia_id' => $identificadorBarbearia,
+                'pagina' => $paginacao['pagina'],
+                'tamanho_pagina' => $paginacao['tamanho_pagina'],
+                'limite' => $paginacao['limite'],
+                'deslocamento' => $paginacao['deslocamento'],
                 'busca' => $busca,
                 'termo' => $termo,
                 'cpf_busca' => $cpfBusca,

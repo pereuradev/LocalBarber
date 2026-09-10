@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 final class BrasilApiException extends RuntimeException
 {
-    public function __construct(string $message, private readonly int $httpStatus = 502)
+    public function __construct(string $message, private int $httpStatus = 502)
     {
         parent::__construct($message);
     }
@@ -22,6 +22,9 @@ function somenteDigitos(string $valor): string
 
 function cnpjEhValido(string $valor): bool
 {
+    if (preg_match('/^(?:\d{14}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})$/', trim($valor)) !== 1) {
+        return false;
+    }
     $cnpj = somenteDigitos($valor);
 
     if (strlen($cnpj) !== 14 || preg_match('/^(\d)\1{13}$/', $cnpj) === 1) {

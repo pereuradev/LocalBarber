@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-session_start();
+require_once __DIR__ . '/config/sessao.php';
+iniciarSessaoSegura();
 
 if (empty($_SESSION['usuario_id'])) {
     header('Location: index.html?login=necessario');

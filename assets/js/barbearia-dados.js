@@ -291,6 +291,9 @@
   }
 
   function preencherFormulario(dados) {
+    document.getElementById("documento-status").textContent = dados.barbearia.documento_requer_regularizacao
+      ? "O CNPJ do cadastro antigo precisa ser regularizado. Informe um documento válido e ativo para atualizá-lo."
+      : "Ao alterar o CNPJ, verificaremos a situação cadastral da empresa.";
     formularioPronto = false;
     dadosOriginais = dados;
     const formulario = document.getElementById("formulario-barbearia");

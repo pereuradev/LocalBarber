@@ -3260,3 +3260,6 @@ a {
     animation: none;
   }
 }
+.paginacao { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+.paginacao span { font-size: 0.875rem; text-align: center; }
+.busca-cliente { margin-bottom: 6px; }

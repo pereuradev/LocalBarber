@@ -5,6 +5,9 @@
     escaparHtml,
     estaAtivo,
     requisitarApi,
+    iniciarEnvioFormulario,
+    concluirEnvioFormulario,
+    renderizarPaginacao,
     inicializarLayout,
     mostrarAviso,
     confirmar,
@@ -15,6 +18,8 @@
   let funcionarios = [];
   let identificadorEmEdicao = null;
   let temporizadorBusca = null;
+  let paginaAtual = 1;
+  let ultimaCarga = 0;
 
   const rotulosStatus = {
     online: "Online",
@@ -407,11 +412,17 @@
     });
   }
 
-  async function carregarEquipe() {
+  async function carregarEquipe(pagina = 1) {
+    const carga = ++ultimaCarga;
     const busca = encodeURIComponent(document.getElementById("busca-equipe").value.trim());
     const situacao = encodeURIComponent(document.getElementById("situacao-equipe").value);
     const funcao = encodeURIComponent(document.getElementById("funcao-equipe").value.trim());
-    const dados = await requisitarApi(`funcionarios.php?busca=${busca}&situacao=${situacao}&funcao=${funcao}`);
+    const dados = await requisitarApi(`funcionarios.php?busca=${busca}&situacao=${situacao}&funcao=${funcao}&pagina=${pagina}`);
+    if (carga !== ultimaCarga) return;
+    const ultimaPagina = Math.max(1, Math.ceil(dados.paginacao.total / dados.paginacao.por_pagina));
+    if (pagina > ultimaPagina) return carregarEquipe(ultimaPagina);
+    paginaAtual = pagina;
+    renderizarPaginacao(dados.paginacao, "conteudo-equipe", carregarEquipe);
     funcionarios = dados.funcionarios;
     document.getElementById("kpi-total").textContent = dados.resumo.total;
     document.getElementById("kpi-ativos").textContent = dados.resumo.ativos;
@@ -439,6 +450,7 @@
     dadosFormulario.ativo = formulario.elements.ativo.checked;
     const estavaEditando = Boolean(identificadorEmEdicao);
 
+    if (!iniciarEnvioFormulario(formulario)) return;
     try {
       await requisitarApi("funcionarios.php", {
         metodo: estavaEditando ? "PATCH" : "POST",
@@ -450,7 +462,7 @@
           ? "Profissional e acesso atualizados."
           : "Profissional cadastrado com acesso ao sistema."
       );
-      await carregarEquipe();
+      await carregarEquipe(paginaAtual);
     } catch (erro) {
       if (["cpf_invalido", "cpf_duplicado"].includes(erro.codigo)) {
         const campoCpf = formulario.elements.cpf;
@@ -461,6 +473,8 @@
       }
 
       mostrarAviso(erro.message, "erro");
+    } finally {
+      concluirEnvioFormulario(formulario);
     }
   }
 
@@ -474,7 +488,7 @@
         try {
           await requisitarApi("funcionarios.php", { metodo: "DELETE", dados: { id: identificador } });
           mostrarAviso("Profissional desativado.");
-          await carregarEquipe();
+          await carregarEquipe(paginaAtual);
         } catch (erro) {
           mostrarAviso(erro.message, "erro");
         }
@@ -485,7 +499,7 @@
   async function iniciarPagina() {
     try {
       await inicializarLayout("equipe", "Equipe");
-      await carregarEquipe();
+      await carregarEquipe(paginaAtual);
     } catch (erro) {
       mostrarAviso(erro.message, "erro");
     }

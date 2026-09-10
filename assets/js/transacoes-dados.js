@@ -6,6 +6,12 @@
     formatarMoeda,
     formatarData,
     requisitarApi,
+    garantirOpcaoSelecionada,
+    configurarBuscaClientes,
+    dataHoraSaoPaulo,
+    iniciarEnvioFormulario,
+    concluirEnvioFormulario,
+    renderizarPaginacao,
     inicializarLayout,
     mostrarAviso,
     confirmar,
@@ -20,6 +26,8 @@
   let periodoAtivo = "hoje";
   let identificadorEmEdicao = null;
   let temporizadorBusca = null;
+  let paginaAtual = 1;
+  let ultimaCarga = 0;
 
   const rotulosStatus = {
     pendente: "Pendente",
@@ -40,16 +48,11 @@
   }
 
   function agoraLocal() {
-    const data = new Date();
-    const deslocamento = data.getTimezoneOffset() * 60000;
-    return new Date(data.getTime() - deslocamento).toISOString().slice(0, 16);
+    return dataHoraSaoPaulo();
   }
 
   function dataHoraParaCampo(valor) {
-    if (!valor) return agoraLocal();
-    const data = new Date(valor);
-    const deslocamento = data.getTimezoneOffset() * 60000;
-    return new Date(data.getTime() - deslocamento).toISOString().slice(0, 16);
+    return valor ? dataHoraSaoPaulo(valor) : agoraLocal();
   }
 
   function preencherOpcoes() {
@@ -76,6 +79,9 @@
       transacao ? "Editar transação" : "Nova transação";
 
     if (transacao) {
+      garantirOpcaoSelecionada(formulario.elements.cliente_id, transacao.cliente_id, transacao.cliente);
+      garantirOpcaoSelecionada(formulario.elements.servico_id, transacao.servico_id, transacao.servico);
+      garantirOpcaoSelecionada(formulario.elements.funcionario_id, transacao.funcionario_id, transacao.funcionario);
       formulario.elements.tipo.value = transacao.tipo;
       formulario.elements.valor.value = transacao.valor;
       formulario.elements.descricao.value = transacao.descricao;
@@ -151,13 +157,19 @@
     });
   }
 
-  async function carregarTransacoes() {
+  async function carregarTransacoes(pagina = 1) {
+    const carga = ++ultimaCarga;
     const busca = encodeURIComponent(document.getElementById("busca-transacoes").value.trim());
     const metodo = encodeURIComponent(document.getElementById("metodo-transacoes").value);
     const situacao = encodeURIComponent(document.getElementById("situacao-transacoes").value);
     const dados = await requisitarApi(
-      `transacoes.php?busca=${busca}&metodo=${metodo}&situacao=${situacao}&periodo=${periodoAtivo}`
+      `transacoes.php?busca=${busca}&metodo=${metodo}&situacao=${situacao}&periodo=${periodoAtivo}&pagina=${pagina}`
     );
+    if (carga !== ultimaCarga) return;
+    const ultimaPagina = Math.max(1, Math.ceil(dados.paginacao.total / dados.paginacao.por_pagina));
+    if (pagina > ultimaPagina) return carregarTransacoes(ultimaPagina);
+    paginaAtual = pagina;
+    renderizarPaginacao(dados.paginacao, "conteudo-transacoes", carregarTransacoes);
     transacoes = dados.transacoes;
     clientes = dados.clientes;
     servicos = dados.servicos;
@@ -172,9 +184,11 @@
 
   async function salvarTransacao(evento) {
     evento.preventDefault();
-    const dadosFormulario = Object.fromEntries(new FormData(evento.currentTarget));
+    const formulario = evento.currentTarget;
+    const dadosFormulario = Object.fromEntries(new FormData(formulario));
     const estavaEditando = Boolean(identificadorEmEdicao);
 
+    if (!iniciarEnvioFormulario(formulario)) return;
     try {
       await requisitarApi("transacoes.php", {
         metodo: estavaEditando ? "PATCH" : "POST",
@@ -182,9 +196,11 @@
       });
       fecharFormulario();
       mostrarAviso(estavaEditando ? "Transação atualizada." : "Transação registrada.");
-      await carregarTransacoes();
+      await carregarTransacoes(paginaAtual);
     } catch (erro) {
       mostrarAviso(erro.message, "erro");
+    } finally {
+      concluirEnvioFormulario(formulario);
     }
   }
 
@@ -192,10 +208,10 @@
     try {
       await requisitarApi("transacoes.php", { metodo: "PATCH", dados: { id: identificador, status } });
       mostrarAviso("Status da transação atualizado.");
-      await carregarTransacoes();
+      await carregarTransacoes(paginaAtual);
     } catch (erro) {
       mostrarAviso(erro.message, "erro");
-      await carregarTransacoes();
+      await carregarTransacoes(paginaAtual);
     }
   }
 
@@ -208,7 +224,7 @@
         try {
           await requisitarApi("transacoes.php", { metodo: "DELETE", dados: { id: identificador } });
           mostrarAviso("Transação cancelada.");
-          await carregarTransacoes();
+          await carregarTransacoes(paginaAtual);
         } catch (erro) {
           mostrarAviso(erro.message, "erro");
         }
@@ -219,7 +235,7 @@
   async function iniciarPagina() {
     try {
       await inicializarLayout("transacoes", "Transações");
-      await carregarTransacoes();
+      await carregarTransacoes(paginaAtual);
       if (new URLSearchParams(window.location.search).has("novo")) abrirFormulario();
     } catch (erro) {
       mostrarAviso(erro.message, "erro");
@@ -250,6 +266,7 @@
     });
   });
 
+  configurarBuscaClientes("transacao-cliente", (lista) => { clientes = lista; });
   iniciarPagina();
 })();
 

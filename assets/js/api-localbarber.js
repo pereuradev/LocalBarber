@@ -8,6 +8,8 @@
   let sessaoAtual = null;
   let temporizadorAviso = null;
   let acaoConfirmacao = null;
+  const enviosFormulario = new WeakMap();
+  const chavesRequisicao = new Map();
   const CHAVE_SESSAO_VISUAL = "localbarber:sessao-visual";
 
   const rotas = [
@@ -49,7 +51,7 @@
     const data = new Date(comHorario ? valor : `${valor}T12:00:00`);
     if (Number.isNaN(data.getTime())) return "—";
     return new Intl.DateTimeFormat("pt-BR", comHorario
-      ? { dateStyle: "short", timeStyle: "short" }
+      ? { dateStyle: "short", timeStyle: "short", timeZone: "America/Sao_Paulo" }
       : { dateStyle: "short" }).format(data);
   }
 
@@ -87,7 +89,9 @@
       .then(async (resposta) => {
         const retorno = await resposta.json().catch(() => ({}));
         if (!resposta.ok || !retorno.sucesso) {
-          throw new Error(retorno.mensagem || "Sessão inválida.");
+          const erro = new Error(retorno.mensagem || "Não foi possível verificar sua sessão. Tente novamente.");
+          erro.status = resposta.status;
+          throw erro;
         }
         tokenCsrf = retorno.dados.token_csrf;
         sessaoAtual = retorno.dados;
@@ -95,8 +99,11 @@
         return sessaoAtual;
       })
       .catch((erro) => {
-        removerSessaoVisual();
-        window.location.href = `${prefixoRaiz}/index.html?login=necessario`;
+        promessaSessao = null;
+        if (erro.status === 401) {
+          removerSessaoVisual();
+          window.location.href = `${prefixoRaiz}/index.html?login=necessario`;
+        }
         throw erro;
       });
 
@@ -124,6 +131,12 @@
   async function requisitarApi(caminho, opcoes = {}) {
     const metodo = String(opcoes.metodo || "GET").toUpperCase();
     const alteraDados = !["GET", "HEAD"].includes(metodo);
+    const corpo = alteraDados ? JSON.stringify(opcoes.dados || {}) : undefined;
+    const identidade = metodo === "POST" && caminho === "transacoes.php" ? corpo : null;
+    if (identidade && !chavesRequisicao.has(identidade)) {
+      if (chavesRequisicao.size >= 50) chavesRequisicao.delete(chavesRequisicao.keys().next().value);
+      chavesRequisicao.set(identidade, criarUuid());
+    }
 
     if (alteraDados && !tokenCsrf) {
       await obterSessao();
@@ -134,12 +147,13 @@
       credentials: "same-origin",
       headers: {
         Accept: "application/json",
+        ...(identidade ? { "Idempotency-Key": chavesRequisicao.get(identidade) } : {}),
         ...(alteraDados ? {
           "Content-Type": "application/json",
           "X-CSRF-Token": tokenCsrf,
         } : {}),
       },
-      body: alteraDados ? JSON.stringify(opcoes.dados || {}) : undefined,
+      body: corpo,
     });
     const retorno = await resposta.json().catch(() => ({}));
 
@@ -155,7 +169,109 @@
       throw erro;
     }
 
+    if (identidade) chavesRequisicao.delete(identidade);
     return retorno.dados;
+  }
+
+  function dataHoraSaoPaulo(valor = new Date()) {
+    const data = new Date(valor);
+    if (Number.isNaN(data.getTime())) return "";
+    const partes = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    }).formatToParts(data).map(({ type, value }) => [type, value]));
+    return `${partes.year}-${partes.month}-${partes.day}T${partes.hour}:${partes.minute}`;
+  }
+
+  function criarUuid() {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 15) | 64;
+    bytes[8] = (bytes[8] & 63) | 128;
+    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join("-");
+  }
+
+  function iniciarEnvioFormulario(formulario) {
+    if (enviosFormulario.has(formulario)) return false;
+    const botoes = Array.from(formulario.querySelectorAll('[type="submit"]'));
+    enviosFormulario.set(formulario, botoes.map((botao) => [botao, botao.disabled]));
+    botoes.forEach((botao) => { botao.disabled = true; });
+    formulario.setAttribute("aria-busy", "true");
+    return true;
+  }
+
+  function concluirEnvioFormulario(formulario) {
+    (enviosFormulario.get(formulario) || []).forEach(([botao, desabilitado]) => {
+      botao.disabled = desabilitado;
+    });
+    enviosFormulario.delete(formulario);
+    formulario.removeAttribute("aria-busy");
+  }
+
+  function renderizarPaginacao(dados, recipienteId, carregar) {
+    const recipiente = document.getElementById(recipienteId);
+    const id = `paginacao-${recipienteId}`;
+    let navegacao = document.getElementById(id);
+    if (!navegacao) {
+      navegacao = document.createElement("nav");
+      navegacao.id = id;
+      navegacao.className = "paginacao";
+      navegacao.setAttribute("aria-label", "Páginas de resultados");
+      recipiente.insertAdjacentElement("afterend", navegacao);
+    }
+    const pagina = Number(dados.pagina);
+    const paginas = Math.max(1, Math.ceil(Number(dados.total) / Number(dados.por_pagina)));
+    navegacao.innerHTML = `<button class="botao" type="button" data-anterior ${pagina <= 1 ? "disabled" : ""}>Anterior</button>
+      <span role="status">Página ${pagina} de ${paginas} · ${Number(dados.total)} registros</span>
+      <button class="botao" type="button" data-proxima ${pagina >= paginas ? "disabled" : ""}>Próxima</button>`;
+    const ir = (destino) => Promise.resolve(carregar(destino)).catch((erro) => mostrarAviso(erro.message, "erro"));
+    navegacao.querySelector("[data-anterior]").addEventListener("click", () => ir(pagina - 1));
+    navegacao.querySelector("[data-proxima]").addEventListener("click", () => ir(pagina + 1));
+  }
+
+  function garantirOpcaoSelecionada(selecao, id, nome) {
+    if (!id) return;
+    if (!Array.from(selecao.options).some((opcao) => opcao.value === id)) {
+      selecao.add(new Option(nome || "Registro do histórico", id));
+    }
+    selecao.value = id;
+  }
+
+  function configurarBuscaClientes(selecaoId, atualizarClientes) {
+    const selecao = document.getElementById(selecaoId);
+    const busca = document.createElement("input");
+    busca.type = "search";
+    busca.className = "campo busca-cliente";
+    busca.placeholder = "Buscar cliente por nome, CPF ou telefone";
+    busca.setAttribute("aria-label", busca.placeholder);
+    selecao.insertAdjacentElement("beforebegin", busca);
+    const status = document.createElement("small");
+    status.className = "ajuda-campo";
+    status.setAttribute("role", "status");
+    busca.insertAdjacentElement("afterend", status);
+    let temporizador;
+    let versao = 0;
+    busca.addEventListener("input", () => {
+      clearTimeout(temporizador);
+      const atual = ++versao;
+      temporizador = setTimeout(async () => {
+        status.textContent = "Buscando clientes…";
+        try {
+          const dados = await requisitarApi(`opcoes-clientes.php?busca=${encodeURIComponent(busca.value.trim())}`);
+          if (atual !== versao) return;
+          const id = selecao.value;
+          const nome = selecao.selectedOptions[0]?.textContent;
+          const vazio = selecao.options[0]?.textContent || "Não vincular";
+          atualizarClientes(dados.clientes);
+          selecao.innerHTML = `<option value="">${escaparHtml(vazio)}</option>${dados.clientes.map((cliente) =>
+            `<option value="${cliente.id}">${escaparHtml(cliente.nome)} · ${escaparHtml(cliente.telefone || "")}</option>`).join("")}`;
+          garantirOpcaoSelecionada(selecao, id, nome);
+          status.textContent = dados.tem_mais ? "Há mais resultados. Refine a busca." : `${dados.clientes.length} clientes encontrados.`;
+        } catch (erro) {
+          if (atual === versao) status.textContent = erro.message;
+        }
+      }, 280);
+    });
   }
 
   function htmlNavegacao(paginaAtual, sessao) {
@@ -553,12 +669,18 @@
     formatarMoeda,
     formatarData,
     formatarHorario,
+    dataHoraSaoPaulo,
     iniciais,
     estaAtivo,
     mostrarAviso,
     obterSessao,
     temPermissao,
     requisitarApi,
+    iniciarEnvioFormulario,
+    concluirEnvioFormulario,
+    renderizarPaginacao,
+    garantirOpcaoSelecionada,
+    configurarBuscaClientes,
     inicializarLayout,
     previsualizarCorTema,
     atualizarCorTema,

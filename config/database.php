@@ -41,7 +41,7 @@ try {
     $user = requiredEnvironmentVariable('SUPABASE_DB_USER');
     $password = requiredEnvironmentVariable('SUPABASE_DB_PASSWORD');
     $schema = requiredEnvironmentVariable('SUPABASE_DB_SCHEMA');
-    $persistentConnection = optionalBooleanEnvironmentVariable('SUPABASE_DB_PERSISTENT', true);
+    $persistentConnection = optionalBooleanEnvironmentVariable('SUPABASE_DB_PERSISTENT', false);
 
     if (filter_var($port, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 65535]]) === false) {
         throw new RuntimeException('SUPABASE_DB_PORT deve conter uma porta válida.');
@@ -68,8 +68,11 @@ try {
         $pdo->rollBack();
     }
 
+    // O navegador envia horários da barbearia. Datas SQL e current_date usam o mesmo fuso.
+    $pdo->exec("set time zone 'America/Sao_Paulo'");
+    date_default_timezone_set('America/Sao_Paulo');
+
 } catch (Throwable $exception) {
     error_log('[LocalBarber] Falha ao inicializar o banco de dados: ' . $exception->getMessage());
-    http_response_code(500);
-    exit('Não foi possível inicializar o banco de dados. Verifique a configuração local.');
+    throw new RuntimeException('Não foi possível inicializar o banco de dados. Verifique a configuração local.', 0, $exception);
 }

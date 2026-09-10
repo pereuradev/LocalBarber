@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="../assets/images/favicon.png?v=20260715">
   <script src="../assets/js/theme-init.js?v=6"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/sistema.css?v=17">
+  <link rel="stylesheet" href="../assets/css/sistema.css?v=20260910">
 </head>
 <body>
   <aside class="sidebar sidebar-carregando" id="barra-lateral" aria-busy="true"></aside>
@@ -83,8 +83,9 @@
                     <input class="campo" id="razao-social" name="razao_social" maxlength="180">
                   </div>
                   <div class="grupo-campo">
-                    <label for="documento">CNPJ/CPF</label>
-                    <input class="campo" id="documento" name="documento" maxlength="30">
+                    <label for="documento">CNPJ</label>
+                    <input class="campo" id="documento" name="documento" maxlength="18" aria-describedby="documento-status">
+                    <small class="ajuda-campo" id="documento-status" role="status"></small>
                   </div>
                   <div class="grupo-campo">
                     <label for="categoria">Categoria *</label>
@@ -328,8 +329,8 @@
     </main>
   </div>
 
-  <script src="../assets/js/api-localbarber.js?v=8"></script>
-  <script src="../assets/js/barbearia-dados.js?v=9"></script>
+  <script src="../assets/js/api-localbarber.js?v=20260910"></script>
+  <script src="../assets/js/barbearia-dados.js?v=20260910"></script>
   <script src="../assets/js/theme-toggle.js?v=2"></script>
 </body>
 </html>

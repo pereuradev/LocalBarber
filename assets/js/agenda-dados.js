@@ -7,6 +7,10 @@
     formatarHorario,
     formatarMoeda,
     requisitarApi,
+    garantirOpcaoSelecionada,
+    configurarBuscaClientes,
+    iniciarEnvioFormulario,
+    concluirEnvioFormulario,
     inicializarLayout,
     mostrarAviso,
     confirmar,
@@ -85,6 +89,9 @@
     formulario.elements.data_agendamento.value = agendamento?.data_agendamento || dataParaIso(new Date());
 
     if (agendamento) {
+      garantirOpcaoSelecionada(formulario.elements.cliente_id, agendamento.cliente_id, agendamento.cliente);
+      garantirOpcaoSelecionada(formulario.elements.servico_id, agendamento.servico_id, agendamento.servico);
+      garantirOpcaoSelecionada(formulario.elements.funcionario_id, agendamento.funcionario_id, agendamento.funcionario);
       formulario.elements.cliente_id.value = agendamento.cliente_id || "";
       formulario.elements.cliente.value = agendamento.cliente || "";
       formulario.elements.telefone.value = agendamento.telefone || "";
@@ -180,9 +187,11 @@
 
   async function salvarAgendamento(evento) {
     evento.preventDefault();
-    const dadosFormulario = Object.fromEntries(new FormData(evento.currentTarget));
+    const formulario = evento.currentTarget;
+    const dadosFormulario = Object.fromEntries(new FormData(formulario));
     const estavaEditando = Boolean(identificadorEmEdicao);
 
+    if (!iniciarEnvioFormulario(formulario)) return;
     try {
       await requisitarApi("agendamentos.php", {
         metodo: estavaEditando ? "PATCH" : "POST",
@@ -193,6 +202,8 @@
       await carregarAgenda();
     } catch (erro) {
       mostrarAviso(erro.message, "erro");
+    } finally {
+      concluirEnvioFormulario(formulario);
     }
   }
 
@@ -265,6 +276,7 @@
     document.getElementById(identificador).addEventListener("change", renderizarTabela);
   });
 
+  configurarBuscaClientes("agendamento-cliente-id", (lista) => { clientes = lista; });
   iniciarPagina();
 })();
 

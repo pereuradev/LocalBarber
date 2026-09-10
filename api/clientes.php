@@ -101,6 +101,7 @@ executarApi(static function () use ($pdo): array {
     $identificadorBarbearia = $sessao['barbearia_id'];
 
     if ($metodo === 'GET') {
+        $paginacao = parametrosPaginacao();
         $busca = parametroConsulta('busca');
         $situacao = parametroConsulta('situacao');
         $termo = '%' . mb_strtolower($busca) . '%';
@@ -124,7 +125,7 @@ executarApi(static function () use ($pdo): array {
                 select
                     c.id, c.nome, c.cpf, c.email, c.telefone, c.cidade, c.observacoes,
                     c.ultima_visita, c.total_visitas, c.total_gasto, c.ativo, c.created_at
-                from clientes c
+                from clientes_com_metricas c
                 cross join parametros p
                 where c.barbearia_id = p.barbearia_id
                   and (
@@ -136,7 +137,9 @@ executarApi(static function () use ($pdo): array {
                   )
                   {$filtroSituacao}
                 order by c.ativo desc, c.nome asc
-                limit 250
+             ),
+             clientes_pagina as (
+                 select * from clientes_filtrados order by ativo desc, nome, id limit :limite offset :deslocamento
              ),
              resumo as (
                 select
@@ -146,19 +149,28 @@ executarApi(static function () use ($pdo): array {
                         where c.ultima_visita >= current_date - interval '30 days'
                     ) as recentes,
                     coalesce(sum(c.total_gasto), 0) as valor_total
-                from clientes c
+                from clientes_com_metricas c
                 cross join parametros p
                 where c.barbearia_id = p.barbearia_id
              )
              select jsonb_build_object(
+                'paginacao', jsonb_build_object(
+                    'pagina', cast(:pagina as int),
+                    'por_pagina', cast(:tamanho_pagina as int),
+                    'total', (select count(*) from clientes_filtrados)
+                ),
                 'clientes', coalesce((
                     select jsonb_agg(to_jsonb(c) order by c.ativo desc, c.nome)
-                    from clientes_filtrados c
+                    from clientes_pagina c
                 ), '[]'::jsonb),
                 'resumo', (select to_jsonb(r) from resumo r)
              )",
             [
                 'barbearia_id' => $identificadorBarbearia,
+                'pagina' => $paginacao['pagina'],
+                'tamanho_pagina' => $paginacao['tamanho_pagina'],
+                'limite' => $paginacao['limite'],
+                'deslocamento' => $paginacao['deslocamento'],
                 'busca' => $busca,
                 'termo' => $termo,
                 'cpf_busca' => preg_replace('/\D+/', '', $busca) ?? '',

@@ -3,6 +3,9 @@
 .env.*
 !.env.example
 
+# Cache local da CLI do Supabase
+supabase/.temp/
+
 # Arquivos gerados pelo sistema operacional e editores
 .DS_Store
 Thumbs.db
