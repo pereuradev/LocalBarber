@@ -1,0 +1,21 @@
+{
+    "name": "localbarber/portal",
+    "description": "Portal de gestao de barbearias",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.0",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pdo_pgsql": "*",
+        "phpmailer/phpmailer": "^7.1.1"
+    },
+    "autoload": {
+        "psr-4": { "LocalBarber\\": "src/" }
+    },
+    "config": {
+        "allow-plugins": false,
+        "platform": { "php": "8.0.30" },
+        "sort-packages": true
+    }
+}

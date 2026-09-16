@@ -4,26 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/_inicializacao.php';
 
-function validarNovaSenha(string $senha): void
-{
-    $tamanho = mb_strlen($senha);
-
-    if ($tamanho < 8 || $tamanho > 72) {
-        throw new ExcecaoApi(
-            'A nova senha deve ter entre 8 e 72 caracteres.',
-            422,
-            'senha_invalida'
-        );
-    }
-
-    if (preg_match('/\p{L}/u', $senha) !== 1 || preg_match('/\d/u', $senha) !== 1) {
-        throw new ExcecaoApi(
-            'A nova senha deve ter pelo menos uma letra e um número.',
-            422,
-            'senha_invalida'
-        );
-    }
-}
+require_once __DIR__ . '/../config/senha.php';
 
 executarApi(static function () use ($pdo): array {
     exigirMetodo('PATCH');

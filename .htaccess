@@ -4,6 +4,10 @@ Options -Indexes
 # Bloqueia também arquivos dentro de diretórios ocultos, como .git/config.
 # FilesMatch sozinho verifica somente o nome final do arquivo.
 RedirectMatch 403 "(^|/)\."
+RedirectMatch 403 "(?i)(^|/)(vendor|src|views|config)(/|$)"
+<FilesMatch "^composer\.(json|lock)$">
+    Require all denied
+</FilesMatch>
 
 # Impede acesso HTTP direto a .env e outros arquivos ocultos.
 <FilesMatch "^\.">

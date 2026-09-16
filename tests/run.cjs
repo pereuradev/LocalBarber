@@ -19,9 +19,10 @@ for (const file of arquivos(root)) {
   if (/\.(?:js|cjs)$/.test(file)) { executar(process.execPath, ['--check', file], true); jsCount++; }
 }
 console.log(`Sintaxe: ${phpCount} arquivos PHP e ${jsCount} arquivos JavaScript passaram.`);
-for (const file of ['php.php', 'sessao.php', 'mutacoes.php']) executar(php, ['tests/' + file]);
+for (const file of ['php.php', 'sessao.php', 'mutacoes.php', 'recuperacao.php']) executar(php, ['tests/' + file]);
 executar(process.execPath, ['--test', 'tests/frontend.cjs']);
 executar(process.execPath, ['tests/http.cjs']);
+executar(process.execPath, ['tests/recuperacao-http.cjs', ...(process.argv.includes('--browser') ? ['--browser'] : [])]);
 const consultas = JSON.parse(executar(php, ['tests/exportar-consultas.php'], true));
 if (consultas.length !== 8) throw new Error('Quantidade inesperada de consultas GET exportadas.');
 console.log('Captura das 8 consultas GET passou; use montar-sql.cjs para validá-las no PostgreSQL.');

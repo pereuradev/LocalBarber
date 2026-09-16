@@ -10,13 +10,23 @@ Portal de gestão de barbearias em PHP, JavaScript e PostgreSQL/Supabase. O nave
 4. Execute `C:\xampp\php\php.exe tools/verificar-conexao.php`. O schema/migração abaixo precisa estar instalado antes de usar as APIs.
 5. Acesse `index.html`, entre e configure o expediente em **Minha Barbearia** antes de agendar.
 
+### Recuperação de senha pelo Gmail
+
+1. Instale as dependências com `composer install`. Se usar um Composer portátil, execute `C:\xampp\php\php.exe C:\caminho\composer.phar install`.
+2. Ative a verificação em duas etapas na conta Google e crie uma **senha de app**. Não use a senha normal da conta.
+3. Preencha somente no `.env`: `APP_URL`, `SMTP_USERNAME` e `SMTP_PASSWORD`. Em produção, `APP_URL` precisa ser a URL pública HTTPS do portal; `localhost` funciona apenas neste computador.
+4. Valide sem enviar e-mail com `C:\xampp\php\php.exe tools\enviar-recuperacoes.php --verificar-config`.
+5. A tarefa do Windows `LocalBarber-RecuperacaoSenha` executa o worker a cada minuto enquanto o usuário configurado estiver conectado. Para outro computador, execute uma vez `powershell -NoProfile -ExecutionPolicy Bypass -File tools\configurar-envio-automatico.ps1` após configurar o projeto.
+
+O formulário sempre apresenta a mesma confirmação para e-mails existentes e inexistentes. O link é aleatório, de uso único, expira em 30 minutos e a troca de senha revoga as sessões anteriores. O sistema guarda somente o hash do token; falhas de envio são repetidas até três vezes.
+
 Nesta máquina, `C:\xampp\htdocs\LocalBarber` é uma junção para `C:\Users\pietro.pereira\Documents\LocalBarber`. O site está em `http://localhost/LocalBarber/`: editar o repositório atualiza diretamente a pasta servida, sem copiar arquivos. A cópia anterior do XAMPP foi preservada em `C:\Users\pietro.pereira\Documents\LocalBarber-xampp-backup-20260910-163443`, fora da pasta pública. Mantenha o Apache ativo e não mova a pasta de destino da junção sem atualizar o vínculo.
 
 As configurações do Google/Supabase Auth continuam em `config/supabase-auth.php` e `assets/js/supabase-auth.js`. Não coloque uma chave `service_role` no navegador. Nesta cópia local, o `.env` foi configurado e a conexão pelo Session pooler foi validada em 10/09/2026, incluindo as oito consultas GET via PDO, em transação somente de leitura. O login real e o OAuth ainda precisam ser validados com uma conta da aplicação; a senha do banco não é a senha de login do portal.
 
 ## Banco de dados
 
-Em 10/09/2026, a migração `20260910190149_corrigir_integridade_localbarber.sql` foi aplicada ao projeto Supabase LocalBarber conectado. A conta legada foi migrada, com hash de senha e tabela de origem preservados. O arquivo local corresponde à versão registrada pelo Supabase; não o reaplique nesse banco.
+As migrações `20260910190149_corrigir_integridade_localbarber.sql` e `20260915171337_recuperacao_senha.sql` foram aplicadas ao projeto Supabase LocalBarber conectado. A conta legada foi migrada, com hash de senha e tabela de origem preservados. Os arquivos locais correspondem às versões registradas pelo Supabase; não os reaplique nesse banco.
 
 - `database/schema.sql`: estrutura inicial, sem dados. Execute **somente em um banco vazio**, sem `locaalbarber`.
 - `supabase/migrations/`: alterações versionadas, em ordem de nome. Para uma instalação nova, aplique a estrutura inicial e depois as migrações. Em banco existente, nunca reaplique a estrutura inicial nem uma migração já registrada.
