@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-acento-publico>
 
 <head>
   <meta charset="UTF-8" />
@@ -10,7 +10,7 @@
     content="Centralize agenda, clientes, serviços, equipe e controle financeiro da sua barbearia com o LocalBarber." />
   <link rel="preload" href="assets/images/mascote-localbarber.png?v=2" as="image" type="image/png" />
 
-  <script src="assets/js/theme-init.js?v=6"></script>
+  <script src="assets/js/theme-init.js?v=7"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
@@ -492,10 +492,6 @@
               "localbarber:sessao-visual",
               JSON.stringify(retorno.sessao_visual)
             );
-            const corTema = retorno.sessao_visual.barbearia?.cor_tema;
-            if (/^#[0-9A-F]{6}$/i.test(corTema || "")) {
-              localStorage.setItem("localbarber-cor-tema", corTema.toUpperCase());
-            }
           } catch {
             // O login continua mesmo se o navegador bloquear o armazenamento.
           }
@@ -717,7 +713,7 @@
   </div>
 
   <script src="assets/js/inicio-login-modal.js?v=5"></script>
-  <script type="module" src="assets/js/supabase-auth.js?v=6"></script>
+  <script type="module" src="assets/js/supabase-auth.js?v=7"></script>
 
 </body>
 

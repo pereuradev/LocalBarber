@@ -5,6 +5,7 @@
     escaparHtml,
     formatarMoeda,
     formatarData,
+    formatarHorario,
     requisitarApi,
     garantirOpcaoSelecionada,
     configurarBuscaClientes,
@@ -23,6 +24,7 @@
   let clientes = [];
   let servicos = [];
   let funcionarios = [];
+  let agendamentosPendentes = [];
   let periodoAtivo = "hoje";
   let identificadorEmEdicao = null;
   let temporizadorBusca = null;
@@ -65,6 +67,37 @@
     document.getElementById("transacao-funcionario").innerHTML =
       `<option value="">Não vincular</option>${funcionarios.map((funcionario) =>
         `<option value="${funcionario.id}">${escaparHtml(funcionario.nome)}</option>`).join("")}`;
+    document.getElementById("transacao-agendamento").innerHTML =
+      `<option value="">Selecione o agendamento</option>${agendamentosPendentes.map((agendamento) =>
+        `<option value="${agendamento.id}">${escaparHtml(
+          `${agendamento.codigo} · ${formatarData(agendamento.data_agendamento)} às ${formatarHorario(agendamento.horario_inicio)} · ${agendamento.cliente} · ${agendamento.servico} · ${formatarMoeda(agendamento.valor_previsto)}`
+        )}</option>`).join("")}`;
+  }
+
+  function preencherPeloAgendamento() {
+    const formulario = document.getElementById("formulario-transacao");
+    const agendamento = agendamentosPendentes.find((item) =>
+      item.id === formulario.elements.agendamento_id.value
+    );
+    const ajuda = document.getElementById("ajuda-agendamento-transacao");
+
+    if (!agendamento) {
+      formulario.elements.valor.value = "";
+      formulario.elements.descricao.value = "";
+      ajuda.textContent = "O cliente, serviço e valor serão preenchidos pelo agendamento.";
+      return;
+    }
+
+    garantirOpcaoSelecionada(formulario.elements.cliente_id, agendamento.cliente_id, agendamento.cliente);
+    garantirOpcaoSelecionada(formulario.elements.servico_id, agendamento.servico_id, agendamento.servico);
+    garantirOpcaoSelecionada(formulario.elements.funcionario_id, agendamento.funcionario_id, agendamento.funcionario);
+    formulario.elements.cliente_id.value = agendamento.cliente_id || "";
+    formulario.elements.servico_id.value = agendamento.servico_id || "";
+    formulario.elements.funcionario_id.value = agendamento.funcionario_id || "";
+    formulario.elements.tipo.value = "entrada";
+    formulario.elements.valor.value = Number(agendamento.valor_previsto || 0).toFixed(2);
+    formulario.elements.descricao.value = `Pagamento de ${agendamento.servico} — ${agendamento.cliente}`;
+    ajuda.textContent = `${agendamento.cliente} · ${agendamento.servico} · ${formatarData(agendamento.data_agendamento)} às ${formatarHorario(agendamento.horario_inicio)}${agendamento.funcionario ? ` · ${agendamento.funcionario}` : ""}`;
   }
 
   function abrirFormulario(transacao = null) {
@@ -75,6 +108,16 @@
     formulario.elements.metodo_pagamento.value = "pix";
     formulario.elements.status.value = "concluido";
     formulario.elements.data_transacao.value = agoraLocal();
+    formulario.classList.toggle("modo-novo", !transacao);
+    const grupoAgendamento = document.getElementById("grupo-agendamento-transacao");
+    const campoAgendamento = formulario.elements.agendamento_id;
+    const opcaoCancelada = formulario.elements.status.querySelector('option[value="cancelado"]');
+    grupoAgendamento.hidden = Boolean(transacao);
+    campoAgendamento.disabled = Boolean(transacao) || !agendamentosPendentes.length;
+    campoAgendamento.required = !transacao;
+    opcaoCancelada.disabled = !transacao;
+    opcaoCancelada.hidden = !transacao;
+    formulario.querySelector('[type="submit"]').disabled = !transacao && !agendamentosPendentes.length;
     document.getElementById("titulo-modal-transacao").textContent =
       transacao ? "Editar transação" : "Nova transação";
 
@@ -92,6 +135,9 @@
       formulario.elements.servico_id.value = transacao.servico_id || "";
       formulario.elements.funcionario_id.value = transacao.funcionario_id || "";
       formulario.elements.observacoes.value = transacao.observacoes || "";
+    } else if (!agendamentosPendentes.length) {
+      document.getElementById("ajuda-agendamento-transacao").textContent =
+        "Não há agendamentos pendentes de pagamento. Crie um agendamento ou revise as transações existentes.";
     }
 
     abrirModal("modal-transacao");
@@ -174,6 +220,7 @@
     clientes = dados.clientes;
     servicos = dados.servicos;
     funcionarios = dados.funcionarios;
+    agendamentosPendentes = dados.agendamentos_pendentes || [];
     preencherOpcoes();
     document.getElementById("kpi-entradas").textContent = formatarMoeda(dados.resumo.entradas);
     document.getElementById("kpi-saidas").textContent = formatarMoeda(dados.resumo.saidas);
@@ -248,6 +295,7 @@
     if (evento.target.id === "modal-transacao") fecharFormulario();
   });
   document.getElementById("formulario-transacao").addEventListener("submit", salvarTransacao);
+  document.getElementById("transacao-agendamento").addEventListener("change", preencherPeloAgendamento);
   document.getElementById("busca-transacoes").addEventListener("input", () => {
     clearTimeout(temporizadorBusca);
     temporizadorBusca = setTimeout(() => carregarTransacoes().catch((erro) => mostrarAviso(erro.message, "erro")), 280);

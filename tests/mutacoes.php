@@ -13,6 +13,7 @@ class ComandoTeste extends PDOStatement {
     public function execute(?array $params = null): bool {
         $this->banco->comandos[] = ['sql'=>$this->sql, 'params'=>$params];
         if (str_contains($this->sql, 'select * from agendamentos')) $this->resultado=$this->banco->agendamento;
+        elseif (str_contains($this->sql, 'from agendamentos a') && str_contains($this->sql, 'not exists')) $this->resultado=$this->banco->agendamento;
         elseif (str_contains($this->sql, 'select * from servicos')) $this->resultado=['nome'=>'Serviço novo','preco'=>90,'duracao_minutos'=>30];
         elseif (str_contains($this->sql, 'insert into transacoes')) {
             $chave=$params['chave_idempotencia'];
@@ -52,7 +53,8 @@ $sessaoTeste=['usuario_id'=>'22222222-2222-4222-8222-222222222222','barbearia_id
 $id='33333333-3333-4333-8333-333333333333';
 $servico='44444444-4444-4444-8444-444444444444';
 $funcionario='55555555-5555-4555-8555-555555555555';
-$pdo->agendamento=['servico_id'=>$servico,'funcionario_id'=>$funcionario,'cliente_id'=>null,
+$pdo->agendamento=['id'=>$id,'codigo'=>'AG-TESTE','servico_id'=>$servico,'funcionario_id'=>$funcionario,'cliente_id'=>null,
+    'nome_cliente_snapshot'=>'Cliente teste',
     'servico_snapshot'=>'Preço contratado','valor_previsto'=>'50.00','horario_inicio'=>'10:00:00','horario_fim'=>'11:00:00'];
 $corpoTeste=['id'=>$id,'cliente'=>'Teste','servico_id'=>$servico,'funcionario_id'=>$funcionario,
     'data_agendamento'=>'2030-01-07','horario_inicio'=>'10:00','observacoes'=>'Observação nova'];
@@ -70,10 +72,11 @@ confirmarTeste($salvo['valor_previsto']==90 && $salvo['horario_fim']==='10:30','
 $financeiro=carregarHandler('transacoes');
 $_SERVER['REQUEST_METHOD']='POST';
 $_SERVER['HTTP_IDEMPOTENCY_KEY']='77777777-7777-4777-8777-777777777777';
-$corpoTeste=['tipo'=>'entrada','descricao'=>'Pagamento','metodo_pagamento'=>'pix','valor'=>'50','status'=>'concluido','data_transacao'=>'2026-09-10T10:00'];
+$corpoTeste=['agendamento_id'=>$id,'tipo'=>'entrada','descricao'=>'Pagamento','metodo_pagamento'=>'pix','valor'=>'50','status'=>'concluido','data_transacao'=>'2026-09-10T10:00'];
 $primeiro=$financeiro();
 $salvo=end($pdo->comandos)['params'];
 confirmarTeste($salvo['data_transacao']==='2026-09-10 10:00:00-03:00','Financeiro não enviou offset explícito.');
+confirmarTeste($salvo['agendamento_id']===$id,'Financeiro não vinculou o agendamento selecionado.');
 $repetido=$financeiro();
 confirmarTeste($primeiro===$repetido && count($pdo->transacoes)===1,'Repetição não retornou a transação original.');
 $corpoTeste['valor']='60';

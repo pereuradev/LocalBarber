@@ -50,6 +50,47 @@ function validarRelacaoFinanceira(
     return $identificador;
 }
 
+function obterAgendamentoPendentePagamento(
+    PDO $pdo,
+    string $identificador,
+    string $identificadorBarbearia,
+    string $chaveIdempotencia
+): array {
+    $consulta = $pdo->prepare(
+        'select a.id, a.codigo, a.cliente_id, a.servico_id, a.funcionario_id,
+                a.nome_cliente_snapshot, a.servico_snapshot, a.valor_previsto
+         from agendamentos a
+         where a.id = :id
+           and a.barbearia_id = :barbearia_id
+           and a.status <> \'cancelado\'
+           and not exists (
+               select 1
+               from transacoes t
+               where t.barbearia_id = a.barbearia_id
+                 and t.agendamento_id = a.id
+                 and t.status <> \'cancelado\'
+                 and t.chave_idempotencia is distinct from cast(:chave_idempotencia as uuid)
+           )
+         limit 1'
+    );
+    $consulta->execute([
+        'id' => $identificador,
+        'barbearia_id' => $identificadorBarbearia,
+        'chave_idempotencia' => $chaveIdempotencia,
+    ]);
+    $agendamento = $consulta->fetch();
+
+    if (!$agendamento) {
+        throw new ExcecaoApi(
+            'Selecione um agendamento existente que ainda não possua pagamento.',
+            422,
+            'agendamento_indisponivel_pagamento'
+        );
+    }
+
+    return $agendamento;
+}
+
 executarApi(static function () use ($pdo): array {
     $metodo = exigirMetodo('GET', 'POST', 'PATCH', 'DELETE');
     $sessao = exigirAutenticacao($pdo);
@@ -80,10 +121,11 @@ executarApi(static function () use ($pdo): array {
              ),
              transacoes_filtradas as (
                 select
-                    t.id, t.codigo, t.cliente_id, t.servico_id, t.funcionario_id,
+                    t.id, t.codigo, t.agendamento_id, t.cliente_id, t.servico_id, t.funcionario_id,
                     t.tipo, t.descricao, t.metodo_pagamento,
                     t.valor, t.status, t.data_transacao, t.observacoes,
-                    c.nome as cliente, s.nome as servico, f.nome as funcionario
+                    c.nome as cliente, s.nome as servico, f.nome as funcionario,
+                    a.codigo as agendamento_codigo
                 from transacoes t
                 cross join parametros p
                 left join clientes c
@@ -92,6 +134,8 @@ executarApi(static function () use ($pdo): array {
                   on s.id = t.servico_id and s.barbearia_id = t.barbearia_id
                 left join funcionarios f
                   on f.id = t.funcionario_id and f.barbearia_id = t.barbearia_id
+                left join agendamentos a
+                  on a.id = t.agendamento_id and a.barbearia_id = t.barbearia_id
                 where t.barbearia_id = p.barbearia_id
                   and t.data_transacao >= {$inicioSql}
                   and t.data_transacao < {$fimSql}
@@ -148,6 +192,29 @@ executarApi(static function () use ($pdo): array {
                 from funcionarios f
                 cross join parametros p
                 where f.barbearia_id = p.barbearia_id and f.ativo
+             ),
+             agendamentos_pendentes as (
+                select
+                    a.id, a.codigo, a.cliente_id, a.servico_id, a.funcionario_id,
+                    a.nome_cliente_snapshot as cliente,
+                    a.servico_snapshot as servico,
+                    a.data_agendamento, a.horario_inicio, a.valor_previsto,
+                    f.nome as funcionario
+                from agendamentos a
+                cross join parametros p
+                left join funcionarios f
+                  on f.id = a.funcionario_id and f.barbearia_id = a.barbearia_id
+                where a.barbearia_id = p.barbearia_id
+                  and a.status <> 'cancelado'
+                  and not exists (
+                      select 1
+                      from transacoes t
+                      where t.barbearia_id = a.barbearia_id
+                        and t.agendamento_id = a.id
+                        and t.status <> 'cancelado'
+                  )
+                order by a.data_agendamento desc, a.horario_inicio desc
+                limit 200
              )
              select jsonb_build_object(
                 'paginacao', jsonb_build_object(
@@ -171,6 +238,12 @@ executarApi(static function () use ($pdo): array {
                 'funcionarios', coalesce((
                     select jsonb_agg(to_jsonb(f) order by f.nome)
                     from funcionarios_ativos f
+                ), '[]'::jsonb),
+                'agendamentos_pendentes', coalesce((
+                    select jsonb_agg(
+                        to_jsonb(a) order by a.data_agendamento desc, a.horario_inicio desc
+                    )
+                    from agendamentos_pendentes a
                 ), '[]'::jsonb)
              )",
             [
@@ -236,7 +309,9 @@ executarApi(static function () use ($pdo): array {
         return ['id' => $identificador, 'status' => $situacao];
     }
 
-    $tipo = exigirOpcao($dados, 'tipo', 'tipo', ['entrada', 'saida']);
+    $tipo = $metodo === 'POST'
+        ? 'entrada'
+        : exigirOpcao($dados, 'tipo', 'tipo', ['entrada', 'saida']);
     $descricao = exigirTexto($dados, 'descricao', 'descrição', 255);
     $metodoPagamento = exigirOpcao(
         $dados,
@@ -251,6 +326,13 @@ executarApi(static function () use ($pdo): array {
         'status',
         ['pendente', 'confirmado', 'concluido', 'cancelado']
     );
+    if ($metodo === 'POST' && $situacao === 'cancelado') {
+        throw new ExcecaoApi(
+            'Uma nova transação não pode ser cadastrada como cancelada.',
+            422,
+            'status_invalido'
+        );
+    }
     $dataTransacao = exigirTexto($dados, 'data_transacao', 'data', 16);
     $objetoData = DateTimeImmutable::createFromFormat('!Y-m-d\TH:i', $dataTransacao, new DateTimeZone('America/Sao_Paulo'));
 
@@ -258,24 +340,45 @@ executarApi(static function () use ($pdo): array {
         throw new ExcecaoApi('Informe uma data válida.', 422, 'data_invalida');
     }
 
-    $identificadorCliente = validarRelacaoFinanceira(
-        $pdo,
-        'clientes',
-        textoOpcional($dados, 'cliente_id', 36),
-        $identificadorBarbearia
-    );
-    $identificadorServico = validarRelacaoFinanceira(
-        $pdo,
-        'servicos',
-        textoOpcional($dados, 'servico_id', 36),
-        $identificadorBarbearia
-    );
-    $identificadorFuncionario = validarRelacaoFinanceira(
-        $pdo,
-        'funcionarios',
-        textoOpcional($dados, 'funcionario_id', 36),
-        $identificadorBarbearia
-    );
+    $identificadorAgendamento = null;
+    $chaveIdempotencia = '';
+    if ($metodo === 'POST') {
+        $chaveIdempotencia = trim((string)($_SERVER['HTTP_IDEMPOTENCY_KEY'] ?? ''));
+        if (!identificadorUuidValido($chaveIdempotencia)) {
+            throw new ExcecaoApi('Atualize a página antes de registrar uma transação.', 422, 'idempotencia_obrigatoria');
+        }
+    }
+    if ($metodo === 'POST') {
+        $identificadorAgendamento = exigirUuid($dados, 'agendamento_id');
+        $agendamento = obterAgendamentoPendentePagamento(
+            $pdo,
+            $identificadorAgendamento,
+            $identificadorBarbearia,
+            $chaveIdempotencia
+        );
+        $identificadorCliente = $agendamento['cliente_id'];
+        $identificadorServico = $agendamento['servico_id'];
+        $identificadorFuncionario = $agendamento['funcionario_id'];
+    } else {
+        $identificadorCliente = validarRelacaoFinanceira(
+            $pdo,
+            'clientes',
+            textoOpcional($dados, 'cliente_id', 36),
+            $identificadorBarbearia
+        );
+        $identificadorServico = validarRelacaoFinanceira(
+            $pdo,
+            'servicos',
+            textoOpcional($dados, 'servico_id', 36),
+            $identificadorBarbearia
+        );
+        $identificadorFuncionario = validarRelacaoFinanceira(
+            $pdo,
+            'funcionarios',
+            textoOpcional($dados, 'funcionario_id', 36),
+            $identificadorBarbearia
+        );
+    }
     $observacoes = textoOpcional($dados, 'observacoes', 1500);
 
     $dadosGravacao = [
@@ -291,31 +394,33 @@ executarApi(static function () use ($pdo): array {
         'data_transacao' => $objetoData->format('Y-m-d H:i:sP'),
         'observacoes' => $observacoes,
     ];
-    $chaveIdempotencia = '';
     $hashRequisicao = '';
 
     if ($metodo === 'POST') {
-        $chaveIdempotencia = trim((string)($_SERVER['HTTP_IDEMPOTENCY_KEY'] ?? ''));
-        if (!identificadorUuidValido($chaveIdempotencia)) {
-            throw new ExcecaoApi('Atualize a página antes de registrar uma transação.', 422, 'idempotencia_obrigatoria');
-        }
-        $hashRequisicao = hash('sha256', $sessao['usuario_id'] . json_encode($dadosGravacao, JSON_UNESCAPED_UNICODE));
+        $hashRequisicao = hash('sha256', $sessao['usuario_id'] . json_encode(
+            array_merge($dadosGravacao, ['agendamento_id' => $identificadorAgendamento]),
+            JSON_UNESCAPED_UNICODE
+        ));
         $gravacao = $pdo->prepare(
             'insert into transacoes (
-                barbearia_id, codigo, cliente_id, servico_id, funcionario_id,
+                barbearia_id, codigo, agendamento_id, cliente_id, servico_id, funcionario_id,
                 tipo, descricao, metodo_pagamento, valor, status,
                 data_transacao, observacoes, chave_idempotencia, requisicao_hash
              ) values (
                 :barbearia_id,
                 concat(\'TX-\', upper(substr(replace(gen_random_uuid()::text, \'-\', \'\'), 1, 8))),
-                :cliente_id, :servico_id, :funcionario_id,
+                :agendamento_id, :cliente_id, :servico_id, :funcionario_id,
                 :tipo, :descricao, :metodo_pagamento, :valor, :status,
                 :data_transacao, :observacoes, :chave_idempotencia, :requisicao_hash
              )
              on conflict (barbearia_id, chave_idempotencia) where chave_idempotencia is not null do nothing
              returning id, codigo'
         );
-        $parametros = ['chave_idempotencia' => $chaveIdempotencia, 'requisicao_hash' => $hashRequisicao];
+        $parametros = [
+            'agendamento_id' => $identificadorAgendamento,
+            'chave_idempotencia' => $chaveIdempotencia,
+            'requisicao_hash' => $hashRequisicao,
+        ];
     } else {
         $gravacao = $pdo->prepare(
             'update transacoes

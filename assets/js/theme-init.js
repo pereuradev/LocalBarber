@@ -2,7 +2,7 @@
   "use strict";
 
   const CHAVE_TEMA = "localbarber-theme";
-  const CHAVE_COR_TEMA = "localbarber-cor-tema";
+  const CHAVE_SESSAO_VISUAL = "localbarber:sessao-visual";
   const COR_TEMA_PADRAO = "#244BC5";
   const CORES_REFERENCIA = {
     claro: "#FFFFFF",
@@ -88,7 +88,7 @@
     });
   }
 
-  function aplicarCorTema(cor, salvar = true) {
+  function aplicarCorTema(cor) {
     const corBase = normalizarCorHex(cor);
     const raiz = document.documentElement;
     const temaEscuro = raiz.dataset.theme === "dark";
@@ -129,11 +129,20 @@
     aplicarTokensCor(raiz, tokens);
     aplicarTokensCor(document.body, tokens);
 
-    if (salvar) {
-      localStorage.setItem(CHAVE_COR_TEMA, corBase);
+    return corBase;
+  }
+
+  function obterCorTemaInicial() {
+    if (document.documentElement.hasAttribute("data-acento-publico")) {
+      return COR_TEMA_PADRAO;
     }
 
-    return corBase;
+    try {
+      const sessao = JSON.parse(sessionStorage.getItem(CHAVE_SESSAO_VISUAL) || "null");
+      return normalizarCorHex(sessao?.usuario?.cor_tema);
+    } catch {
+      return COR_TEMA_PADRAO;
+    }
   }
 
   function resolverTema(preferencia) {
@@ -150,17 +159,24 @@
     const tema = resolverTema(localStorage.getItem(CHAVE_TEMA) || "system");
     document.documentElement.dataset.theme = tema;
     document.documentElement.style.colorScheme = tema;
-    aplicarCorTema(localStorage.getItem(CHAVE_COR_TEMA) || COR_TEMA_PADRAO, false);
+    aplicarCorTema(obterCorTemaInicial());
   } catch {
     const tema = resolverTema("system");
     document.documentElement.dataset.theme = tema;
     document.documentElement.style.colorScheme = tema;
-    aplicarCorTema(COR_TEMA_PADRAO, false);
+    aplicarCorTema(COR_TEMA_PADRAO);
+  }
+
+  try {
+    // Remove a chave antiga, que misturava a cor de contas diferentes no mesmo navegador.
+    localStorage.removeItem("localbarber-cor-tema");
+  } catch {
+    // A interface continua funcional quando o navegador bloqueia armazenamento.
   }
 
   const observarMudancaTema = new MutationObserver((alteracoes) => {
     if (alteracoes.some((alteracao) => alteracao.attributeName === "data-theme")) {
-      aplicarCorTema(corTemaAtiva, false);
+      aplicarCorTema(corTemaAtiva);
     }
   });
   observarMudancaTema.observe(document.documentElement, {
@@ -169,7 +185,7 @@
   });
 
   window.addEventListener("DOMContentLoaded", () => {
-    aplicarCorTema(corTemaAtiva, false);
+    aplicarCorTema(corTemaAtiva);
   }, { once: true });
 
   window.addEventListener("pageshow", (evento) => {
@@ -183,6 +199,5 @@
     corHexValida,
     normalizarCorHex,
     COR_TEMA_PADRAO,
-    CHAVE_COR_TEMA,
   });
 })();

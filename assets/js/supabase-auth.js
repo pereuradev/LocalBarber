@@ -96,10 +96,6 @@ async function sincronizarSessaoGoogle(sessao) {
           'localbarber:sessao-visual',
           JSON.stringify(retorno.sessao_visual)
         );
-        const corTema = retorno.sessao_visual.barbearia?.cor_tema;
-        if (/^#[0-9A-F]{6}$/i.test(corTema || '')) {
-          localStorage.setItem('localbarber-cor-tema', corTema.toUpperCase());
-        }
       } catch {
         // O login continua mesmo se o navegador bloquear o armazenamento.
       }

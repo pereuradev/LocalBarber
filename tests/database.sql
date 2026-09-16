@@ -5,9 +5,10 @@ DO $tests$
 DECLARE
     b uuid := '11111111-1111-4111-8111-111111111111';
     u uuid := '22222222-2222-4222-8222-222222222222';
+    u2 uuid := '22222222-2222-4222-8222-222222222223';
     c uuid; f uuid; s uuid; a uuid; cancelado uuid; t uuid;
     chave uuid := gen_random_uuid();
-    metricas record; quantidade int; versao bigint;
+    metricas record; quantidade int; versao bigint; cor_um text; cor_dois text;
 BEGIN
     IF NOT locaalbarber.cnpj_valido('11222333000181') OR locaalbarber.cnpj_valido('11222333000182') THEN
         RAISE EXCEPTION 'Falha na validação dos dígitos do CNPJ';
@@ -28,6 +29,22 @@ BEGIN
     END;
     INSERT INTO locaalbarber.usuarios (id,barbearia_id,nome,email,senha_hash)
     VALUES (u,b,'Teste','teste-automatizado@example.invalid','hash-inicial');
+    UPDATE locaalbarber.usuarios SET cor_tema='#0F766E' WHERE id=u;
+    INSERT INTO locaalbarber.usuarios (id,barbearia_id,nome,email,senha_hash)
+    VALUES (u2,b,'Outro usuário','outro-usuario@example.invalid','hash-inicial');
+    SELECT cor_tema INTO cor_um FROM locaalbarber.usuarios WHERE id=u;
+    SELECT cor_tema INTO cor_dois FROM locaalbarber.usuarios WHERE id=u2;
+    IF cor_um<>'#0F766E' OR cor_dois<>'#244BC5' THEN
+        RAISE EXCEPTION 'Preferências de cor não estão separadas por usuário';
+    END IF;
+    UPDATE locaalbarber.usuarios SET cor_tema='#7C3AED' WHERE id=u2;
+    SELECT cor_tema INTO cor_um FROM locaalbarber.usuarios WHERE id=u;
+    IF cor_um<>'#0F766E' THEN RAISE EXCEPTION 'A cor de outro usuário foi alterada'; END IF;
+    BEGIN
+        UPDATE locaalbarber.usuarios SET cor_tema='vermelho' WHERE id=u2;
+        RAISE EXCEPTION 'Cor de usuário inválida foi aceita';
+    EXCEPTION WHEN check_violation THEN NULL;
+    END;
     UPDATE locaalbarber.usuarios SET senha_hash='hash-modificado' WHERE id=u;
     SELECT versao_sessao INTO versao FROM locaalbarber.usuarios WHERE id=u;
     IF versao<>2 THEN RAISE EXCEPTION 'Alteração de senha não revogou sessões'; END IF;

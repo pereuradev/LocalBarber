@@ -102,6 +102,12 @@ executarApi(static function () use ($pdo): array {
                 where c.barbearia_id = p.barbearia_id and c.ativo
                 order by c.nome
                  limit 50
+             ),
+             horarios_configurados as (
+                select h.dia_semana, h.abertura, h.fechamento, h.ativo
+                from horarios_funcionamento h
+                cross join parametros p
+                where h.barbearia_id = p.barbearia_id
              )
              select jsonb_build_object(
                 \'agendamentos\', coalesce((
@@ -119,6 +125,10 @@ executarApi(static function () use ($pdo): array {
                 ), \'[]\'::jsonb),
                 \'clientes\', coalesce((
                     select jsonb_agg(to_jsonb(c) order by c.nome) from clientes_ativos c
+                ), \'[]\'::jsonb),
+                \'horarios\', coalesce((
+                    select jsonb_agg(to_jsonb(h) order by h.dia_semana)
+                    from horarios_configurados h
                 ), \'[]\'::jsonb)
              )',
             [

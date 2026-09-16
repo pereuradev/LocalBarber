@@ -263,17 +263,21 @@ executarApi(static function () use ($pdo): array {
         $resultado = executarConsultaJson(
             $pdo,
             'with parametros as (
-                select cast(:barbearia_id as uuid) as barbearia_id
+                select cast(:barbearia_id as uuid) as barbearia_id,
+                       cast(:usuario_id as uuid) as usuario_id
              )
              select jsonb_build_object(
                 \'barbearia\', (
                     select to_jsonb(b)
                     from (
                         select
-                            id, razao_social, nome_fantasia, documento, categoria,
-                            email, telefone, descricao, logo_url, cor_tema, status
-                        from barbearias
-                        where id = (select barbearia_id from parametros)
+                            b.id, b.razao_social, b.nome_fantasia, b.documento, b.categoria,
+                            b.email, b.telefone, b.descricao, b.logo_url, u.cor_tema, b.status
+                        from barbearias b
+                        join usuarios u
+                          on u.id = (select usuario_id from parametros)
+                         and u.barbearia_id = b.id
+                        where b.id = (select barbearia_id from parametros)
                         limit 1
                     ) b
                 ),
@@ -303,7 +307,10 @@ executarApi(static function () use ($pdo): array {
                     ) r
                 ), \'[]\'::jsonb)
              )',
-            ['barbearia_id' => $identificadorBarbearia]
+            [
+                'barbearia_id' => $identificadorBarbearia,
+                'usuario_id' => $sessao['usuario_id'],
+            ]
         );
         $dadosBarbearia = $resultado['barbearia'] ?? null;
 
@@ -384,10 +391,9 @@ executarApi(static function () use ($pdo): array {
                  categoria = :categoria,
                  email = :email,
                  telefone = :telefone,
-                 descricao = :descricao,
-                 cor_tema = coalesce(:cor_tema, cor_tema)
+                 descricao = :descricao
              where id = :id
-             returning id, cor_tema'
+             returning id'
         );
         $atualizacaoBarbearia->execute([
             'id' => $identificadorBarbearia,
@@ -398,12 +404,27 @@ executarApi(static function () use ($pdo): array {
             'email' => $email,
             'telefone' => $telefone,
             'descricao' => $descricao,
-            'cor_tema' => $corTema,
         ]);
 
         $barbeariaAtualizada = $atualizacaoBarbearia->fetch();
         if (!$barbeariaAtualizada) {
             throw new ExcecaoApi('Barbearia não encontrada.', 404, 'barbearia_nao_encontrada');
+        }
+
+        $atualizacaoPreferencia = $pdo->prepare(
+            'update usuarios
+             set cor_tema = coalesce(:cor_tema, cor_tema)
+             where id = :usuario_id and barbearia_id = :barbearia_id
+             returning cor_tema'
+        );
+        $atualizacaoPreferencia->execute([
+            'cor_tema' => $corTema,
+            'usuario_id' => $sessao['usuario_id'],
+            'barbearia_id' => $identificadorBarbearia,
+        ]);
+        $corTemaAtual = $atualizacaoPreferencia->fetchColumn();
+        if (!is_string($corTemaAtual)) {
+            throw new ExcecaoApi('Usuário não encontrado para salvar a aparência.', 404, 'usuario_nao_encontrado');
         }
 
         $endereco = $pdo->prepare(
@@ -496,13 +517,11 @@ executarApi(static function () use ($pdo): array {
         }
 
         $pdo->commit();
-        $corTemaAtual = (string)$barbeariaAtualizada['cor_tema'];
-
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
         $_SESSION['barbearia_nome'] = $nomeFantasia;
-        $_SESSION['barbearia_cor_tema'] = $corTemaAtual;
+        $_SESSION['usuario_cor_tema'] = $corTemaAtual;
         session_write_close();
 
         return [

@@ -1,7 +1,9 @@
 (() => {
   "use strict";
 
-  const emSubpasta = window.location.pathname.replaceAll("\\", "/").includes("/pages/");
+  const emSubpasta = window.location.pathname
+    .replaceAll("\\", "/")
+    .includes("/pages/");
   const prefixoRaiz = emSubpasta ? ".." : ".";
   let tokenCsrf = "";
   let promessaSessao = null;
@@ -11,16 +13,65 @@
   const enviosFormulario = new WeakMap();
   const chavesRequisicao = new Map();
   const CHAVE_SESSAO_VISUAL = "localbarber:sessao-visual";
+  const PREFIXO_PREFERENCIA_SIDEBAR = "localbarber:sidebar-minimizada";
 
   const rotas = [
-    ["dashboard", "Dashboard", `${prefixoRaiz}/dashboard.php`, "▦", "dashboard.visualizar"],
-    ["agenda", "Agenda", `${prefixoRaiz}/pages/agenda.html`, "◷", "agenda.visualizar"],
-    ["clientes", "Clientes", `${prefixoRaiz}/pages/clientes.html`, "♙", "clientes.visualizar"],
-    ["servicos", "Serviços", `${prefixoRaiz}/pages/servicos.html`, "✂", "servicos.visualizar"],
-    ["faturamento", "Faturamento", `${prefixoRaiz}/pages/faturamento.html`, "R$", "financeiro.visualizar"],
-    ["transacoes", "Transações", `${prefixoRaiz}/pages/transacoes.html`, "↗", "financeiro.visualizar"],
-    ["equipe", "Equipe", `${prefixoRaiz}/pages/equipe.html`, "♟", "equipe.visualizar"],
-    ["barbearia", "Minha Barbearia", `${prefixoRaiz}/pages/minha-barbearia.html`, "⌂", "barbearia.visualizar"],
+    [
+      "dashboard",
+      "Dashboard",
+      `${prefixoRaiz}/dashboard.php`,
+      "▦",
+      "dashboard.visualizar",
+    ],
+    [
+      "agenda",
+      "Agenda",
+      `${prefixoRaiz}/pages/agenda.html`,
+      "◷",
+      "agenda.visualizar",
+    ],
+    [
+      "clientes",
+      "Clientes",
+      `${prefixoRaiz}/pages/clientes.html`,
+      "♙",
+      "clientes.visualizar",
+    ],
+    [
+      "servicos",
+      "Serviços",
+      `${prefixoRaiz}/pages/servicos.html`,
+      "✂",
+      "servicos.visualizar",
+    ],
+    [
+      "faturamento",
+      "Faturamento",
+      `${prefixoRaiz}/pages/faturamento.html`,
+      "R$",
+      "financeiro.visualizar",
+    ],
+    [
+      "transacoes",
+      "Transações",
+      `${prefixoRaiz}/pages/transacoes.html`,
+      "↗",
+      "financeiro.visualizar",
+    ],
+    [
+      "equipe",
+      "Equipe",
+      `${prefixoRaiz}/pages/equipe.html`,
+      "♟",
+      "equipe.visualizar",
+    ],
+    [
+      "barbearia",
+      "Minha Barbearia",
+      `${prefixoRaiz}/pages/minha-barbearia.html`,
+      "⌂",
+      "barbearia.visualizar",
+    ],
   ];
 
   const secoesNavegacao = [
@@ -50,18 +101,73 @@
     if (!valor) return "—";
     const data = new Date(comHorario ? valor : `${valor}T12:00:00`);
     if (Number.isNaN(data.getTime())) return "—";
-    return new Intl.DateTimeFormat("pt-BR", comHorario
-      ? { dateStyle: "short", timeStyle: "short", timeZone: "America/Sao_Paulo" }
-      : { dateStyle: "short" }).format(data);
+    return new Intl.DateTimeFormat(
+      "pt-BR",
+      comHorario
+        ? {
+            dateStyle: "short",
+            timeStyle: "short",
+            timeZone: "America/Sao_Paulo",
+          }
+        : { dateStyle: "short" },
+    ).format(data);
   }
 
   function formatarHorario(valor) {
     return valor ? String(valor).slice(0, 5) : "—";
   }
 
+  function obterDigitosTelefone(valor) {
+    let digitos = String(valor || "").replace(/\D/g, "");
+    if ([12, 13].includes(digitos.length) && digitos.startsWith("55")) {
+      digitos = digitos.slice(2);
+    }
+    return digitos.slice(0, 11);
+  }
+
+  function formatarTelefone(valor) {
+    const digitos = obterDigitosTelefone(valor);
+    if (!digitos) return "";
+    if (digitos.length <= 2) return `(${digitos}`;
+
+    const ddd = digitos.slice(0, 2);
+    const numero = digitos.slice(2);
+    if (numero.length <= 4) return `(${ddd}) ${numero}`;
+
+    const tamanhoPrefixo = digitos.length === 11 ? 5 : 4;
+    return `(${ddd}) ${numero.slice(0, tamanhoPrefixo)}-${numero.slice(tamanhoPrefixo)}`;
+  }
+
+  function configurarCampoTelefone(campo) {
+    if (!campo || campo.dataset.mascaraTelefone === "ativa") return;
+    campo.dataset.mascaraTelefone = "ativa";
+    campo.inputMode = "numeric";
+    campo.maxLength = 15;
+    if (!campo.placeholder) campo.placeholder = "(00) 00000-0000";
+    campo.value = formatarTelefone(campo.value);
+    campo.addEventListener("input", () => {
+      campo.value = formatarTelefone(campo.value);
+    });
+  }
+
+  function configurarCamposTelefone(raiz = document) {
+    raiz
+      .querySelectorAll('input[type="tel"], input[data-telefone]')
+      .forEach(configurarCampoTelefone);
+  }
+
   function iniciais(nome) {
-    const partes = String(nome || "U").trim().split(/\s+/).filter(Boolean);
-    return partes.slice(0, 2).map((parte) => parte[0]).join("").toUpperCase() || "U";
+    const partes = String(nome || "U")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    return (
+      partes
+        .slice(0, 2)
+        .map((parte) => parte[0])
+        .join("")
+        .toUpperCase() || "U"
+    );
   }
 
   function estaAtivo(valor) {
@@ -89,7 +195,10 @@
       .then(async (resposta) => {
         const retorno = await resposta.json().catch(() => ({}));
         if (!resposta.ok || !retorno.sucesso) {
-          const erro = new Error(retorno.mensagem || "Não foi possível verificar sua sessão. Tente novamente.");
+          const erro = new Error(
+            retorno.mensagem ||
+              "Não foi possível verificar sua sessão. Tente novamente.",
+          );
           erro.status = resposta.status;
           throw erro;
         }
@@ -111,13 +220,17 @@
   }
 
   function temPermissao(permissao, sessao = sessaoAtual) {
-    return Array.isArray(sessao?.usuario?.permissoes)
-      && sessao.usuario.permissoes.includes(permissao);
+    return (
+      Array.isArray(sessao?.usuario?.permissoes) &&
+      sessao.usuario.permissoes.includes(permissao)
+    );
   }
 
   function destinoInicialPermitido(sessao) {
-    return rotas.find((rota) => temPermissao(rota[4], sessao))?.[2]
-      || `${prefixoRaiz}/index.html`;
+    return (
+      rotas.find((rota) => temPermissao(rota[4], sessao))?.[2] ||
+      `${prefixoRaiz}/index.html`
+    );
   }
 
   function aplicarPermissoes(sessao) {
@@ -132,9 +245,11 @@
     const metodo = String(opcoes.metodo || "GET").toUpperCase();
     const alteraDados = !["GET", "HEAD"].includes(metodo);
     const corpo = alteraDados ? JSON.stringify(opcoes.dados || {}) : undefined;
-    const identidade = metodo === "POST" && caminho === "transacoes.php" ? corpo : null;
+    const identidade =
+      metodo === "POST" && caminho === "transacoes.php" ? corpo : null;
     if (identidade && !chavesRequisicao.has(identidade)) {
-      if (chavesRequisicao.size >= 50) chavesRequisicao.delete(chavesRequisicao.keys().next().value);
+      if (chavesRequisicao.size >= 50)
+        chavesRequisicao.delete(chavesRequisicao.keys().next().value);
       chavesRequisicao.set(identidade, criarUuid());
     }
 
@@ -147,11 +262,15 @@
       credentials: "same-origin",
       headers: {
         Accept: "application/json",
-        ...(identidade ? { "Idempotency-Key": chavesRequisicao.get(identidade) } : {}),
-        ...(alteraDados ? {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": tokenCsrf,
-        } : {}),
+        ...(identidade
+          ? { "Idempotency-Key": chavesRequisicao.get(identidade) }
+          : {}),
+        ...(alteraDados
+          ? {
+              "Content-Type": "application/json",
+              "X-CSRF-Token": tokenCsrf,
+            }
+          : {}),
       },
       body: corpo,
     });
@@ -164,7 +283,9 @@
     }
 
     if (!resposta.ok || !retorno.sucesso) {
-      const erro = new Error(retorno.mensagem || "Não foi possível concluir a operação.");
+      const erro = new Error(
+        retorno.mensagem || "Não foi possível concluir a operação.",
+      );
       erro.codigo = retorno.codigo || "erro_api";
       throw erro;
     }
@@ -176,10 +297,19 @@
   function dataHoraSaoPaulo(valor = new Date()) {
     const data = new Date(valor);
     if (Number.isNaN(data.getTime())) return "";
-    const partes = Object.fromEntries(new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", hourCycle: "h23",
-    }).formatToParts(data).map(({ type, value }) => [type, value]));
+    const partes = Object.fromEntries(
+      new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Sao_Paulo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+      })
+        .formatToParts(data)
+        .map(({ type, value }) => [type, value]),
+    );
     return `${partes.year}-${partes.month}-${partes.day}T${partes.hour}:${partes.minute}`;
   }
 
@@ -187,23 +317,38 @@
     const bytes = crypto.getRandomValues(new Uint8Array(16));
     bytes[6] = (bytes[6] & 15) | 64;
     bytes[8] = (bytes[8] & 63) | 128;
-    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-    return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join("-");
+    const hex = Array.from(bytes, (byte) =>
+      byte.toString(16).padStart(2, "0"),
+    ).join("");
+    return [
+      hex.slice(0, 8),
+      hex.slice(8, 12),
+      hex.slice(12, 16),
+      hex.slice(16, 20),
+      hex.slice(20),
+    ].join("-");
   }
 
   function iniciarEnvioFormulario(formulario) {
     if (enviosFormulario.has(formulario)) return false;
     const botoes = Array.from(formulario.querySelectorAll('[type="submit"]'));
-    enviosFormulario.set(formulario, botoes.map((botao) => [botao, botao.disabled]));
-    botoes.forEach((botao) => { botao.disabled = true; });
+    enviosFormulario.set(
+      formulario,
+      botoes.map((botao) => [botao, botao.disabled]),
+    );
+    botoes.forEach((botao) => {
+      botao.disabled = true;
+    });
     formulario.setAttribute("aria-busy", "true");
     return true;
   }
 
   function concluirEnvioFormulario(formulario) {
-    (enviosFormulario.get(formulario) || []).forEach(([botao, desabilitado]) => {
-      botao.disabled = desabilitado;
-    });
+    (enviosFormulario.get(formulario) || []).forEach(
+      ([botao, desabilitado]) => {
+        botao.disabled = desabilitado;
+      },
+    );
     enviosFormulario.delete(formulario);
     formulario.removeAttribute("aria-busy");
   }
@@ -220,13 +365,23 @@
       recipiente.insertAdjacentElement("afterend", navegacao);
     }
     const pagina = Number(dados.pagina);
-    const paginas = Math.max(1, Math.ceil(Number(dados.total) / Number(dados.por_pagina)));
+    const paginas = Math.max(
+      1,
+      Math.ceil(Number(dados.total) / Number(dados.por_pagina)),
+    );
     navegacao.innerHTML = `<button class="botao" type="button" data-anterior ${pagina <= 1 ? "disabled" : ""}>Anterior</button>
       <span role="status">Página ${pagina} de ${paginas} · ${Number(dados.total)} registros</span>
       <button class="botao" type="button" data-proxima ${pagina >= paginas ? "disabled" : ""}>Próxima</button>`;
-    const ir = (destino) => Promise.resolve(carregar(destino)).catch((erro) => mostrarAviso(erro.message, "erro"));
-    navegacao.querySelector("[data-anterior]").addEventListener("click", () => ir(pagina - 1));
-    navegacao.querySelector("[data-proxima]").addEventListener("click", () => ir(pagina + 1));
+    const ir = (destino) =>
+      Promise.resolve(carregar(destino)).catch((erro) =>
+        mostrarAviso(erro.message, "erro"),
+      );
+    navegacao
+      .querySelector("[data-anterior]")
+      .addEventListener("click", () => ir(pagina - 1));
+    navegacao
+      .querySelector("[data-proxima]")
+      .addEventListener("click", () => ir(pagina + 1));
   }
 
   function garantirOpcaoSelecionada(selecao, id, nome) {
@@ -257,16 +412,24 @@
       temporizador = setTimeout(async () => {
         status.textContent = "Buscando clientes…";
         try {
-          const dados = await requisitarApi(`opcoes-clientes.php?busca=${encodeURIComponent(busca.value.trim())}`);
+          const dados = await requisitarApi(
+            `opcoes-clientes.php?busca=${encodeURIComponent(busca.value.trim())}`,
+          );
           if (atual !== versao) return;
           const id = selecao.value;
           const nome = selecao.selectedOptions[0]?.textContent;
           const vazio = selecao.options[0]?.textContent || "Não vincular";
           atualizarClientes(dados.clientes);
-          selecao.innerHTML = `<option value="">${escaparHtml(vazio)}</option>${dados.clientes.map((cliente) =>
-            `<option value="${cliente.id}">${escaparHtml(cliente.nome)} · ${escaparHtml(cliente.telefone || "")}</option>`).join("")}`;
+          selecao.innerHTML = `<option value="">${escaparHtml(vazio)}</option>${dados.clientes
+            .map(
+              (cliente) =>
+                `<option value="${cliente.id}">${escaparHtml(cliente.nome)} · ${escaparHtml(formatarTelefone(cliente.telefone))}</option>`,
+            )
+            .join("")}`;
           garantirOpcaoSelecionada(selecao, id, nome);
-          status.textContent = dados.tem_mais ? "Há mais resultados. Refine a busca." : `${dados.clientes.length} clientes encontrados.`;
+          status.textContent = dados.tem_mais
+            ? "Há mais resultados. Refine a busca."
+            : `${dados.clientes.length} clientes encontrados.`;
         } catch (erro) {
           if (atual === versao) status.textContent = erro.message;
         }
@@ -280,23 +443,28 @@
         identificadorSecao,
         titulo,
         identificadoresRotas,
-        rotas: rotas.filter(([identificador, , , , permissao]) =>
-          identificadoresRotas.includes(identificador)
-          && temPermissao(permissao, sessao)),
+        rotas: rotas.filter(
+          ([identificador, , , , permissao]) =>
+            identificadoresRotas.includes(identificador) &&
+            temPermissao(permissao, sessao),
+        ),
       }))
       .filter((secao) => secao.rotas.length > 0);
     const secaoPaginaAtual = secoesPermitidas.find((secao) =>
-      secao.identificadoresRotas.includes(paginaAtual));
+      secao.identificadoresRotas.includes(paginaAtual),
+    );
     const identificadorSecaoAberta =
-      secaoPaginaAtual?.identificadorSecao
-      || secoesPermitidas[0]?.identificadorSecao;
+      secaoPaginaAtual?.identificadorSecao ||
+      secoesPermitidas[0]?.identificadorSecao;
 
-    return secoesPermitidas.map((secao) => {
-      const estaAberta = secao.identificadorSecao === identificadorSecaoAberta;
-      const identificadorBotao = `botao-nav-${secao.identificadorSecao}`;
-      const identificadorConteudo = `conteudo-nav-${secao.identificadorSecao}`;
+    return secoesPermitidas
+      .map((secao) => {
+        const estaAberta =
+          secao.identificadorSecao === identificadorSecaoAberta;
+        const identificadorBotao = `botao-nav-${secao.identificadorSecao}`;
+        const identificadorConteudo = `conteudo-nav-${secao.identificadorSecao}`;
 
-      return `
+        return `
         <section class="nav-secao ${estaAberta ? "aberta" : ""}"
                  data-secao-navegacao="${secao.identificadorSecao}">
           <button class="nav-secao-botao" id="${identificadorBotao}" type="button"
@@ -308,23 +476,29 @@
                aria-labelledby="${identificadorBotao}" aria-hidden="${!estaAberta}"
                ${estaAberta ? "" : "inert"}>
             <div class="nav-secao-links">
-              ${secao.rotas.map(([identificador, rotulo, destino, icone]) => `
+              ${secao.rotas
+                .map(
+                  ([identificador, rotulo, destino, icone]) => `
                 <a class="nav-item ${paginaAtual === identificador ? "active" : ""}"
-                   href="${destino}">
+                   href="${destino}" title="${escaparHtml(rotulo)}"
+                   aria-label="${escaparHtml(rotulo)}">
                   <span aria-hidden="true">${icone}</span>
                   <span>${rotulo}</span>
                 </a>
-              `).join("")}
+              `,
+                )
+                .join("")}
             </div>
           </div>
         </section>
       `;
-    }).join("");
+      })
+      .join("");
   }
 
   function configurarAcordeaoNavegacao(barraLateral) {
     const secoes = Array.from(
-      barraLateral.querySelectorAll("[data-secao-navegacao]")
+      barraLateral.querySelectorAll("[data-secao-navegacao]"),
     );
 
     function atualizarSecoes(secaoParaAbrir = null) {
@@ -350,20 +524,21 @@
 
   function obterSessaoVisual() {
     try {
-      const sessao = JSON.parse(sessionStorage.getItem(CHAVE_SESSAO_VISUAL) || "null");
+      const sessao = JSON.parse(
+        sessionStorage.getItem(CHAVE_SESSAO_VISUAL) || "null",
+      );
       const usuario = sessao?.usuario;
 
       if (
-        !usuario
-        || typeof usuario.nome !== "string"
-        || !Array.isArray(usuario.permissoes)
+        !usuario ||
+        typeof usuario.nome !== "string" ||
+        !Array.isArray(usuario.permissoes)
       ) {
         return null;
       }
 
       window.LocalBarberTema?.aplicarCorTema(
-        sessao?.barbearia?.cor_tema
-          || window.LocalBarberTema.COR_TEMA_PADRAO
+        sessao?.usuario?.cor_tema || window.LocalBarberTema.COR_TEMA_PADRAO,
       );
 
       return sessao;
@@ -378,20 +553,20 @@
     if (!usuario) return;
 
     try {
-      const corTema = window.LocalBarberTema?.normalizarCorHex(
-        sessao?.barbearia?.cor_tema
-      ) || "#244BC5";
+      const corTema =
+        window.LocalBarberTema?.normalizarCorHex(sessao?.usuario?.cor_tema) ||
+        "#244BC5";
       const sessaoVisual = {
         usuario: {
+          id: String(usuario.id || ""),
           nome: String(usuario.nome || "Usuário"),
-          tipo_acesso: usuario.tipo_acesso === "administrador"
-            ? "administrador"
-            : "colaborador",
+          tipo_acesso:
+            usuario.tipo_acesso === "administrador"
+              ? "administrador"
+              : "colaborador",
           permissoes: Array.isArray(usuario.permissoes)
             ? usuario.permissoes
             : [],
-        },
-        barbearia: {
           cor_tema: corTema,
         },
       };
@@ -413,18 +588,21 @@
   }
 
   function previsualizarCorTema(cor) {
-    return window.LocalBarberTema?.aplicarCorTema(cor, false)
-      || String(cor || "").toUpperCase();
+    return (
+      window.LocalBarberTema?.aplicarCorTema(cor, false) ||
+      String(cor || "").toUpperCase()
+    );
   }
 
   function atualizarCorTema(cor) {
-    const corNormalizada = window.LocalBarberTema?.aplicarCorTema(cor)
-      || String(cor || "").toUpperCase();
+    const corNormalizada =
+      window.LocalBarberTema?.aplicarCorTema(cor) ||
+      String(cor || "").toUpperCase();
     const sessao = sessaoAtual || obterSessaoVisual();
 
     if (sessao) {
-      sessao.barbearia = {
-        ...(sessao.barbearia || {}),
+      sessao.usuario = {
+        ...(sessao.usuario || {}),
         cor_tema: corNormalizada,
       };
       sessaoAtual = sessao;
@@ -452,13 +630,80 @@
     document.getElementById("botao-sair")?.addEventListener("click", () => {
       confirmar({
         titulo: "Sair do sistema?",
-        mensagem: "Sua sessão atual será encerrada. Você precisará entrar novamente para acessar o painel.",
+        mensagem:
+          "Sua sessão atual será encerrada. Você precisará entrar novamente para acessar o painel.",
         rotulo: "Sim, sair",
         acao: async () => {
           removerSessaoVisual();
           window.location.href = `${prefixoRaiz}/auth/logout.php`;
         },
       });
+    });
+  }
+
+  function chavePreferenciaSidebar(sessao) {
+    const usuarioId = String(sessao?.usuario?.id || "navegador");
+    return `${PREFIXO_PREFERENCIA_SIDEBAR}:${usuarioId}`;
+  }
+
+  function obterPreferenciaSidebar(sessao) {
+    try {
+      return localStorage.getItem(chavePreferenciaSidebar(sessao)) === "true";
+    } catch {
+      return false;
+    }
+  }
+
+  function salvarPreferenciaSidebar(sessao, minimizada) {
+    try {
+      localStorage.setItem(chavePreferenciaSidebar(sessao), String(minimizada));
+    } catch {
+      // A sidebar continua funcionando durante a sessão se o armazenamento falhar.
+    }
+  }
+
+  function aplicarEstadoSidebar(barraLateral, minimizada) {
+    barraLateral.dataset.minimizada = String(minimizada);
+    const visualizacaoMovel = window.matchMedia?.("(max-width: 760px)").matches ?? false;
+    const minimizacaoAplicada = minimizada && !visualizacaoMovel;
+    document.body.classList.toggle("sidebar-minimizada", minimizacaoAplicada);
+    barraLateral.classList.toggle("sidebar-minimizada", minimizacaoAplicada);
+
+    const botao = barraLateral.querySelector("#botao-minimizar-sidebar");
+    if (botao) {
+      const acao = minimizacaoAplicada ? "Expandir" : "Minimizar";
+      botao.setAttribute("aria-label", `${acao} menu lateral`);
+      botao.setAttribute("title", `${acao} menu lateral`);
+      botao.setAttribute("aria-pressed", String(minimizacaoAplicada));
+      botao.querySelector("[aria-hidden]").textContent = minimizacaoAplicada ? "›" : "‹";
+    }
+
+    barraLateral.querySelectorAll("[data-secao-navegacao]").forEach((secao) => {
+      const conteudo = secao.querySelector(".nav-secao-conteudo");
+      if (!conteudo) return;
+      const oculto = !minimizacaoAplicada && !secao.classList.contains("aberta");
+      conteudo.setAttribute("aria-hidden", String(oculto));
+      conteudo.toggleAttribute("inert", oculto);
+    });
+  }
+
+  function configurarMinimizacaoSidebar(barraLateral, sessao) {
+    const botao = barraLateral.querySelector("#botao-minimizar-sidebar");
+    if (!botao) {
+      document.body.classList.remove("sidebar-minimizada");
+      return;
+    }
+
+    aplicarEstadoSidebar(barraLateral, obterPreferenciaSidebar(sessao));
+    botao.addEventListener("click", () => {
+      const minimizada = barraLateral.dataset.minimizada !== "true";
+      aplicarEstadoSidebar(barraLateral, minimizada);
+      salvarPreferenciaSidebar(sessao, minimizada);
+    });
+
+    const consultaMovel = window.matchMedia?.("(max-width: 760px)");
+    consultaMovel?.addEventListener?.("change", () => {
+      aplicarEstadoSidebar(barraLateral, barraLateral.dataset.minimizada === "true");
     });
   }
 
@@ -469,32 +714,47 @@
     const nomeUsuario = sessao?.usuario?.nome || "Carregando…";
     const tipoAcesso = sessao?.usuario?.tipo_acesso;
 
-    barraLateral.className = carregando ? "sidebar sidebar-carregando" : "sidebar";
+    barraLateral.className = carregando
+      ? "sidebar sidebar-carregando"
+      : "sidebar";
     barraLateral.setAttribute("aria-busy", String(carregando));
     barraLateral.innerHTML = `
       <div class="sidebar-logo">
         <img src="${prefixoRaiz}/assets/images/logo.png" alt="LocalBarber">
+        <span class="sidebar-logo-compacta" aria-hidden="true">LB</span>
+        ${sessao ? `
+          <button class="botao-minimizar-sidebar" id="botao-minimizar-sidebar" type="button"
+                  aria-controls="navegacao-sidebar" aria-label="Minimizar menu lateral"
+                  title="Minimizar menu lateral" aria-pressed="false">
+            <span aria-hidden="true">‹</span>
+          </button>
+        ` : ""}
       </div>
-      <nav class="sidebar-nav" aria-label="Navegação principal">
+      <nav class="sidebar-nav" id="navegacao-sidebar" aria-label="Navegação principal">
         ${sessao ? htmlNavegacao(paginaAtual, sessao) : htmlNavegacaoCarregando()}
       </nav>
       <div class="sidebar-footer">
         <div class="user-row">
-          <div class="user-avatar" id="avatar-usuario">${sessao ? iniciais(nomeUsuario) : "…"}</div>
           <div class="user-info">
             <p id="nome-usuario">${escaparHtml(nomeUsuario)}</p>
             <span id="papel-usuario">${
               carregando
                 ? "Validando sessão"
-                : tipoAcesso === "administrador" ? "Administrador" : "Colaborador"
+                : tipoAcesso === "administrador"
+                  ? "Administrador"
+                  : "Colaborador"
             }</span>
           </div>
-          ${sessao ? `
+          ${
+            sessao
+              ? `
             <button class="botao-sair" id="botao-sair" type="button"
                     aria-label="Sair do sistema" title="Sair do sistema">
               <span aria-hidden="true">↪</span>
             </button>
-          ` : ""}
+          `
+              : ""
+          }
         </div>
       </div>
     `;
@@ -502,6 +762,7 @@
     if (sessao) {
       configurarAcordeaoNavegacao(barraLateral);
     }
+    configurarMinimizacaoSidebar(barraLateral, sessao);
     configurarBotaoSair();
   }
 
@@ -526,7 +787,9 @@
   function garantirModalConfirmacao() {
     if (document.getElementById("modal-confirmacao")) return;
 
-    document.body.insertAdjacentHTML("beforeend", `
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      `
       <div class="modal-fundo" id="modal-confirmacao" role="dialog" aria-modal="true"
            aria-labelledby="titulo-confirmacao">
         <div class="modal modal-confirmacao">
@@ -541,19 +804,24 @@
           </div>
         </div>
       </div>
-    `);
+    `,
+    );
 
     document.querySelectorAll("[data-fechar-confirmacao]").forEach((botao) => {
       botao.addEventListener("click", fecharConfirmacao);
     });
-    document.getElementById("modal-confirmacao").addEventListener("click", (evento) => {
-      if (evento.target.id === "modal-confirmacao") fecharConfirmacao();
-    });
-    document.getElementById("executar-confirmacao").addEventListener("click", async () => {
-      const acao = acaoConfirmacao;
-      fecharConfirmacao();
-      if (acao) await acao();
-    });
+    document
+      .getElementById("modal-confirmacao")
+      .addEventListener("click", (evento) => {
+        if (evento.target.id === "modal-confirmacao") fecharConfirmacao();
+      });
+    document
+      .getElementById("executar-confirmacao")
+      .addEventListener("click", async () => {
+        const acao = acaoConfirmacao;
+        fecharConfirmacao();
+        if (acao) await acao();
+      });
   }
 
   function confirmar({ titulo, mensagem, rotulo = "Confirmar", acao }) {
@@ -574,7 +842,9 @@
   function garantirModalAviso() {
     if (document.getElementById("modal-aviso")) return;
 
-    document.body.insertAdjacentHTML("beforeend", `
+    document.body.insertAdjacentHTML(
+      "beforeend",
+      `
       <div class="modal-fundo" id="modal-aviso" role="dialog" aria-modal="true"
            aria-labelledby="titulo-aviso">
         <div class="modal modal-confirmacao">
@@ -588,14 +858,17 @@
           </div>
         </div>
       </div>
-    `);
+    `,
+    );
 
     document.querySelectorAll("[data-fechar-aviso]").forEach((botao) => {
       botao.addEventListener("click", fecharModalAviso);
     });
-    document.getElementById("modal-aviso").addEventListener("click", (evento) => {
-      if (evento.target.id === "modal-aviso") fecharModalAviso();
-    });
+    document
+      .getElementById("modal-aviso")
+      .addEventListener("click", (evento) => {
+        if (evento.target.id === "modal-aviso") fecharModalAviso();
+      });
   }
 
   function mostrarModalAviso(titulo, mensagem) {
@@ -611,13 +884,16 @@
   }
 
   async function inicializarLayout(paginaAtual, tituloPagina) {
+    configurarCamposTelefone();
     const sessaoVisual = obterSessaoVisual();
     sessaoAtual = sessaoVisual;
     renderizarBarraLateral(paginaAtual, sessaoVisual, !sessaoVisual);
     renderizarBarraSuperior(tituloPagina);
 
-    const sessao = sessaoVisual || await obterSessao();
-    const rotaAtual = rotas.find(([identificador]) => identificador === paginaAtual);
+    const sessao = sessaoVisual || (await obterSessao());
+    const rotaAtual = rotas.find(
+      ([identificador]) => identificador === paginaAtual,
+    );
 
     if (rotaAtual && !temPermissao(rotaAtual[4], sessao)) {
       window.location.replace(destinoInicialPermitido(sessao));
@@ -669,6 +945,10 @@
     formatarMoeda,
     formatarData,
     formatarHorario,
+    obterDigitosTelefone,
+    formatarTelefone,
+    configurarCampoTelefone,
+    configurarCamposTelefone,
     dataHoraSaoPaulo,
     iniciais,
     estaAtivo,

@@ -16,11 +16,11 @@ executarApi(static function () use ($pdo): array {
             'papel' => $sessao['usuario_papel'],
             'tipo_acesso' => $sessao['tipo_acesso'],
             'permissoes' => $sessao['permissoes'],
+            'cor_tema' => $sessao['usuario_cor_tema'],
         ],
         'barbearia' => [
             'id' => $sessao['barbearia_id'],
             'nome' => $sessao['barbearia_nome'],
-            'cor_tema' => $sessao['barbearia_cor_tema'],
         ],
         'token_csrf' => tokenCsrf(),
     ];

@@ -11,6 +11,7 @@
     confirmar,
     previsualizarCorTema,
     atualizarCorTema,
+    formatarTelefone,
   } = window.LocalBarber;
 
   const diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
@@ -300,6 +301,7 @@
     Object.entries(dados.barbearia || {}).forEach(([nome, valor]) => {
       if (formulario.elements[nome]) formulario.elements[nome].value = valor ?? "";
     });
+    formulario.elements.telefone.value = formatarTelefone(formulario.elements.telefone.value);
     Object.entries(dados.endereco || {}).forEach(([nome, valor]) => {
       if (formulario.elements[nome]) formulario.elements[nome].value = valor ?? "";
     });
@@ -357,7 +359,7 @@
       razao_social: campos.razao_social,
       documento: campos.documento,
       categoria: campos.categoria,
-      telefone: campos.telefone,
+      telefone: formatarTelefone(campos.telefone),
       email: campos.email,
       descricao: campos.descricao,
       cor_tema: atualizarSeletorCor(campos.cor_tema),
@@ -385,7 +387,7 @@
         },
       });
       atualizarCorTema(resultado.cor_tema);
-      mostrarAviso("Dados da barbearia atualizados.");
+      mostrarAviso("Dados da barbearia e sua aparência foram atualizados.");
       await carregarBarbearia();
     } catch (erro) {
       formularioAlterado = true;

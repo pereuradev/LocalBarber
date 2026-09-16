@@ -44,13 +44,24 @@ function executarApi(callable $operacao): void
             responderJson(['sucesso' => false, 'codigo' => 'horario_ocupado',
                 'mensagem' => 'O profissional já possui um atendimento nesse intervalo.'], 409);
         }
-        if (str_contains($detalhe, 'agendamentos_expediente')) {
+        if (
+            str_contains($detalhe, 'agendamentos_expediente')
+            || str_contains($detalhe, 'Agendamento fora do horário de funcionamento')
+            || str_contains($detalhe, 'Agendamento fora do horario de funcionamento')
+        ) {
             responderJson(['sucesso' => false, 'codigo' => 'fora_do_expediente',
                 'mensagem' => 'O atendimento está fora do expediente. Confira os horários em Minha Barbearia.'], 422);
         }
         if (str_contains($detalhe, 'barbearias_cnpj')) {
             responderJson(['sucesso' => false, 'codigo' => 'cnpj_invalido_ou_duplicado',
                 'mensagem' => 'O CNPJ é inválido ou já pertence a outra barbearia.'], 422);
+        }
+        if (str_contains($detalhe, 'transacoes_agendamento_ativo_uniq')) {
+            responderJson([
+                'sucesso' => false,
+                'codigo' => 'agendamento_ja_pago',
+                'mensagem' => 'Este agendamento já possui uma transação ativa.',
+            ], 409);
         }
 
         if ($excecao->getCode() === '23505') {
@@ -107,7 +118,8 @@ function exigirAutenticacao(PDO $pdo): array
 
     // A versão é consultada a cada requisição para revogar outros dispositivos após trocar a senha.
     $consultaUsuario = $pdo->prepare(
-        'select u.id, u.nome, u.email, u.papel, u.versao_sessao, b.nome_fantasia, b.cor_tema
+        'select u.id, u.nome, u.email, u.papel, u.versao_sessao, b.nome_fantasia,
+                coalesce(u.cor_tema, b.cor_tema, \'#244BC5\') as cor_tema
          from usuarios u
          join barbearias b on b.id = u.barbearia_id
          where u.id = :usuario_id and u.barbearia_id = :barbearia_id and u.ativo
@@ -127,7 +139,7 @@ function exigirAutenticacao(PDO $pdo): array
     $_SESSION['usuario_email'] = $usuario['email'];
     $_SESSION['usuario_papel'] = $usuario['papel'];
     $_SESSION['barbearia_nome'] = $usuario['nome_fantasia'] ?: 'LocalBarber';
-    $_SESSION['barbearia_cor_tema'] = $usuario['cor_tema'] ?: '#244BC5';
+    $_SESSION['usuario_cor_tema'] = $usuario['cor_tema'] ?: '#244BC5';
     $papelUsuario = (string)$usuario['papel'];
     tokenCsrf();
 
@@ -140,7 +152,7 @@ function exigirAutenticacao(PDO $pdo): array
         'tipo_acesso' => tipoAcessoPorPapel($papelUsuario),
         'permissoes' => permissoesPorPapel($papelUsuario),
         'barbearia_nome' => $_SESSION['barbearia_nome'],
-        'barbearia_cor_tema' => $_SESSION['barbearia_cor_tema'],
+        'usuario_cor_tema' => $_SESSION['usuario_cor_tema'],
     ];
     session_write_close();
     return $sessao;

@@ -5,6 +5,7 @@
     escaparHtml,
     formatarMoeda,
     formatarData,
+    formatarTelefone,
     estaAtivo,
     requisitarApi,
     iniciarEnvioFormulario,
@@ -81,7 +82,7 @@
     if (cliente) {
       formulario.elements.nome.value = cliente.nome || "";
       formulario.elements.cpf.value = formatarCpf(cliente.cpf || "");
-      formulario.elements.telefone.value = cliente.telefone || "";
+      formulario.elements.telefone.value = formatarTelefone(cliente.telefone);
       formulario.elements.email.value = cliente.email || "";
       formulario.elements.cidade.value = cliente.cidade || "";
       formulario.elements.observacoes.value = cliente.observacoes || "";
@@ -119,7 +120,7 @@
         <tbody>${clientes.map((cliente) => `
           <tr>
             <td><strong>${escaparHtml(cliente.nome)}</strong><br><span class="texto-suave">${escaparHtml(cliente.cidade || "Cidade não informada")}</span></td>
-            <td>${escaparHtml(cliente.telefone)}<br><span class="texto-suave">${escaparHtml(cliente.email || "E-mail não informado")}</span><br><span class="texto-suave">${cliente.cpf ? `CPF ${escaparHtml(formatarCpf(cliente.cpf))}` : "CPF não informado"}</span></td>
+            <td>${escaparHtml(formatarTelefone(cliente.telefone))}<br><span class="texto-suave">${escaparHtml(cliente.email || "E-mail não informado")}</span><br><span class="texto-suave">${cliente.cpf ? `CPF ${escaparHtml(formatarCpf(cliente.cpf))}` : "CPF não informado"}</span></td>
             <td>${cliente.ultima_visita ? formatarData(cliente.ultima_visita) : "Sem visita"}</td>
             <td>${Number(cliente.total_visitas || 0)}</td>
             <td>${formatarMoeda(cliente.total_gasto)}</td>
@@ -161,6 +162,7 @@
     evento.preventDefault();
     const formulario = evento.currentTarget;
     if (!validarCampoCpf()) return;
+    formulario.elements.telefone.value = formatarTelefone(formulario.elements.telefone.value);
     const dadosFormulario = Object.fromEntries(new FormData(formulario));
     dadosFormulario.cpf = obterDigitosCpf(dadosFormulario.cpf);
     dadosFormulario.ativo = formulario.elements.ativo.checked;

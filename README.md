@@ -26,7 +26,7 @@ As configurações do Google/Supabase Auth continuam em `config/supabase-auth.ph
 
 ## Banco de dados
 
-As migrações `20260910190149_corrigir_integridade_localbarber.sql` e `20260915171337_recuperacao_senha.sql` foram aplicadas ao projeto Supabase LocalBarber conectado. A conta legada foi migrada, com hash de senha e tabela de origem preservados. Os arquivos locais correspondem às versões registradas pelo Supabase; não os reaplique nesse banco.
+As migrações `20260910190149_corrigir_integridade_localbarber.sql`, `20260915171337_recuperacao_senha.sql` e `20260916172714_cor_tema_por_usuario.sql` foram aplicadas ao projeto Supabase LocalBarber conectado. A conta legada foi migrada, com hash de senha e tabela de origem preservados. Os arquivos locais correspondem às versões registradas pelo Supabase; não os reaplique nesse banco.
 
 - `database/schema.sql`: estrutura inicial, sem dados. Execute **somente em um banco vazio**, sem `locaalbarber`.
 - `supabase/migrations/`: alterações versionadas, em ordem de nome. Para uma instalação nova, aplique a estrutura inicial e depois as migrações. Em banco existente, nunca reaplique a estrutura inicial nem uma migração já registrada.
@@ -43,6 +43,7 @@ As migrações `20260910190149_corrigir_integridade_localbarber.sql` e `20260915
 - `total_visitas` e `ultima_visita` são derivados de agendamentos concluídos; `total_gasto` soma entradas concluídas vinculadas ao cliente. Cancelamentos deixam de compor os indicadores. Concluir um agendamento não cria um pagamento automaticamente.
 - POST de `api/transacoes.php` exige `Idempotency-Key` UUID. Repetir a chave com os mesmos dados retorna a operação original; outros dados retornam 409. O navegador reaproveita a chave após falha de rede enquanto a página permanece aberta. Recarregar a página não preserva essa chave.
 - Alterar senha revoga outras sessões na próxima requisição. A sessão usada na troca continua ativa. As sessões anteriores à migração precisam entrar novamente.
+- A landing page e as demais telas públicas mantêm a identidade azul do LocalBarber. No painel, a cor principal é uma preferência individual: alterar uma conta não modifica a aparência dos outros usuários da mesma barbearia.
 - Clientes, serviços, equipe e transações têm paginação (`pagina`, `por_pagina`, máximo 100 por página). A busca de clientes nos formulários consulta a base completa e pede refinamento quando há mais de 50 resultados.
 - Falha temporária ao verificar a sessão não redireciona para login. Resposta 401 continua encerrando o acesso visual.
 

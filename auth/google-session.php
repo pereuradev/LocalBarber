@@ -78,7 +78,7 @@ function criarSessaoLocal(array $usuario, string $tipoAcesso): void
     $_SESSION['usuario_papel'] = $usuario['papel'];
     $_SESSION['tipo_acesso'] = $tipoAcesso;
     $_SESSION['barbearia_nome'] = $usuario['nome_fantasia'] ?: 'LocalBarber';
-    $_SESSION['barbearia_cor_tema'] = $usuario['cor_tema'] ?: '#244BC5';
+    $_SESSION['usuario_cor_tema'] = $usuario['cor_tema'] ?: '#244BC5';
     $_SESSION['auth_provider'] = 'google';
     $_SESSION['usuario_validado_em'] = time();
 }
@@ -110,7 +110,7 @@ try {
             u.ativo,
             u.versao_sessao,
             b.nome_fantasia,
-            b.cor_tema
+            coalesce(u.cor_tema, b.cor_tema, \'#244BC5\') as cor_tema
          from usuarios u
          left join barbearias b on b.id = u.barbearia_id
          where lower(u.email) = lower(:email)
@@ -132,11 +132,10 @@ try {
             'redirect' => rotaInicialPorPapel((string)$usuario['papel']),
             'sessao_visual' => [
                 'usuario' => [
+                    'id' => $usuario['id'],
                     'nome' => $usuario['nome'],
                     'tipo_acesso' => $tipoAcesso,
                     'permissoes' => permissoesPorPapel((string)$usuario['papel']),
-                ],
-                'barbearia' => [
                     'cor_tema' => $usuario['cor_tema'] ?: '#244BC5',
                 ],
             ],

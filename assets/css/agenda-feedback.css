@@ -1,0 +1,57 @@
+.confirmacao-agendamento {
+  align-items: center;
+  gap: 12px;
+  margin: 0 20px 4px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--primaria, #244bc5) 28%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primaria, #244bc5) 8%, var(--superficie, #fff));
+  color: var(--texto, #1a1f3a);
+  animation: confirmacao-agendamento-entrada 180ms ease-out both;
+}
+
+.confirmacao-agendamento:not([hidden]) {
+  display: flex;
+}
+
+.confirmacao-agendamento span:last-child {
+  display: grid;
+  gap: 2px;
+}
+
+.confirmacao-agendamento small {
+  color: var(--texto-suave, #5a6480);
+}
+
+.confirmacao-agendamento-spinner {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border: 3px solid color-mix(in srgb, var(--primaria, #244bc5) 20%, transparent);
+  border-top-color: var(--primaria, #244bc5);
+  border-radius: 50%;
+  animation: confirmacao-agendamento-giro 700ms linear infinite;
+}
+
+#formulario-agendamento.aguardando-confirmacao .modal-corpo,
+#formulario-agendamento.aguardando-confirmacao .modal-cabecalho,
+#formulario-agendamento.aguardando-confirmacao .modal-rodape {
+  opacity: .72;
+}
+
+@keyframes confirmacao-agendamento-giro {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes confirmacao-agendamento-entrada {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confirmacao-agendamento,
+  .confirmacao-agendamento-spinner {
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+  }
+}

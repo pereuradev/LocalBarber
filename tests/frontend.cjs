@@ -6,6 +6,7 @@ const vm = require("node:vm");
 const { webcrypto } = require("node:crypto");
 const root = path.resolve(__dirname, "..");
 const apiSource = fs.readFileSync(path.join(root, "assets/js/api-localbarber.js"), "utf8");
+const themeSource = fs.readFileSync(path.join(root, "assets/js/theme-init.js"), "utf8");
 
 function ambiente(fetch) {
   const storage = { getItem: () => null, setItem() {}, removeItem() {} };
@@ -16,9 +17,54 @@ function ambiente(fetch) {
   vm.runInContext(apiSource, context);
   return { context, api: context.window.LocalBarber };
 }
+function executarTemaInicial({ paginaPublica = false, corUsuario = "#244BC5" } = {}) {
+  const valores = new Map([["localbarber-cor-tema", "#B4235A"]]);
+  const storage = {
+    getItem: (chave) => valores.get(chave) ?? null,
+    setItem: (chave, valor) => valores.set(chave, valor),
+    removeItem: (chave) => valores.delete(chave),
+  };
+  const criarAlvo = () => ({ dataset: {}, style: { valores: {}, setProperty(nome, valor) { this.valores[nome] = valor; } } });
+  const raiz = criarAlvo();
+  raiz.hasAttribute = (nome) => nome === "data-acento-publico" && paginaPublica;
+  const corpo = criarAlvo();
+  const sessaoStorage = {
+    getItem: (chave) => chave === "localbarber:sessao-visual"
+      ? JSON.stringify({ usuario: { id: "usuario-teste", cor_tema: corUsuario } })
+      : null,
+  };
+  const janela = {
+    matchMedia: () => ({ matches: false }),
+    addEventListener() {},
+  };
+  const context = {
+    window: janela,
+    document: { documentElement: raiz, body: corpo },
+    localStorage: storage,
+    sessionStorage: sessaoStorage,
+    MutationObserver: class { observe() {} },
+    JSON,
+  };
+  vm.createContext(context);
+  vm.runInContext(themeSource, context);
+  return { raiz, corpo, valores };
+}
 const sessao = () => ({ ok: true, status: 200, json: async () => ({ sucesso: true, dados: {
-  token_csrf: "token-teste", usuario: { nome: "Teste", permissoes: [] }, barbearia: { cor_tema: "#244BC5" },
+  token_csrf: "token-teste", usuario: { id: "usuario-teste", nome: "Teste", permissoes: [], cor_tema: "#244BC5" }, barbearia: {},
 } }) });
+
+test("landing mantém o azul público e não herda a cor da conta", () => {
+  const { raiz, valores } = executarTemaInicial({ paginaPublica: true, corUsuario: "#B4235A" });
+  assert.equal(raiz.style.valores["--cor-tema-original"], "#244BC5");
+  assert.equal(valores.has("localbarber-cor-tema"), false);
+});
+
+test("cada sessão visual aplica a cor do próprio usuário", () => {
+  const primeiro = executarTemaInicial({ corUsuario: "#0F766E" });
+  const segundo = executarTemaInicial({ corUsuario: "#7C3AED" });
+  assert.equal(primeiro.raiz.style.valores["--cor-tema-original"], "#0F766E");
+  assert.equal(segundo.raiz.style.valores["--cor-tema-original"], "#7C3AED");
+});
 
 test("erro 503 preserva a tela e permite consultar a sessão novamente", async () => {
   let chamadas = 0;
@@ -62,6 +108,13 @@ test("campos financeiros usam São Paulo inclusive na virada do dia", () => {
   assert.equal(api.dataHoraSaoPaulo("inválida"), "");
 });
 
+test("telefones brasileiros são formatados de forma consistente", () => {
+  const { api } = ambiente();
+  assert.equal(api.formatarTelefone("11987654321"), "(11) 98765-4321");
+  assert.equal(api.formatarTelefone("1134567890"), "(11) 3456-7890");
+  assert.equal(api.formatarTelefone("+55 11 98765-4321"), "(11) 98765-4321");
+});
+
 for (const [file,save,loader] of [
   ["transacoes-dados.js","salvarTransacao","carregarTransacoes"],
   ["agenda-dados.js","salvarAgendamento","carregarAgenda"],
@@ -70,7 +123,8 @@ for (const [file,save,loader] of [
     const { context, api } = ambiente();
     Object.assign(context, api, { identificadorEmEdicao: null, paginaAtual: 1,
       FormData: class { *[Symbol.iterator]() { yield ["cliente", "Teste"]; } },
-      fecharFormulario() {}, mostrarAviso() {}, [loader]: async () => {} });
+      fecharFormulario() {}, mostrarAviso() {}, mensagemHorarioInvalido: () => "",
+      definirConfirmacaoEmAndamento() {}, [loader]: async () => {} });
     let requisicoes = 0;
     let resolver;
     context.requisitarApi = () => { requisicoes++; return new Promise((resolve) => { resolver = resolve; }); };

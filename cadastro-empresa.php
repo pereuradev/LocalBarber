@@ -251,14 +251,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-acento-publico>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LocalBarber | Cadastrar Barbearia</title>
     <link rel="icon" type="image/png" href="assets/images/favicon.png?v=20260715">
     
-  <script src="assets/js/theme-init.js?v=6"></script>
+  <script src="assets/js/theme-init.js?v=7"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -370,7 +370,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="form-row">
                     <div class="form-group">
                         <label for="telefone">Telefone</label>
-                        <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" required>
+                        <input type="tel" id="telefone" name="telefone" inputmode="numeric"
+                               autocomplete="tel" maxlength="15" placeholder="(00) 00000-0000" required>
                     </div>
                     <div class="form-group">
                         <label for="endereco">Endereço</label>
@@ -423,7 +424,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="form-group">
                         <label for="telefoneRepresentante">Telefone do representante</label>
-                        <input type="tel" id="telefoneRepresentante" name="telefoneRepresentante" placeholder="(00) 00000-0000" required>
+                        <input type="tel" id="telefoneRepresentante" name="telefoneRepresentante" inputmode="numeric"
+                               autocomplete="tel" maxlength="15" placeholder="(00) 00000-0000" required>
                     </div>
                 </div>
             </section>

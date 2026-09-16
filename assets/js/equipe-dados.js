@@ -3,6 +3,8 @@
 
   const {
     escaparHtml,
+    formatarTelefone,
+    obterDigitosTelefone,
     estaAtivo,
     requisitarApi,
     iniciarEnvioFormulario,
@@ -74,25 +76,6 @@
     const primeiroDigito = calcularDigitoCpf(cpf.slice(0, 9), 10);
     const segundoDigito = calcularDigitoCpf(`${cpf.slice(0, 9)}${primeiroDigito}`, 11);
     return cpf.endsWith(`${primeiroDigito}${segundoDigito}`);
-  }
-
-  function obterDigitosTelefone(valor) {
-    return String(valor || "").replace(/\D/g, "").slice(0, 11);
-  }
-
-  function formatarTelefone(valor) {
-    const digitos = obterDigitosTelefone(valor);
-
-    if (!digitos) return "";
-    if (digitos.length <= 2) return `(${digitos}`;
-
-    const ddd = digitos.slice(0, 2);
-    const numero = digitos.slice(2);
-
-    if (numero.length <= 4) return `(${ddd}) ${numero}`;
-
-    const tamanhoPrefixo = digitos.length === 11 ? 5 : 4;
-    return `(${ddd}) ${numero.slice(0, tamanhoPrefixo)}-${numero.slice(tamanhoPrefixo)}`;
   }
 
   function definirValidade(campo, mensagem = "") {
@@ -386,7 +369,7 @@
         <thead><tr><th>Profissional</th><th>Função</th><th>Acesso</th><th>Status</th><th>Hoje</th><th>No mês</th><th>Comissão</th><th></th></tr></thead>
         <tbody>${funcionarios.map((funcionario) => `
           <tr>
-            <td><strong>${escaparHtml(funcionario.nome)}</strong><br><span class="texto-suave">${escaparHtml(funcionario.email || funcionario.telefone || "Contato não informado")}</span><br><span class="texto-suave">${funcionario.cpf ? `CPF ${escaparHtml(formatarCpf(funcionario.cpf))}` : "CPF não informado"}</span></td>
+            <td><strong>${escaparHtml(funcionario.nome)}</strong><br><span class="texto-suave">${escaparHtml(funcionario.email || formatarTelefone(funcionario.telefone) || "Contato não informado")}</span><br><span class="texto-suave">${funcionario.cpf ? `CPF ${escaparHtml(formatarCpf(funcionario.cpf))}` : "CPF não informado"}</span></td>
             <td>${escaparHtml(funcionario.funcao)}</td>
             <td><span class="etiqueta ${funcionario.tem_acesso && estaAtivo(funcionario.usuario_ativo) ? "sucesso" : "perigo"}">${
               funcionario.tem_acesso
