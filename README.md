@@ -29,6 +29,7 @@ As configurações do Google/Supabase Auth continuam em `config/supabase-auth.ph
 As migrações `20260910190149_corrigir_integridade_localbarber.sql`, `20260915171337_recuperacao_senha.sql` e `20260916172714_cor_tema_por_usuario.sql` foram aplicadas ao projeto Supabase LocalBarber conectado. A conta legada foi migrada, com hash de senha e tabela de origem preservados. Os arquivos locais correspondem às versões registradas pelo Supabase; não os reaplique nesse banco.
 
 - `database/schema.sql`: estrutura inicial, sem dados. Execute **somente em um banco vazio**, sem `locaalbarber`.
+- `database/dados-demonstracao.sql`: carga fictícia e idempotente para a barbearia acessada mais recentemente; respeita expediente, duração e conflitos de agenda.
 - `supabase/migrations/`: alterações versionadas, em ordem de nome. Para uma instalação nova, aplique a estrutura inicial e depois as migrações. Em banco existente, nunca reaplique a estrutura inicial nem uma migração já registrada.
 - Faça backup e confira conflitos antes de migrar outra instalação. A alteração da agenda cria constraints e pode exigir uma janela de manutenção em bases grandes.
 - A migração de integridade preserva a tabela antiga `public.barbearias`, copia suas contas compatíveis para UUIDs e mantém os hashes de senha. Correspondências ambíguas interrompem a migração, sem mesclar usuários automaticamente.

@@ -104,22 +104,10 @@
       padding: 10px 20px;
       border-top: 1px solid var(--border);
       height: 40px;
-     
+
     }
 
     .user-row { display: flex; align-items: center; gap: 10px; }
-
-    .user-avatar {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold), var(--gold2));
-      display: grid;
-      place-items: center;
-      font-size: .8rem;
-      font-weight: 700;
-      color: #fff;
-      flex-shrink: 0;
-    }
 
     .user-info p { font-size: .82rem; font-weight: 600; color: var(--white); }
     .user-info span { font-size: .72rem; color: var(--muted); }

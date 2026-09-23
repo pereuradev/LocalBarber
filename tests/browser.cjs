@@ -106,6 +106,9 @@ async function main() {
     assert.equal(await page.locator('body').evaluate((corpo) => corpo.classList.contains('sidebar-minimizada')), true);
     assert.equal(await page.locator('#barra-lateral').evaluate((menu) => Math.round(menu.getBoundingClientRect().width)), 76);
     assert.equal(await page.locator('.principal').evaluate((principal) => getComputedStyle(principal).marginLeft), '76px');
+    assert.equal(await page.locator('.sidebar-logo-compacta').isVisible(), true);
+    assert.match(await page.locator('.sidebar-logo-compacta').getAttribute('src'), /assets\/images\/favicon\.png/);
+    assert.equal(await page.locator('.sidebar-logo-completa').isVisible(), false);
     assert.equal(await page.getByRole('link', { name: 'Clientes', exact: true }).isVisible(), true);
     assert.equal(await page.evaluate(() => localStorage.getItem(
       'localbarber:sidebar-minimizada:22222222-2222-4222-8222-222222222222'
@@ -115,6 +118,8 @@ async function main() {
     assert.equal(await page.locator('body').evaluate((corpo) => corpo.classList.contains('sidebar-minimizada')), true);
     await page.getByRole('button', { name: 'Expandir menu lateral', exact: true }).click();
     assert.equal(await page.locator('body').evaluate((corpo) => corpo.classList.contains('sidebar-minimizada')), false);
+    assert.equal(await page.locator('.sidebar-logo-completa').isVisible(), true);
+    assert.equal(await page.locator('.sidebar-logo-compacta').isVisible(), false);
     console.log('PASS: sidebar minimiza, mantém atalhos e restaura a preferência do usuário');
 
     for (const width of [1366, 390]) {
@@ -142,6 +147,14 @@ async function main() {
       assert.equal(await page.locator(select).inputValue(), cliente.id);
       console.log(`PASS: ${tela}, seleção histórica e busca de cliente`);
     }
+    historico.agendamento_id = agendamentoPagamento.id;
+    await page.goto(`${base}/pages/transacoes.html`);
+    await page.locator('[data-editar]').first().click();
+    for (const seletor of ['#transacao-cliente', '#transacao-servico', '#transacao-funcionario']) {
+      assert.equal(await page.locator(seletor).isDisabled(), true);
+    }
+    delete historico.agendamento_id;
+    console.log('PASS: pagamento vinculado preserva cliente, serviço e profissional do agendamento');
     await page.setViewportSize({ width: 1366, height: 900 });
     await page.goto(`${base}/pages/transacoes.html`);
     await page.getByRole('button', { name: 'Nova transação', exact: true }).click();

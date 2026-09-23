@@ -150,10 +150,9 @@ a {
 
 .sidebar-logo-compacta {
   display: none;
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 900;
-  letter-spacing: -0.04em;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
 }
 
 .botao-minimizar-sidebar {
@@ -186,7 +185,7 @@ a {
   outline-offset: 2px;
 }
 
-.sidebar-logo img {
+.sidebar-logo-completa {
   width: 154px;
   max-height: 46px;
   object-fit: contain;
@@ -199,7 +198,7 @@ a {
     filter 180ms ease;
 }
 
-.sidebar-logo:hover img {
+.sidebar-logo:hover .sidebar-logo-completa {
   transform: translateY(-1px);
   filter: drop-shadow(
     0 10px 22px color-mix(in srgb, var(--primaria-brilho) 38%, transparent)
@@ -507,12 +506,12 @@ body.sidebar-minimizada #barra-lateral .sidebar-logo {
   padding-inline: 12px;
 }
 
-body.sidebar-minimizada #barra-lateral .sidebar-logo img {
+body.sidebar-minimizada #barra-lateral .sidebar-logo-completa {
   display: none;
 }
 
 body.sidebar-minimizada #barra-lateral .sidebar-logo-compacta {
-  display: inline;
+  display: block;
 }
 
 body.sidebar-minimizada #barra-lateral .sidebar-nav {
@@ -2012,7 +2011,7 @@ body.sidebar-minimizada #barra-lateral .user-info {
     padding: 12px 18px;
   }
 
-  .sidebar-logo img {
+  .sidebar-logo-completa {
     width: 130px;
   }
 

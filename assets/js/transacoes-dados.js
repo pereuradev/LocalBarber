@@ -109,6 +109,13 @@
     formulario.elements.status.value = "concluido";
     formulario.elements.data_transacao.value = agoraLocal();
     formulario.classList.toggle("modo-novo", !transacao);
+    const possuiAgendamento = Boolean(transacao?.agendamento_id);
+    ["cliente_id", "servico_id", "funcionario_id"].forEach((campo) => {
+      formulario.elements[campo].disabled = possuiAgendamento;
+      formulario.elements[campo].title = possuiAgendamento
+        ? "Este vínculo é definido pelo agendamento do pagamento."
+        : "";
+    });
     const grupoAgendamento = document.getElementById("grupo-agendamento-transacao");
     const campoAgendamento = formulario.elements.agendamento_id;
     const opcaoCancelada = formulario.elements.status.querySelector('option[value="cancelado"]');

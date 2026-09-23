@@ -14,6 +14,7 @@ class ComandoTeste extends PDOStatement {
         $this->banco->comandos[] = ['sql'=>$this->sql, 'params'=>$params];
         if (str_contains($this->sql, 'select * from agendamentos')) $this->resultado=$this->banco->agendamento;
         elseif (str_contains($this->sql, 'from agendamentos a') && str_contains($this->sql, 'not exists')) $this->resultado=$this->banco->agendamento;
+        elseif (str_contains($this->sql, 'select t.agendamento_id')) $this->resultado=$this->banco->transacaoAtual;
         elseif (str_contains($this->sql, 'select * from servicos')) $this->resultado=['nome'=>'Serviço novo','preco'=>90,'duracao_minutos'=>30];
         elseif (str_contains($this->sql, 'insert into transacoes')) {
             $chave=$params['chave_idempotencia'];
@@ -29,6 +30,7 @@ class BancoMutacaoTeste extends PDO {
     public array $agendamento=[];
     public array $comandos=[];
     public array $transacoes=[];
+    public array $transacaoAtual=[];
     private bool $transacao=false;
     public function __construct() {}
     public function prepare(string $query,array $options=[]): PDOStatement { return new ComandoTeste($this,$query); }
@@ -51,9 +53,10 @@ function confirmarTeste(bool $ok,string $mensagem): void { if (!$ok) throw new R
 $pdo=new BancoMutacaoTeste();
 $sessaoTeste=['usuario_id'=>'22222222-2222-4222-8222-222222222222','barbearia_id'=>'11111111-1111-4111-8111-111111111111','usuario_papel'=>'admin'];
 $id='33333333-3333-4333-8333-333333333333';
+$cliente='88888888-8888-4888-8888-888888888888';
 $servico='44444444-4444-4444-8444-444444444444';
 $funcionario='55555555-5555-4555-8555-555555555555';
-$pdo->agendamento=['id'=>$id,'codigo'=>'AG-TESTE','servico_id'=>$servico,'funcionario_id'=>$funcionario,'cliente_id'=>null,
+$pdo->agendamento=['id'=>$id,'codigo'=>'AG-TESTE','servico_id'=>$servico,'funcionario_id'=>$funcionario,'cliente_id'=>$cliente,
     'nome_cliente_snapshot'=>'Cliente teste',
     'servico_snapshot'=>'Preço contratado','valor_previsto'=>'50.00','horario_inicio'=>'10:00:00','horario_fim'=>'11:00:00'];
 $corpoTeste=['id'=>$id,'cliente'=>'Teste','servico_id'=>$servico,'funcionario_id'=>$funcionario,
@@ -82,4 +85,20 @@ confirmarTeste($primeiro===$repetido && count($pdo->transacoes)===1,'Repetição
 $corpoTeste['valor']='60';
 try { $financeiro(); throw new RuntimeException('Chave repetida aceitou outro valor.'); }
 catch (ExcecaoApi $erro) { confirmarTeste($erro->codigo==='idempotencia_conflitante','Erro inesperado na idempotência.'); }
-echo "Mutações: histórico, troca de serviço, fuso, repetição e conflito passaram.\n";
+$pdo->transacaoAtual=['agendamento_id'=>$id,'cliente_id'=>$cliente,
+    'servico_id'=>$servico,'funcionario_id'=>$funcionario];
+$_SERVER['REQUEST_METHOD']='PATCH';
+$corpoTeste=['id'=>'99999999-9999-4999-8999-999999999999','tipo'=>'entrada',
+    'descricao'=>'Pagamento editado','metodo_pagamento'=>'credito','valor'=>'50',
+    'status'=>'concluido','data_transacao'=>'2026-09-10T10:00',
+    'cliente_id'=>'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    'servico_id'=>'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+    'funcionario_id'=>'cccccccc-cccc-4ccc-8ccc-cccccccccccc'];
+$financeiro();
+$salvo=end($pdo->comandos)['params'];
+confirmarTeste(
+    $salvo['cliente_id']===$cliente && $salvo['servico_id']===$servico
+    && $salvo['funcionario_id']===$funcionario,
+    'Edição de pagamento alterou os vínculos definidos pelo agendamento.'
+);
+echo "Mutações: histórico, troca de serviço, fuso, repetição, conflito e vínculos passaram.\n";

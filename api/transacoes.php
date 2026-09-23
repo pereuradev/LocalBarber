@@ -91,6 +91,40 @@ function obterAgendamentoPendentePagamento(
     return $agendamento;
 }
 
+function obterVinculosAgendamentoDaTransacao(
+    PDO $pdo,
+    string $identificador,
+    string $identificadorBarbearia
+): ?array {
+    $consulta = $pdo->prepare(
+        'select t.agendamento_id, a.cliente_id, a.servico_id, a.funcionario_id
+         from transacoes t
+         left join agendamentos a
+           on a.id = t.agendamento_id and a.barbearia_id = t.barbearia_id
+         where t.id = :id and t.barbearia_id = :barbearia_id
+         limit 1'
+    );
+    $consulta->execute([
+        'id' => $identificador,
+        'barbearia_id' => $identificadorBarbearia,
+    ]);
+    $transacao = $consulta->fetch();
+
+    if (!$transacao) {
+        throw new ExcecaoApi('TransaÃ§Ã£o nÃ£o encontrada.', 404, 'transacao_nao_encontrada');
+    }
+
+    if (empty($transacao['agendamento_id'])) {
+        return null;
+    }
+
+    return [
+        'cliente_id' => $transacao['cliente_id'],
+        'servico_id' => $transacao['servico_id'],
+        'funcionario_id' => $transacao['funcionario_id'],
+    ];
+}
+
 executarApi(static function () use ($pdo): array {
     $metodo = exigirMetodo('GET', 'POST', 'PATCH', 'DELETE');
     $sessao = exigirAutenticacao($pdo);
@@ -360,24 +394,37 @@ executarApi(static function () use ($pdo): array {
         $identificadorServico = $agendamento['servico_id'];
         $identificadorFuncionario = $agendamento['funcionario_id'];
     } else {
-        $identificadorCliente = validarRelacaoFinanceira(
+        $vinculosAgendamento = obterVinculosAgendamentoDaTransacao(
             $pdo,
-            'clientes',
-            textoOpcional($dados, 'cliente_id', 36),
+            $identificador,
             $identificadorBarbearia
         );
-        $identificadorServico = validarRelacaoFinanceira(
-            $pdo,
-            'servicos',
-            textoOpcional($dados, 'servico_id', 36),
-            $identificadorBarbearia
-        );
-        $identificadorFuncionario = validarRelacaoFinanceira(
-            $pdo,
-            'funcionarios',
-            textoOpcional($dados, 'funcionario_id', 36),
-            $identificadorBarbearia
-        );
+
+        if ($vinculosAgendamento !== null) {
+            // Um pagamento vinculado sempre conserva as entidades do agendamento original.
+            $identificadorCliente = $vinculosAgendamento['cliente_id'];
+            $identificadorServico = $vinculosAgendamento['servico_id'];
+            $identificadorFuncionario = $vinculosAgendamento['funcionario_id'];
+        } else {
+            $identificadorCliente = validarRelacaoFinanceira(
+                $pdo,
+                'clientes',
+                textoOpcional($dados, 'cliente_id', 36),
+                $identificadorBarbearia
+            );
+            $identificadorServico = validarRelacaoFinanceira(
+                $pdo,
+                'servicos',
+                textoOpcional($dados, 'servico_id', 36),
+                $identificadorBarbearia
+            );
+            $identificadorFuncionario = validarRelacaoFinanceira(
+                $pdo,
+                'funcionarios',
+                textoOpcional($dados, 'funcionario_id', 36),
+                $identificadorBarbearia
+            );
+        }
     }
     $observacoes = textoOpcional($dados, 'observacoes', 1500);
 

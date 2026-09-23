@@ -720,8 +720,8 @@
     barraLateral.setAttribute("aria-busy", String(carregando));
     barraLateral.innerHTML = `
       <div class="sidebar-logo">
-        <img src="${prefixoRaiz}/assets/images/logo.png" alt="LocalBarber">
-        <span class="sidebar-logo-compacta" aria-hidden="true">LB</span>
+        <img class="sidebar-logo-completa" src="${prefixoRaiz}/assets/images/logo.png" alt="LocalBarber">
+        <img class="sidebar-logo-compacta" src="${prefixoRaiz}/assets/images/favicon.png?v=20260715" alt="LocalBarber">
         ${sessao ? `
           <button class="botao-minimizar-sidebar" id="botao-minimizar-sidebar" type="button"
                   aria-controls="navegacao-sidebar" aria-label="Minimizar menu lateral"
